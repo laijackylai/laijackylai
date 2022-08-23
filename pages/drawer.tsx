@@ -12,24 +12,36 @@ const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
         <div className='flex flex-col col-span-1 items-center h-screen'>
             <Image src={require("../assets/logo_black.svg")} height="750vw" />
             <ul className='flex flex-col font-sans font-normal text-base gap-10'>
-                <li className='hover:underline hover:underline-offset-8' onClick={() => setPage('home')}>
+                <li onClick={() => setPage('home')}>
                     <Link href="/" >
-                        <a>Home</a>
+                        <a className='cover-underline'>
+                            <a>Home</a>
+                            <a></a>
+                        </a>
                     </Link>
                 </li>
-                <li className='hover:underline hover:underline-offset-8' onClick={() => setPage('tech')}>
+                <li onClick={() => setPage('tech')}>
                     <Link href="/">
-                        <a>Tech</a>
+                        <a className='cover-underline'>
+                            <a>Tech</a>
+                            <a></a>
+                        </a>
                     </Link>
                 </li>
-                <li className='hover:underline hover:underline-offset-8' onClick={() => setPage('photo')}>
+                <li onClick={() => setPage('photo')}>
                     <Link href="/" >
-                        <a>Photography</a>
+                        <a className='cover-underline'>
+                            <a>Photography</a>
+                            <a></a>
+                        </a>
                     </Link>
                 </li>
-                <li className='hover:underline hover:underline-offset-8' onClick={() => setPage('music')}>
+                <li onClick={() => setPage('music')}>
                     <Link href="/" >
-                        <a>Music</a>
+                        <a className='cover-underline'>
+                            <a>Music</a>
+                            <a></a>
+                        </a>
                     </Link>
                 </li>
             </ul>
