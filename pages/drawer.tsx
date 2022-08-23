@@ -10,8 +10,8 @@ interface DrawerProps {
 const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
     return (
         <div className='flex flex-col col-span-1 items-center h-screen'>
-            <Image src={require("../assets/logo_black.svg")} height="750vw" />
-            <ul className='flex flex-col font-sans font-normal text-base gap-10'>
+            <Image src={require("../assets/logo_black.svg")} height="600vw" width="550vw" />
+            <ul className='flex flex-col font-sans font-normal text-base gap-12'>
                 <li onClick={() => setPage('home')}>
                     <Link href="/" >
                         <a className='cover-underline'>

@@ -3,6 +3,9 @@ import React, { useState } from 'react'
 import Head from 'next/head'
 import ResponsiveDrawer from './drawer'
 import Home from './home'
+import Tech from './tech'
+import Photo from './photo'
+import Music from './music'
 
 const Title: NextPage = () => {
     return (
@@ -25,15 +28,15 @@ const ContentSwitch: NextPage<ContentSwitchProps> = ({ page }) => {
             )
         case 'tech':
             return (
-                <div>tech</div>
+                <Tech />
             )
         case 'photo':
             return (
-                <div>photo</div>
+                <Photo />
             )
         case 'music':
             return (
-                <div>music</div>
+                <Music />
             )
         default:
             return null;
