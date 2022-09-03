@@ -2,10 +2,11 @@ import type { NextPage } from 'next'
 import React, { useState } from 'react'
 import Head from 'next/head'
 import ResponsiveDrawer from './drawer'
-import Home from './home'
+import Home from './work'
 import Tech from './tech'
 import Photo from './photo'
 import Music from './music'
+import Work from './work'
 
 const Title: NextPage = () => {
     return (
@@ -24,7 +25,7 @@ const ContentSwitch: NextPage<ContentSwitchProps> = ({ page }) => {
     switch (page) {
         case 'home':
             return (
-                <Home />
+                <Work />
             )
         case 'tech':
             return (
@@ -47,7 +48,7 @@ const App: NextPage = () => {
     const [page, setPage] = useState('home')
 
     return (
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-5 global-font">
             <Title />
             <ResponsiveDrawer setPage={setPage} />
             <ContentSwitch page={page} />

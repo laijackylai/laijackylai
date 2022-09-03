@@ -2,6 +2,12 @@
 @tailwind utilities;
 @tailwind components;
 
+.global-font {
+    /* font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif */
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 400;
+}
+
 .link-underline {
     border-bottom-width: 0;
     background-image: linear-gradient(transparent, transparent), linear-gradient(#fff, #fff);
