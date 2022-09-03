@@ -2,7 +2,7 @@ import React from 'react'
 import { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from '../assets/logo_black.svg';
+import logo from '../assets/logo/logo_black.svg';
 
 interface DrawerProps {
     setPage: React.Dispatch<any>
@@ -10,7 +10,7 @@ interface DrawerProps {
 
 const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
     return (
-        <div className='flex flex-col col-span-1 h-screen px-20'>
+        <div className='flex flex-col col-span-1 h-screen px-20 sticky top-0'>
             <div className='py-28'>
                 <Image src={logo} height="500vw" width="550vw" />
             </div>

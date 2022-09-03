@@ -29,3 +29,7 @@
 .cover-underline {
     @apply flex flex-col w-fit link-underline link-underline-black text-black gap-1
 }
+
+.card {
+    @apply m-2 items-center justify-center
+}
