@@ -8,7 +8,13 @@ const nextConfig = {
     distDir: "build",
     images: {
         // loader: 'akamai',
+        // path: './assets/images',
         formats: ['image/avif', 'image/webp'],
+    },
+    experimental: {
+        images: {
+            unoptimized: true,
+        },
     }
 }
 
