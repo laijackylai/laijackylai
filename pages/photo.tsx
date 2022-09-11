@@ -1,52 +1,41 @@
-import type { NextPage } from 'next'
+import type { NextComponentType, NextPage } from 'next'
 import Image from 'next/image'
-import { XMasonry, XBlock } from "react-xmasonry"; // Imports precompiled bundle
-import ReactModal from 'react-modal';
-
-import img1 from '../assets/images/000082500004.jpg'
-import img2 from '../assets/images/000082500005.jpg'
 import { useState } from 'react';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 const Photo: NextPage = () => {
+    const { data, error } = useSWR('/api/images', fetcher)
 
     const [modalOpen, setModalOpen] = useState(false);
-
-    const rand = (s: number = 1, e: number = 2) => {
-        return Math.floor(Math.random() * (e - s + 1) + s)
-    }
 
     return (
         <div className='col-span-4 p-5 flex-col'>
             <div className='p-2 text-lg' >photo page</div>
-            <XMasonry>
-                <XBlock width={rand()}>
-                    <div className="card" onClick={() => setModalOpen(oldBool => !oldBool)}>
-                        <Image src={img1} layout='responsive' objectFit='contain' quality={50} placeholder='blur' />
-                    </div>
-                </XBlock>
-                <XBlock width={rand(2, 3)}>
-                    <div className="card">
-                        <Image src={img2} layout='responsive' objectFit='contain' quality={50} placeholder='blur' />
-                    </div>
-                </XBlock>
-                <XBlock width={rand()}>
-                    <div className="card">
-                        <Image src={img1} layout='responsive' objectFit='contain' quality={50} placeholder='blur' />
-                    </div>
-                </XBlock>
-                <XBlock width={rand(2, 3)}>
-                    <div className="card">
-                        <Image src={img2} layout='responsive' objectFit='contain' quality={50} placeholder='blur' />
-                    </div>
-                </XBlock>
-                <XBlock width={rand(2, 3)}>
-                    <div className="card">
-                        <Image src={img2} layout='responsive' objectFit='contain' quality={50} placeholder='blur' />
-                    </div>
-                </XBlock>
-            </XMasonry>
+            <div className='grid grid-cols-3 grid-flow-dense'>
+                {data && data.imagesData.map((image: image, key: number) => <ImageGridItem key={key} image={image} />)}
+            </div>
         </div>
     )
+}
+
+const ImageGridItem = ({ image }: { image: image }) => {
+    const style = {
+        gridColumn: `span ${image.colSpan}`
+    }
+    return (
+        <div className='px-1 self-center' style={style}>
+            <Image src={image.url} blurDataURL={image.url} width={image.width} height={image.height} objectFit='contain' quality={50} placeholder='blur' />
+        </div>
+    )
+}
+
+interface image {
+    url: string,
+    width: number,
+    height: number,
+    colSpan: number,
 }
 
 export default Photo
