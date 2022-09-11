@@ -11,8 +11,8 @@ interface DrawerProps {
 const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
     return (
         <div className='flex flex-col col-span-1 h-screen px-20 sticky top-0'>
-            <div className='py-28'>
-                <Image src={logo} height="500vw" width="550vw" />
+            <div className='py-28 min-h-min'>
+                <Image src={logo} height="100vw" width="100vw" layout='fixed' />
             </div>
             <ul className='flex flex-col font-sans font-normal text-base gap-12'>
                 <li onClick={() => setPage('home')}>
