@@ -11,11 +11,11 @@ const nextConfig = {
         // path: './assets/images',
         formats: ['image/avif', 'image/webp'],
     },
-    experimental: {
-        images: {
-            unoptimized: true,
-        },
-    }
+    // experimental: {
+    //     images: {
+    //         unoptimized: true,
+    //     },
+    // }
 }
 
 module.exports = nextConfig
