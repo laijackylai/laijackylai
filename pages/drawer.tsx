@@ -10,7 +10,7 @@ interface DrawerProps {
 
 const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
     return (
-        <div className='flex flex-col col-span-1 h-screen px-20 sticky top-0'>
+        <div className='flex-col col-span-1 h-screen px-20 sticky top-0 hidden lg:flex'>
             <div className='py-28 min-h-min'>
                 <Image src={logo} height="100vw" width="100vw" layout='fixed' />
             </div>

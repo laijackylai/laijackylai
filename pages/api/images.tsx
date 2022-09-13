@@ -3,8 +3,8 @@ import db from '../../utils/db';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-        const images = await db.collection('images').orderBy('created').get();
-        const imagesData = images.docs.map(entry => ({
+        const images = await db.collection('images').get();
+        const imagesData = shuffle(images.docs).map(entry => ({
             id: entry.id,
             ...entry.data()
         }));
@@ -12,4 +12,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     } catch (e) {
         res.status(400).end();
     }
+}
+
+const shuffle = (array: Array<any>) => {
+    return array.sort((a, b) => 0.5 - Math.random());
 }
