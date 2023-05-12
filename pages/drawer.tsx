@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,46 +9,77 @@ interface DrawerProps {
 }
 
 const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
+    const [imgWidth, setImgWidth] = useState(100)
+    const [gap, setGap] = useState(4)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScroll = window.scrollY;
+            // * handle img
+            setImgWidth(() => {
+                const newWidth = 100 - (currentScroll / 2)
+                if (newWidth > 50) {
+                    const newGap = (newWidth / 100 * 4)
+                    setGap(newGap)
+                    console.log(newGap)
+                    return newWidth
+                }
+                else {
+                    setGap(og => og)
+                    return 50
+                }
+            })
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    })
+
     return (
-        <div className='flex-col col-span-1 h-screen px-20 sticky top-0 hidden lg:flex'>
-            <div className='py-28 min-h-min'>
-                <Image src={logo} height="100vw" width="100vw" layout='fixed' />
-            </div>
-            <ul className='flex flex-col font-sans font-normal text-base gap-12'>
-                <li onClick={() => setPage('home')}>
-                    <Link href="/" >
-                        <a className='cover-underline'>
-                            <div className='global-font'>Work</div>
-                            <div></div>
-                        </a>
-                    </Link>
-                </li>
-                <li onClick={() => setPage('tech')}>
-                    <Link href="/">
-                        <a className='cover-underline'>
-                            <div className='global-font'>Tech</div>
-                            <div></div>
-                        </a>
-                    </Link>
-                </li>
-                <li onClick={() => setPage('photo')}>
-                    <Link href="/" >
-                        <a className='cover-underline'>
-                            <div className='global-font'>Photography</div>
-                            <div></div>
-                        </a>
-                    </Link>
-                </li>
-                <li onClick={() => setPage('music')}>
-                    <Link href="/" >
-                        <a className='cover-underline'>
-                            <div className='global-font'>Music</div>
-                            <div></div>
-                        </a>
-                    </Link>
-                </li>
-            </ul>
-        </div >
+        <div className='top-0 relative'>
+            <div className='fixed flex flex-col col-span-2 md:col-span-1 h-full px-5'>
+                <div className={`py-16 min-h-min`}>
+                    <Image alt={logo} src={logo} height={imgWidth} width={imgWidth} />
+                </div>
+                <ul className={`flex flex-col font-sans font-normal text-base`} style={{ gap: `${gap}rem` }}>
+                    <li onClick={() => setPage('home')}>
+                        <Link href="/" >
+                            <div className='cover-underline'>
+                                <div className='global-font'>Work</div>
+                                <div />
+                            </div>
+                        </Link>
+                    </li>
+                    <li onClick={() => setPage('tech')}>
+                        <Link href="/">
+                            <div className='cover-underline'>
+                                <div className='global-font'>Tech</div>
+                                <div />
+                            </div>
+                        </Link>
+                    </li>
+                    <li onClick={() => setPage('photo')}>
+                        <Link href="/" >
+                            <div className='cover-underline'>
+                                <div className='global-font'>Photography</div>
+                                <div />
+                            </div>
+                        </Link>
+                    </li>
+                    <li onClick={() => setPage('music')}>
+                        <Link href="/" >
+                            <div className='cover-underline'>
+                                <div className='global-font'>Music</div>
+                                <div />
+                            </div>
+                        </Link>
+                    </li>
+                </ul>
+            </div >
+        </div>
     )
 }
 

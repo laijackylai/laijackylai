@@ -1,0 +1,13 @@
+{
+  "AppSyncApiName": "laijackylai",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authlaijackylai4dd07064",
+      "Outputs.UserPoolId"
+    ]
+  },
+  "AuthModeLastUpdated": "2022-09-14T11:48:54.355Z",
+  "CreateAPIKey": 1
+}

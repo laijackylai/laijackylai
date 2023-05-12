@@ -1,14 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import db from '../../utils/db';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-        const images = await db.collection('images').get();
-        const imagesData = shuffle(images.docs).map(entry => ({
-            id: entry.id,
-            ...entry.data()
-        }));
-        res.status(200).json({ imagesData });
+        // const images = await db.collection('images').get();
+        // const imagesData = shuffle(images.docs).map(entry => ({
+        //     id: entry.id,
+        //     ...entry.data()
+        // }));
+        res.status(200).json({ imagesData: [] });
     } catch (e) {
         res.status(400).end();
     }
