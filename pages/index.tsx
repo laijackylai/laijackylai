@@ -1,12 +1,23 @@
 import type { NextPage } from 'next'
 import React, { useState } from 'react'
 import Head from 'next/head'
+import localFont from '@next/font/local'
 import ResponsiveDrawer from './drawer'
 import Home from './work'
 import Tech from './tech'
 import Photo from './photo'
 import Music from './music'
 import Work from './work'
+
+const ocra = localFont({
+    src: [
+        {
+            path: '../public/ocr-a/ocr-aregular.ttf',
+            weight: '400'
+        },
+    ],
+    variable: '--font-ocra'
+})
 
 const Title: NextPage = () => {
     return (
@@ -48,7 +59,7 @@ const App: NextPage = () => {
     const [page, setPage] = useState('home')
 
     return (
-        <div className="grid grid-cols-5 global-font">
+        <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
             <Title />
             <ResponsiveDrawer setPage={setPage} />
             <ContentSwitch page={page} />

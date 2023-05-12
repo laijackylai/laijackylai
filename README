@@ -4,4 +4,4 @@
 
 - Frontend: Next.js
 - Frontend Hosting with SSR support: Vercel
-- Database: AWS
+- Database: AWS Amplify

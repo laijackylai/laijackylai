@@ -19,14 +19,14 @@ const Photo: NextPage = () => {
         }
         return (
             <div className='px-1 self-center' style={style} onClick={() => setModalImage(image)}>
-                <Image className='rounded-sm' src={image.url} blurDataURL={image.url} width={image.width} height={image.height} objectFit='contain' quality={imageQuality} placeholder='blur' />
+                <Image alt={image.url} className='rounded-sm' src={image.url} blurDataURL={image.url} width={image.width} height={image.height} objectFit='contain' quality={imageQuality} placeholder='blur' />
             </div>
         )
     }
 
     return (
-        <div className='col-span-5 p-5 flex-col lg:col-span-4'>
-            <div className='p-2 text-lg' >photo page</div>
+        <div className='flex col-span-3 md:col-span-4 pt-5'>
+            <div className='text-lg' >photo page</div>
             <div className='grid grid-cols-3 grid-flow-dense'>
                 {data && data.imagesData.map((image: image, key: number) => <ImageGridItem key={key} image={image} />)}
             </div>
