@@ -3,12 +3,13 @@ import { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import logo from '../assets/logo/logo_black.svg';
+import { useRouter } from 'next/router';
 
 interface DrawerProps {
-    setPage: React.Dispatch<any>
+
 }
 
-const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
+const ResponsiveDrawer: NextPage<DrawerProps> = () => {
     const [imgWidth, setImgWidth] = useState(100)
     const [gap, setGap] = useState(4)
 
@@ -21,7 +22,6 @@ const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
                 if (newWidth > 50) {
                     const newGap = (newWidth / 100 * 4)
                     setGap(newGap)
-                    console.log(newGap)
                     return newWidth
                 }
                 else {
@@ -38,14 +38,19 @@ const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
         };
     })
 
+    const router = useRouter()
+    const setPage = (page: string) => {
+        router.push(page)
+    }
+
     return (
         <div className='top-0 relative'>
             <div className='fixed flex flex-col col-span-2 md:col-span-1 h-full px-5'>
-                <div className={`py-16 min-h-min`}>
+                <a href="/" className={`py-16 min-h-min`}>
                     <Image alt={logo} src={logo} height={imgWidth} width={imgWidth} />
-                </div>
+                </a>
                 <ul className={`flex flex-col font-sans font-normal text-base`} style={{ gap: `${gap}rem` }}>
-                    <li onClick={() => setPage('home')}>
+                    <li onClick={() => setPage('work')}>
                         <Link href="/" >
                             <div className='cover-underline'>
                                 <div className='global-font'>Work</div>
@@ -61,7 +66,7 @@ const ResponsiveDrawer: NextPage<DrawerProps> = ({ setPage }) => {
                             </div>
                         </Link>
                     </li>
-                    <li onClick={() => setPage('photo')}>
+                    <li onClick={() => setPage('photography')}>
                         <Link href="/" >
                             <div className='cover-underline'>
                                 <div className='global-font'>Photography</div>

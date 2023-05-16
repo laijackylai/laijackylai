@@ -17,6 +17,9 @@
       },
       "api": {
         "laijackylai": {}
+      },
+      "storage": {
+        "s3laijackylaistorage4ba35e56": {}
       }
     }
   }

@@ -1,0 +1,14 @@
+{
+  "resourceName": "s3laijackylaistorage4ba35e56",
+  "bucketName": "laijackylai-storage-4ba35e56",
+  "policyUUID": "faf42d5c",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "READ",
+    "CREATE_AND_UPDATE",
+    "DELETE"
+  ]
+}

@@ -5,5 +5,5 @@
  **************************************************************************/
 
 export { default as studioTheme } from "./studioTheme";
-export { default as PostCreateForm } from "./PostCreateForm";
-export { default as PostUpdateForm } from "./PostUpdateForm";
+export { default as TakcarlyCoverPhotoCreateForm } from "./TakcarlyCoverPhotoCreateForm";
+export { default as TakcarlyCoverPhotoUpdateForm } from "./TakcarlyCoverPhotoUpdateForm";
