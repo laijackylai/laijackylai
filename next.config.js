@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true,
+    reactStrictMode: false,
     swcMinify: true,
     eslint: {
         ignoreDuringBuilds: true,
@@ -10,6 +10,14 @@ const nextConfig = {
         // loader: 'akamai',
         // path: './assets/images',
         formats: ['image/avif', 'image/webp'],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'laijackylai-storage-4ba35e56184317-dev.s3.ap-southeast-1.amazonaws.com',
+                port: '',
+                pathname: '/public/**',
+            },
+        ]
     },
     // experimental: {
     //     images: {

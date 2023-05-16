@@ -2,32 +2,28 @@ import { ModelInit, MutableModel } from "@aws-amplify/datastore";
 // @ts-ignore
 import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
-type PostMetaData = {
+type TakcarlyCoverPhotoMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
 
-type EagerPost = {
+type EagerTakcarlyCoverPhoto = {
   readonly id: string;
+  readonly name: string;
   readonly url: string;
-  readonly width: number;
-  readonly height: number;
-  readonly colSpan: number;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
-type LazyPost = {
+type LazyTakcarlyCoverPhoto = {
   readonly id: string;
+  readonly name: string;
   readonly url: string;
-  readonly width: number;
-  readonly height: number;
-  readonly colSpan: number;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
-export declare type Post = LazyLoading extends LazyLoadingDisabled ? EagerPost : LazyPost
+export declare type TakcarlyCoverPhoto = LazyLoading extends LazyLoadingDisabled ? EagerTakcarlyCoverPhoto : LazyTakcarlyCoverPhoto
 
-export declare const Post: (new (init: ModelInit<Post, PostMetaData>) => Post) & {
-  copyOf(source: Post, mutator: (draft: MutableModel<Post, PostMetaData>) => MutableModel<Post, PostMetaData> | void): Post;
+export declare const TakcarlyCoverPhoto: (new (init: ModelInit<TakcarlyCoverPhoto, TakcarlyCoverPhotoMetaData>) => TakcarlyCoverPhoto) & {
+  copyOf(source: TakcarlyCoverPhoto, mutator: (draft: MutableModel<TakcarlyCoverPhoto, TakcarlyCoverPhotoMetaData>) => MutableModel<TakcarlyCoverPhoto, TakcarlyCoverPhotoMetaData> | void): TakcarlyCoverPhoto;
 }
