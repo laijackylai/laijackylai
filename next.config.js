@@ -18,7 +18,11 @@ const nextConfig = {
                 port: '',
                 pathname: '/public/**',
             },
-        ]
+        ],
+        domains: [
+            'localhost',
+            'laijackylai-storage-4ba35e56184317-dev.s3.ap-southeast-1.amazonaws.com'
+        ],
     },
     // experimental: {
     //     images: {
