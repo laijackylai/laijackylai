@@ -4,6 +4,7 @@ frontend:
     preBuild:
       commands:
         # - COPY --from=builder /app/next.config.js ./
+        - cat next.config.js
         - npm ci
     build:
       commands:
