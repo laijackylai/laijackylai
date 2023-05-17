@@ -1,5 +1,9 @@
+import { Amplify } from 'aws-amplify'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
+import awsconfig from '../src/aws-exports'
+
+Amplify.configure(awsconfig)
 
 function MyApp({ Component, pageProps }: AppProps) {
     return <Component {...pageProps} />

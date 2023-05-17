@@ -1,14 +1,8 @@
 import type { NextPage } from 'next'
 import React, { useState } from 'react'
-import Head from 'next/head'
-import localFont from '@next/font/local'
-import ResponsiveDrawer from './drawer'
-import { Amplify } from 'aws-amplify'
-import awsconfig from '../src/aws-exports';
-import { Title } from './title'
-import { ocra } from './font'
-
-Amplify.configure(awsconfig)
+import ResponsiveDrawer from '../components/drawer'
+import Title from '../components/title'
+import ocra from '../components/font'
 
 const App: NextPage = () => {
     return (

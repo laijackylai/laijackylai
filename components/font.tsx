@@ -10,4 +10,4 @@ const ocra = localFont({
   variable: '--font-ocra'
 })
 
-export { ocra }
+export default ocra

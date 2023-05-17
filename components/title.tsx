@@ -5,9 +5,9 @@ const Title: NextPage = () => {
   return (
     <Head>
       <title>HKLai</title>
-      <link rel="icon" href="logos/logo_black.ico" />
+      <link rel="icon" href="logo_black.ico" />
     </Head>
   )
 }
 
-export { Title }
+export default Title
