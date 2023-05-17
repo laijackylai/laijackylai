@@ -8,7 +8,7 @@
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-yarn.lock
+# yarn.lock
 
 # dependencies
 /node_modules
