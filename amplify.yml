@@ -3,7 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - COPY --from=builder /app/next.config.js ./
+        # - COPY --from=builder /app/next.config.js ./
         - npm ci
     build:
       commands:
