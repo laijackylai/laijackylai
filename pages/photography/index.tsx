@@ -1,7 +1,7 @@
 import { GetServerSideProps, NextPage } from 'next';
-import { ocra } from '../font';
-import { Title } from '../title';
-import ResponsiveDrawer from '../drawer';
+import ocra from '../../components/font';
+import Title from '../../components/title';
+import ResponsiveDrawer from '../../components/drawer';
 
 type Props = {
 

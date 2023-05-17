@@ -5,9 +5,9 @@ import githubLogo from '../../public/logos/github.png'
 import pythonLogo from '../../public/logos/python.png'
 import reactLogo from '../../public/logos/react.png'
 import { Storage } from 'aws-amplify'
-import ResponsiveDrawer from '../drawer'
-import { ocra } from '../font'
-import { Title } from '../title'
+import ResponsiveDrawer from '../../components/drawer'
+import ocra from '../../components/font'
+import Title from '../../components/title'
 
 
 type Props = {

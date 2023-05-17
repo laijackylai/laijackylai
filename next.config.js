@@ -8,7 +8,7 @@ const nextConfig = {
     distDir: "build",
     images: {
         // loader: 'akamai',
-        // path: './assets/images',
+        // path: '',
         formats: ['image/avif', 'image/webp'],
         remotePatterns: [
             {
