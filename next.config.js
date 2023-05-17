@@ -6,7 +6,7 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
     },
-    distDir: "build",
+    // distDir: "build",
     images: {
         // loader: 'akamai',
         // path: '',
