@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "mkdir .next && next build",
-    "export": "next build && next export",
+    "local-build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
