@@ -3,7 +3,6 @@ import { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import logo from '../assets/logo/logo_black.svg';
-import { useRouter } from 'next/router';
 
 interface DrawerProps {
 
@@ -38,44 +37,39 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
         };
     })
 
-    const router = useRouter()
-    const setPage = (page: string) => {
-        router.push(page)
-    }
-
     return (
-        <div className='top-0 relative'>
+        <div className='top-0 relative' data-testid="drawer-component">
             <div className='fixed flex flex-col col-span-2 md:col-span-1 h-full px-5'>
                 <a href="/" className={`py-16 min-h-min`}>
-                    <Image alt={logo} src={logo} height={imgWidth} width={imgWidth} />
+                    <Image alt={"logo"} src={logo} height={imgWidth} width={imgWidth} />
                 </a>
                 <ul className={`flex flex-col font-sans font-normal text-base`} style={{ gap: `${gap}rem` }}>
-                    <li onClick={() => setPage('work')}>
-                        <Link href="/" >
+                    <li>
+                        <Link href="/work" >
                             <div className='cover-underline'>
                                 <div className='global-font'>Work</div>
                                 <div />
                             </div>
                         </Link>
                     </li>
-                    <li onClick={() => setPage('tech')}>
-                        <Link href="/">
+                    <li>
+                        <Link href="/tech">
                             <div className='cover-underline'>
                                 <div className='global-font'>Tech</div>
                                 <div />
                             </div>
                         </Link>
                     </li>
-                    <li onClick={() => setPage('photography')}>
-                        <Link href="/" >
+                    <li>
+                        <Link href="/photography" >
                             <div className='cover-underline'>
                                 <div className='global-font'>Photography</div>
                                 <div />
                             </div>
                         </Link>
                     </li>
-                    <li onClick={() => setPage('music')}>
-                        <Link href="/" >
+                    <li>
+                        <Link href="/music" >
                             <div className='cover-underline'>
                                 <div className='global-font'>Music</div>
                                 <div />

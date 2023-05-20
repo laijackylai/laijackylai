@@ -3,7 +3,7 @@ import type { NextPage } from 'next'
 
 const Title: NextPage = () => {
   return (
-    <Head>
+    <Head data-testid="title-component">
       <title>HKLai</title>
       <link rel="icon" href="logo_black.ico" />
     </Head>
