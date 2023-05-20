@@ -110,13 +110,6 @@ const Tech: NextPage<Props> = ({ imageUrls }) => {
           <div className=''>A two in one app for taking care of elderly</div>
           <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
           <div className='flex overflow-x-auto pt-3 gap-5'>
-            {/* {takcarlyUrl && takcarlyUrl.map(url => {
-                        return (
-                            <div className='rounded-lg' key={url}>
-                                <Image quality={25} src={url} alt={url} width={500} height={500} />
-                            </div>
-                        )
-                    })} */}
             {imageUrls && imageUrls.map(url => {
               return (
                 <div className='rounded-lg' key={url}>
@@ -124,7 +117,6 @@ const Tech: NextPage<Props> = ({ imageUrls }) => {
                 </div>
               )
             })}
-
           </div>
         </div>
       </div>
