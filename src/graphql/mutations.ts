@@ -2,63 +2,54 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
+export const createPhoto = /* GraphQL */ `
+  mutation CreatePhoto(
+    $input: CreatePhotoInput!
+    $condition: ModelPhotoConditionInput
   ) {
-    createPost(input: $input, condition: $condition) {
+    createPhoto(input: $input, condition: $condition) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;
-export const updatePost = /* GraphQL */ `
-  mutation UpdatePost(
-    $input: UpdatePostInput!
-    $condition: ModelPostConditionInput
+export const updatePhoto = /* GraphQL */ `
+  mutation UpdatePhoto(
+    $input: UpdatePhotoInput!
+    $condition: ModelPhotoConditionInput
   ) {
-    updatePost(input: $input, condition: $condition) {
+    updatePhoto(input: $input, condition: $condition) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;
-export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
+export const deletePhoto = /* GraphQL */ `
+  mutation DeletePhoto(
+    $input: DeletePhotoInput!
+    $condition: ModelPhotoConditionInput
   ) {
-    deletePost(input: $input, condition: $condition) {
+    deletePhoto(input: $input, condition: $condition) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;
