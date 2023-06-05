@@ -4,8 +4,8 @@ import { schema } from './schema';
 
 
 
-const { TakcarlyCoverPhoto } = initSchema(schema);
+const { Photo } = initSchema(schema);
 
 export {
-  TakcarlyCoverPhoto
+  Photo
 };

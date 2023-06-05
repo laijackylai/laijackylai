@@ -2,63 +2,45 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreatePost = /* GraphQL */ `
-  subscription OnCreatePost(
-    $filter: ModelSubscriptionPostFilterInput
-    $owner: String
-  ) {
-    onCreatePost(filter: $filter, owner: $owner) {
+export const onCreatePhoto = /* GraphQL */ `
+  subscription OnCreatePhoto($filter: ModelSubscriptionPhotoFilterInput) {
+    onCreatePhoto(filter: $filter) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;
-export const onUpdatePost = /* GraphQL */ `
-  subscription OnUpdatePost(
-    $filter: ModelSubscriptionPostFilterInput
-    $owner: String
-  ) {
-    onUpdatePost(filter: $filter, owner: $owner) {
+export const onUpdatePhoto = /* GraphQL */ `
+  subscription OnUpdatePhoto($filter: ModelSubscriptionPhotoFilterInput) {
+    onUpdatePhoto(filter: $filter) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;
-export const onDeletePost = /* GraphQL */ `
-  subscription OnDeletePost(
-    $filter: ModelSubscriptionPostFilterInput
-    $owner: String
-  ) {
-    onDeletePost(filter: $filter, owner: $owner) {
+export const onDeletePhoto = /* GraphQL */ `
+  subscription OnDeletePhoto($filter: ModelSubscriptionPhotoFilterInput) {
+    onDeletePhoto(filter: $filter) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;

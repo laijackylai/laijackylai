@@ -2,23 +2,19 @@
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
 
-export type CreatePostInput = {
+export type CreatePhotoInput = {
   id?: string | null,
-  url: string,
-  width: number,
-  height: number,
-  colSpan: number,
+  s3key: string,
+  type: string,
   _version?: number | null,
 };
 
-export type ModelPostConditionInput = {
-  url?: ModelStringInput | null,
-  width?: ModelIntInput | null,
-  height?: ModelIntInput | null,
-  colSpan?: ModelIntInput | null,
-  and?: Array< ModelPostConditionInput | null > | null,
-  or?: Array< ModelPostConditionInput | null > | null,
-  not?: ModelPostConditionInput | null,
+export type ModelPhotoConditionInput = {
+  s3key?: ModelStringInput | null,
+  type?: ModelStringInput | null,
+  and?: Array< ModelPhotoConditionInput | null > | null,
+  or?: Array< ModelPhotoConditionInput | null > | null,
+  not?: ModelPhotoConditionInput | null,
 };
 
 export type ModelStringInput = {
@@ -61,56 +57,37 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
-export type ModelIntInput = {
-  ne?: number | null,
-  eq?: number | null,
-  le?: number | null,
-  lt?: number | null,
-  ge?: number | null,
-  gt?: number | null,
-  between?: Array< number | null > | null,
-  attributeExists?: boolean | null,
-  attributeType?: ModelAttributeTypes | null,
-};
-
-export type Post = {
-  __typename: "Post",
+export type Photo = {
+  __typename: "Photo",
   id: string,
-  url: string,
-  width: number,
-  height: number,
-  colSpan: number,
+  s3key: string,
+  type: string,
   createdAt: string,
   updatedAt: string,
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
-  owner?: string | null,
 };
 
-export type UpdatePostInput = {
+export type UpdatePhotoInput = {
   id: string,
-  url?: string | null,
-  width?: number | null,
-  height?: number | null,
-  colSpan?: number | null,
+  s3key?: string | null,
+  type?: string | null,
   _version?: number | null,
 };
 
-export type DeletePostInput = {
+export type DeletePhotoInput = {
   id: string,
   _version?: number | null,
 };
 
-export type ModelPostFilterInput = {
+export type ModelPhotoFilterInput = {
   id?: ModelIDInput | null,
-  url?: ModelStringInput | null,
-  width?: ModelIntInput | null,
-  height?: ModelIntInput | null,
-  colSpan?: ModelIntInput | null,
-  and?: Array< ModelPostFilterInput | null > | null,
-  or?: Array< ModelPostFilterInput | null > | null,
-  not?: ModelPostFilterInput | null,
+  s3key?: ModelStringInput | null,
+  type?: ModelStringInput | null,
+  and?: Array< ModelPhotoFilterInput | null > | null,
+  or?: Array< ModelPhotoFilterInput | null > | null,
+  not?: ModelPhotoFilterInput | null,
 };
 
 export type ModelIDInput = {
@@ -129,21 +106,19 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null,
 };
 
-export type ModelPostConnection = {
-  __typename: "ModelPostConnection",
-  items:  Array<Post | null >,
+export type ModelPhotoConnection = {
+  __typename: "ModelPhotoConnection",
+  items:  Array<Photo | null >,
   nextToken?: string | null,
   startedAt?: number | null,
 };
 
-export type ModelSubscriptionPostFilterInput = {
+export type ModelSubscriptionPhotoFilterInput = {
   id?: ModelSubscriptionIDInput | null,
-  url?: ModelSubscriptionStringInput | null,
-  width?: ModelSubscriptionIntInput | null,
-  height?: ModelSubscriptionIntInput | null,
-  colSpan?: ModelSubscriptionIntInput | null,
-  and?: Array< ModelSubscriptionPostFilterInput | null > | null,
-  or?: Array< ModelSubscriptionPostFilterInput | null > | null,
+  s3key?: ModelSubscriptionStringInput | null,
+  type?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionPhotoFilterInput | null > | null,
+  or?: Array< ModelSubscriptionPhotoFilterInput | null > | null,
 };
 
 export type ModelSubscriptionIDInput = {
@@ -176,224 +151,182 @@ export type ModelSubscriptionStringInput = {
   notIn?: Array< string | null > | null,
 };
 
-export type ModelSubscriptionIntInput = {
-  ne?: number | null,
-  eq?: number | null,
-  le?: number | null,
-  lt?: number | null,
-  ge?: number | null,
-  gt?: number | null,
-  between?: Array< number | null > | null,
-  in?: Array< number | null > | null,
-  notIn?: Array< number | null > | null,
+export type CreatePhotoMutationVariables = {
+  input: CreatePhotoInput,
+  condition?: ModelPhotoConditionInput | null,
 };
 
-export type CreatePostMutationVariables = {
-  input: CreatePostInput,
-  condition?: ModelPostConditionInput | null,
-};
-
-export type CreatePostMutation = {
-  createPost?:  {
-    __typename: "Post",
+export type CreatePhotoMutation = {
+  createPhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
 
-export type UpdatePostMutationVariables = {
-  input: UpdatePostInput,
-  condition?: ModelPostConditionInput | null,
+export type UpdatePhotoMutationVariables = {
+  input: UpdatePhotoInput,
+  condition?: ModelPhotoConditionInput | null,
 };
 
-export type UpdatePostMutation = {
-  updatePost?:  {
-    __typename: "Post",
+export type UpdatePhotoMutation = {
+  updatePhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
 
-export type DeletePostMutationVariables = {
-  input: DeletePostInput,
-  condition?: ModelPostConditionInput | null,
+export type DeletePhotoMutationVariables = {
+  input: DeletePhotoInput,
+  condition?: ModelPhotoConditionInput | null,
 };
 
-export type DeletePostMutation = {
-  deletePost?:  {
-    __typename: "Post",
+export type DeletePhotoMutation = {
+  deletePhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
 
-export type GetPostQueryVariables = {
+export type GetPhotoQueryVariables = {
   id: string,
 };
 
-export type GetPostQuery = {
-  getPost?:  {
-    __typename: "Post",
+export type GetPhotoQuery = {
+  getPhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
 
-export type ListPostsQueryVariables = {
-  filter?: ModelPostFilterInput | null,
+export type ListPhotosQueryVariables = {
+  filter?: ModelPhotoFilterInput | null,
   limit?: number | null,
   nextToken?: string | null,
 };
 
-export type ListPostsQuery = {
-  listPosts?:  {
-    __typename: "ModelPostConnection",
+export type ListPhotosQuery = {
+  listPhotos?:  {
+    __typename: "ModelPhotoConnection",
     items:  Array< {
-      __typename: "Post",
+      __typename: "Photo",
       id: string,
-      url: string,
-      width: number,
-      height: number,
-      colSpan: number,
+      s3key: string,
+      type: string,
       createdAt: string,
       updatedAt: string,
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
-      owner?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
   } | null,
 };
 
-export type SyncPostsQueryVariables = {
-  filter?: ModelPostFilterInput | null,
+export type SyncPhotosQueryVariables = {
+  filter?: ModelPhotoFilterInput | null,
   limit?: number | null,
   nextToken?: string | null,
   lastSync?: number | null,
 };
 
-export type SyncPostsQuery = {
-  syncPosts?:  {
-    __typename: "ModelPostConnection",
+export type SyncPhotosQuery = {
+  syncPhotos?:  {
+    __typename: "ModelPhotoConnection",
     items:  Array< {
-      __typename: "Post",
+      __typename: "Photo",
       id: string,
-      url: string,
-      width: number,
-      height: number,
-      colSpan: number,
+      s3key: string,
+      type: string,
       createdAt: string,
       updatedAt: string,
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
-      owner?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
   } | null,
 };
 
-export type OnCreatePostSubscriptionVariables = {
-  filter?: ModelSubscriptionPostFilterInput | null,
-  owner?: string | null,
+export type OnCreatePhotoSubscriptionVariables = {
+  filter?: ModelSubscriptionPhotoFilterInput | null,
 };
 
-export type OnCreatePostSubscription = {
-  onCreatePost?:  {
-    __typename: "Post",
+export type OnCreatePhotoSubscription = {
+  onCreatePhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
 
-export type OnUpdatePostSubscriptionVariables = {
-  filter?: ModelSubscriptionPostFilterInput | null,
-  owner?: string | null,
+export type OnUpdatePhotoSubscriptionVariables = {
+  filter?: ModelSubscriptionPhotoFilterInput | null,
 };
 
-export type OnUpdatePostSubscription = {
-  onUpdatePost?:  {
-    __typename: "Post",
+export type OnUpdatePhotoSubscription = {
+  onUpdatePhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
 
-export type OnDeletePostSubscriptionVariables = {
-  filter?: ModelSubscriptionPostFilterInput | null,
-  owner?: string | null,
+export type OnDeletePhotoSubscriptionVariables = {
+  filter?: ModelSubscriptionPhotoFilterInput | null,
 };
 
-export type OnDeletePostSubscription = {
-  onDeletePost?:  {
-    __typename: "Post",
+export type OnDeletePhotoSubscription = {
+  onDeletePhoto?:  {
+    __typename: "Photo",
     id: string,
-    url: string,
-    width: number,
-    height: number,
-    colSpan: number,
+    s3key: string,
+    type: string,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    owner?: string | null,
   } | null,
 };
