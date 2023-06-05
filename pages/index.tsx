@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import React, { useState } from 'react'
+import React from 'react'
 import ResponsiveDrawer from '../components/drawer'
 import Title from '../components/title'
 import ocra from '../components/font'
