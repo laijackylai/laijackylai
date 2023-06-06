@@ -52,6 +52,28 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
         </div>
         <div className='pt-10'>
+          <div className='font-extrabold text-2xl'>Takcarly</div>
+          <div className=''>A two in one app for taking care of elderly</div>
+          <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
+          <div className='flex overflow-x-auto pt-3 gap-5'>
+            {imageUrls && imageUrls.map((url, i) => {
+              return (
+                <div className='rounded-lg' key={url}>
+                  <Image
+                    quality={75}
+                    src={url}
+                    alt={url}
+                    width={500}
+                    height={500}
+                    placeholder='blur'
+                    blurDataURL={base64[i]}
+                  />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <div className='pt-10'>
           <div className='flex flex-row items-center'>
             <div className='font-extrabold text-2xl'>Senior Design Project</div>
           </div>
@@ -105,28 +127,6 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
           <div className='p-3' />
           <MyPdfViewer />
-        </div>
-        <div className='pt-10'>
-          <div className='font-extrabold text-2xl'>Takcarly</div>
-          <div className=''>A two in one app for taking care of elderly</div>
-          <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
-          <div className='flex overflow-x-auto pt-3 gap-5'>
-            {imageUrls && imageUrls.map((url, i) => {
-              return (
-                <div className='rounded-lg' key={url}>
-                  <Image
-                    quality={75}
-                    src={url}
-                    alt={url}
-                    width={500}
-                    height={500}
-                    placeholder='blur'
-                    blurDataURL={base64[i]}
-                  />
-                </div>
-              )
-            })}
-          </div>
         </div>
       </div>
     </div>

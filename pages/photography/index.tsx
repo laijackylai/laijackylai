@@ -39,7 +39,7 @@ const Photography: NextPage<Props> = ({ photosData }) => {
               const isOdd = i % 2
               const wh = random()
               return (
-                <div key={p.id} className={`gap-5 py-16 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
                   <Image
                     quality={75}
                     src={p.url}
