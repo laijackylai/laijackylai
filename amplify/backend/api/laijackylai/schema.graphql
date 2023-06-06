@@ -1,6 +1,6 @@
-type TakcarlyCoverPhoto @model @auth(rules: [{allow: private, operations: [read]}]) {
+type Photo @model @auth(rules: [{allow: public}]) {
   id: ID!
-  name: String!
-  url: String!
+  s3key: String!
+  type: String!
 }
  

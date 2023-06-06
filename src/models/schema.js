@@ -1,7 +1,7 @@
 export const schema = {
     "models": {
-        "TakcarlyCoverPhoto": {
-            "name": "TakcarlyCoverPhoto",
+        "Photo": {
+            "name": "Photo",
             "fields": {
                 "id": {
                     "name": "id",
@@ -10,15 +10,15 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "name": {
-                    "name": "name",
+                "s3key": {
+                    "name": "s3key",
                     "isArray": false,
                     "type": "String",
                     "isRequired": true,
                     "attributes": []
                 },
-                "url": {
-                    "name": "url",
+                "type": {
+                    "name": "type",
                     "isArray": false,
                     "type": "String",
                     "isRequired": true,
@@ -42,7 +42,7 @@ export const schema = {
                 }
             },
             "syncable": true,
-            "pluralName": "TakcarlyCoverPhotos",
+            "pluralName": "Photos",
             "attributes": [
                 {
                     "type": "model",
@@ -53,8 +53,11 @@ export const schema = {
                     "properties": {
                         "rules": [
                             {
-                                "allow": "private",
+                                "allow": "public",
                                 "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
                                     "read"
                                 ]
                             }
@@ -67,5 +70,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.3",
-    "version": "b7ff553bccec58c66e08500eb4b9845d"
+    "version": "9ea0b13118949d0595c9211eb2883979"
 };

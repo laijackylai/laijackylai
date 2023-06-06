@@ -8,13 +8,14 @@ import { Storage } from 'aws-amplify'
 import ResponsiveDrawer from '../../components/drawer'
 import ocra from '../../components/font'
 import Title from '../../components/title'
-
+import { getPlaiceholder } from 'plaiceholder';
 
 type Props = {
   imageUrls: string[];
+  base64: string[];
 };
 
-const Tech: NextPage<Props> = ({ imageUrls }) => {
+const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
   const hkterrainURL = "https://github.com/laijackylai/hkterrain"
   const hkdsmURL = "https://github.com/laijackylai/hkdsm"
   const hktidesURL = "https://github.com/laijackylai/hktides"
@@ -48,6 +49,28 @@ const Tech: NextPage<Props> = ({ imageUrls }) => {
               Delatin
             </a>
             ) as an option for the terrain loader
+          </div>
+        </div>
+        <div className='pt-10'>
+          <div className='font-extrabold text-2xl'>Takcarly</div>
+          <div className=''>A two in one app for taking care of elderly</div>
+          <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
+          <div className='flex overflow-x-auto pt-3 gap-5'>
+            {imageUrls && imageUrls.map((url, i) => {
+              return (
+                <div className='rounded-lg' key={url}>
+                  <Image
+                    quality={75}
+                    src={url}
+                    alt={url}
+                    width={500}
+                    height={500}
+                    placeholder='blur'
+                    blurDataURL={base64[i]}
+                  />
+                </div>
+              )
+            })}
           </div>
         </div>
         <div className='pt-10'>
@@ -105,20 +128,6 @@ const Tech: NextPage<Props> = ({ imageUrls }) => {
           <div className='p-3' />
           <MyPdfViewer />
         </div>
-        <div className='pt-10'>
-          <div className='font-extrabold text-2xl'>Takcarly</div>
-          <div className=''>A two in one app for taking care of elderly</div>
-          <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
-          <div className='flex overflow-x-auto pt-3 gap-5'>
-            {imageUrls && imageUrls.map(url => {
-              return (
-                <div className='rounded-lg' key={url}>
-                  <Image quality={25} src={url} alt={url} width={500} height={500} />
-                </div>
-              )
-            })}
-          </div>
-        </div>
       </div>
     </div>
   )
@@ -132,9 +141,23 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     const urls = await Promise.all(
       imageKeys.map((key) => Storage.get(key, { level: 'public' }))
     );
+
+    // get blurred photos
+    const photoBase64 = await Promise.all(
+      urls.map(async (url: string) => {
+        const buffer = await fetch(url).then(async (res) =>
+          Buffer.from(await res.arrayBuffer())
+        );
+        const { base64 } = await getPlaiceholder(buffer);
+        return base64
+      })
+    );
+
+
     return {
       props: {
         imageUrls: urls,
+        base64: photoBase64
       },
     };
   } catch (error) {
@@ -142,6 +165,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     return {
       props: {
         imageUrls: [],
+        base64: []
       },
     };
   }
