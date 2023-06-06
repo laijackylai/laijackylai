@@ -10,7 +10,6 @@ import ocra from '../../components/font'
 import Title from '../../components/title'
 import { getPlaiceholder } from 'plaiceholder';
 
-
 type Props = {
   imageUrls: string[];
   base64: string[];

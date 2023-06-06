@@ -18,33 +18,48 @@ type Props = {
 }
 
 const Photography: NextPage<Props> = ({ photosData }) => {
+
+  const random = (min = 300, max = 600) => {
+    let difference = max - min;
+    let rand = Math.random();
+    rand = Math.floor(rand * difference);
+    rand = rand + min;
+    return rand;
+  }
+
   return (
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
       <Title />
       <ResponsiveDrawer />
       <div className='flex col-span-3 md:col-span-4 p-5 flex-col'>
         <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div>
-        {
-          photosData.map((p) => {
-            return (
-              <div key={p.id}>
-                <div>{p.s3key}</div>
-                <div className='rounded-lg' key={p.url}>
+        <div>
+          {
+            photosData.map((p, i) => {
+              const isOdd = i % 2
+              const wh = random()
+              return (
+                <div key={p.id} className={`gap-5 py-16 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
                   <Image
                     quality={75}
                     src={p.url}
                     alt={p.s3key}
-                    width={500}
-                    height={500}
+                    width={wh}
+                    height={wh}
                     placeholder='blur'
                     blurDataURL={p.base64}
                   />
+                  <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
+                    <div className='font-bold text-lg'>{p.type}</div>
+                    <div>{p.id}</div>
+                    <div>{p.s3key}</div>
+                    <div>{p.createdAt}</div>
+                  </div>
                 </div>
-              </div>
-            )
+              )
+            })
           }
-          )
-        }
+        </div>
       </div>
     </div>
   );
@@ -60,6 +75,14 @@ const getPhotos = async () => {
     console.log(error)
     return []
   }
+}
+
+const shuffleArray = (array: Object[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -88,7 +111,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      photosData: data
+      photosData: shuffleArray(data)
     }
   }
 }
