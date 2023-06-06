@@ -2,56 +2,50 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getPost = /* GraphQL */ `
-  query GetPost($id: ID!) {
-    getPost(id: $id) {
+export const getPhoto = /* GraphQL */ `
+  query GetPhoto($id: ID!) {
+    getPhoto(id: $id) {
       id
-      url
-      width
-      height
-      colSpan
+      s3key
+      type
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      owner
     }
   }
 `;
-export const listPosts = /* GraphQL */ `
-  query ListPosts(
-    $filter: ModelPostFilterInput
+export const listPhotos = /* GraphQL */ `
+  query ListPhotos(
+    $filter: ModelPhotoFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    listPosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listPhotos(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        url
-        width
-        height
-        colSpan
+        s3key
+        type
         createdAt
         updatedAt
         _version
         _deleted
         _lastChangedAt
-        owner
       }
       nextToken
       startedAt
     }
   }
 `;
-export const syncPosts = /* GraphQL */ `
-  query SyncPosts(
-    $filter: ModelPostFilterInput
+export const syncPhotos = /* GraphQL */ `
+  query SyncPhotos(
+    $filter: ModelPhotoFilterInput
     $limit: Int
     $nextToken: String
     $lastSync: AWSTimestamp
   ) {
-    syncPosts(
+    syncPhotos(
       filter: $filter
       limit: $limit
       nextToken: $nextToken
@@ -59,16 +53,13 @@ export const syncPosts = /* GraphQL */ `
     ) {
       items {
         id
-        url
-        width
-        height
-        colSpan
+        s3key
+        type
         createdAt
         updatedAt
         _version
         _deleted
         _lastChangedAt
-        owner
       }
       nextToken
       startedAt

@@ -17,6 +17,7 @@
     "axios": "^0.27.2",
     "next": "13.2.4",
     "pdfjs-dist": "^2.16.105",
+    "plaiceholder": "^3.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "sharp": "^0.32.1",
