@@ -40,8 +40,8 @@ const Photography: NextPage<Props> = ({
       <div className='flex col-span-3 md:col-span-4 p-5 flex-col'>
         <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div>
         <div>
-          {/* {
-            photosData.map((p, i) => {
+          {
+            photosData && photosData.length > 0 && photosData.map((p, i) => {
               const isOdd = i % 2
               const wh = random()
               return (
@@ -64,7 +64,7 @@ const Photography: NextPage<Props> = ({
                 </div>
               )
             })
-          } */}
+          }
         </div>
       </div>
     </div>
@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       props: {
         photosData: [],
-        error: error
+        error: "no data"
       }
     }
   }
