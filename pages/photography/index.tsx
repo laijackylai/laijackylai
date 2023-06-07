@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const getPhotos = async () => {
     try {
       const res = await API.graphql(graphqlOperation(listPhotos))
-      if (res instanceof Object && 'data' in res) {
+      if ('data' in res) {
         return res.data.listPhotos.items
       }
     } catch (e: any) {
