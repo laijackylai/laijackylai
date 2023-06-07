@@ -14,11 +14,13 @@ interface PhotoData extends Photo {
 }
 
 type Props = {
-  photosData: PhotoData[]
+  photosData: PhotoData[],
+  error: any,
 }
 
 const Photography: NextPage<Props> = ({
-  photosData
+  photosData,
+  error
 }) => {
   // create random numbers
   const random = (min = 300, max = 600) => {
@@ -29,7 +31,7 @@ const Photography: NextPage<Props> = ({
     return rand;
   }
 
-  console.log(photosData)
+  console.log(photosData, error)
 
   return (
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
@@ -70,6 +72,8 @@ const Photography: NextPage<Props> = ({
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  let error = "";
+
   // get all photos data from datastore
   const getPhotos = async () => {
     try {
@@ -77,8 +81,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       if (res instanceof Object && 'data' in res) {
         return res.data.listPhotos.items
       }
-    } catch (error) {
-      console.log(error)
+    } catch (e: any) {
+      console.log(e)
+      error = e
       return []
     }
   }
@@ -97,7 +102,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (photosData.length) {
     return {
       props: {
-        photosData: []
+        photosData: [],
+        error: error
       }
     }
   }
@@ -125,7 +131,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      photosData: shuffleArray(data)
+      photosData: shuffleArray(data),
+      error: error
     }
   }
 }
