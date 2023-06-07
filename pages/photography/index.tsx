@@ -18,7 +18,7 @@ type Props = {
 }
 
 const Photography: NextPage<Props> = ({
-  // photosData
+  photosData
 }) => {
   // create random numbers
   const random = (min = 300, max = 600) => {
@@ -28,6 +28,8 @@ const Photography: NextPage<Props> = ({
     rand = rand + min;
     return rand;
   }
+
+  console.log(photosData)
 
   return (
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
@@ -68,55 +70,55 @@ const Photography: NextPage<Props> = ({
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  // // get all photos data from datastore
-  // const getPhotos = async () => {
-  //   try {
-  //     const res = await API.graphql(graphqlOperation(listPhotos))
-  //     if (res instanceof Object && 'data' in res) {
-  //       return res.data.listPhotos.items
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //     return []
-  //   }
-  // }
+  // get all photos data from datastore
+  const getPhotos = async () => {
+    try {
+      const res = await API.graphql(graphqlOperation(listPhotos))
+      if (res instanceof Object && 'data' in res) {
+        return res.data.listPhotos.items
+      }
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
 
-  // // shuffle the input array
-  // const shuffleArray = (array: Object[]) => {
-  //   for (let i = array.length - 1; i > 0; i--) {
-  //     const j = Math.floor(Math.random() * (i + 1));
-  //     [array[i], array[j]] = [array[j], array[i]];
-  //   }
-  //   return array;
-  // }
+  // shuffle the input array
+  const shuffleArray = (array: Object[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
-  // // get all photos
-  // const photosData = await getPhotos()
+  // get all photos
+  const photosData = await getPhotos()
 
-  // // get photo urls
-  // const photoUrls = await Promise.all(
-  //   photosData.map((o: Photo) => Storage.get(o.s3key, { level: 'public' }))
-  // );
+  // get photo urls
+  const photoUrls = await Promise.all(
+    photosData.map((o: Photo) => Storage.get(o.s3key, { level: 'public' }))
+  );
 
-  // // get blurred photos
-  // const photoBase64 = await Promise.all(
-  //   photoUrls.map(async (url: string) => {
-  //     const buffer = await fetch(url).then(async (res) =>
-  //       Buffer.from(await res.arrayBuffer())
-  //     );
-  //     const { base64 } = await getPlaiceholder(buffer);
-  //     return base64
-  //   })
-  // );
+  // get blurred photos
+  const photoBase64 = await Promise.all(
+    photoUrls.map(async (url: string) => {
+      const buffer = await fetch(url).then(async (res) =>
+        Buffer.from(await res.arrayBuffer())
+      );
+      const { base64 } = await getPlaiceholder(buffer);
+      return base64
+    })
+  );
 
-  // // add photo urls and blurred photos
-  // const data = photosData.map((obj: Photo, i: number) => {
-  //   return { ...obj, "url": photoUrls[i], "base64": photoBase64[i] };
-  // });
+  // add photo urls and blurred photos
+  const data = photosData.map((obj: Photo, i: number) => {
+    return { ...obj, "url": photoUrls[i], "base64": photoBase64[i] };
+  });
 
   return {
     props: {
-      // photosData: shuffleArray(data)
+      photosData: shuffleArray(data)
     }
   }
 }
