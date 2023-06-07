@@ -99,7 +99,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // get all photos
   const photosData: Photo[] = await getPhotos()
-  if (photosData.length) {
+  if (photosData.length === 0) {
     return {
       props: {
         photosData: [],
