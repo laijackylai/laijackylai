@@ -23,7 +23,7 @@ const Photography: NextPage<Props> = ({
   error
 }) => {
   // create random numbers
-  const random = (min = 300, max = 600) => {
+  const random = (min = 300, max = 500) => {
     let difference = max - min;
     let rand = Math.random();
     rand = Math.floor(rand * difference);

@@ -1,22 +1,19 @@
 {
-  "dev": {
+  "main": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-laijackylai-dev-184317-authRole",
-      "UnauthRoleArn": "arn:aws:iam::232665835945:role/amplify-laijackylai-dev-184317-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::232665835945:role/amplify-laijackylai-dev-184317-authRole",
+      "AuthRoleName": "amplify-laijackylai-main-23621-authRole",
+      "UnauthRoleArn": "arn:aws:iam::232665835945:role/amplify-laijackylai-main-23621-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::232665835945:role/amplify-laijackylai-main-23621-authRole",
       "Region": "ap-southeast-1",
-      "DeploymentBucketName": "amplify-laijackylai-dev-184317-deployment",
-      "UnauthRoleName": "amplify-laijackylai-dev-184317-unauthRole",
-      "StackName": "amplify-laijackylai-dev-184317",
-      "StackId": "arn:aws:cloudformation:ap-southeast-1:232665835945:stack/amplify-laijackylai-dev-184317/0bc3f8a0-341a-11ed-af7b-02d2a38b514c",
+      "DeploymentBucketName": "amplify-laijackylai-main-23621-deployment",
+      "UnauthRoleName": "amplify-laijackylai-main-23621-unauthRole",
+      "StackName": "amplify-laijackylai-main-23621",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:232665835945:stack/amplify-laijackylai-main-23621/9c2539c0-f45b-11ed-8a2e-0a6e7c6dc01e",
       "AmplifyAppId": "d2ukbi00figpw1"
     },
     "categories": {
       "auth": {
         "laijackylai4dd07064": {}
-      },
-      "api": {
-        "laijackylai": {}
       },
       "storage": {
         "s3laijackylaistorage4ba35e56": {}
