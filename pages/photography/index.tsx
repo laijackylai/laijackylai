@@ -2,7 +2,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import ocra from '../../components/font';
 import Title from '../../components/title';
 import ResponsiveDrawer from '../../components/drawer';
-import { API, Storage, graphqlOperation } from 'aws-amplify';
+import { API, DataStore, Storage, graphqlOperation } from 'aws-amplify';
 import { listPhotos } from '../../src/graphql/queries';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
@@ -31,8 +31,6 @@ const Photography: NextPage<Props> = ({
     return rand;
   }
 
-  console.log(photosData, error)
-
   return (
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
       <Title />
@@ -54,6 +52,7 @@ const Photography: NextPage<Props> = ({
                     height={wh}
                     placeholder='blur'
                     blurDataURL={p.base64}
+                    loading='lazy'
                   />
                   <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
                     <div className='font-bold text-lg'>{p.type}</div>
@@ -76,16 +75,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // get all photos data from datastore
   const getPhotos = async () => {
-    try {
-      const res = await API.graphql(graphqlOperation(listPhotos))
-      if ('data' in res) {
-        return res.data.listPhotos.items
-      }
-    } catch (e: any) {
-      console.log(e)
-      error = e
-      return []
-    }
+    // try {
+    //   const res = await API.graphql(graphqlOperation(listPhotos))
+    //   if ('data' in res) {
+    //     return res.data.listPhotos.items
+    //   }
+    // } catch (e: any) {
+    //   console.log(e)
+    //   error = e
+    //   return []
+    // }
+    const res = await DataStore.query(Photo).catch(e => console.error(e))
+    return res
   }
 
   // shuffle the input array
@@ -98,12 +99,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   // get all photos
-  const photosData: Photo[] = await getPhotos()
-  if (photosData.length === 0) {
+  const photosData = await getPhotos()
+  if (!photosData) {
     return {
       props: {
         photosData: [],
-        error: "no data"
+        error: "error fetching photos"
       }
     }
   }
