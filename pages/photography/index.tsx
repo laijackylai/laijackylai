@@ -10,7 +10,7 @@ import { getPlaiceholder } from 'plaiceholder';
 
 interface PhotoData extends Photo {
   url: string
-  base64: string
+  // base64: string
 }
 
 type Props = {
@@ -50,8 +50,8 @@ const Photography: NextPage<Props> = ({
                     alt={p.s3key}
                     width={wh}
                     height={wh}
-                    placeholder='blur'
-                    blurDataURL={p.base64}
+                    // placeholder='blur'
+                    // blurDataURL={p.base64}
                     loading='lazy'
                   />
                   <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
@@ -115,19 +115,23 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   );
 
   // get blurred photos
-  const photoBase64 = await Promise.all(
-    photoUrls.map(async (url: string) => {
-      const buffer = await fetch(url).then(async (res) =>
-        Buffer.from(await res.arrayBuffer())
-      );
-      const { base64 } = await getPlaiceholder(buffer);
-      return base64
-    })
-  );
+  // const photoBase64 = await Promise.all(
+  //   photoUrls.map(async (url: string) => {
+  //     const buffer = await fetch(url).then(async (res) =>
+  //       Buffer.from(await res.arrayBuffer())
+  //     );
+  //     const { base64 } = await getPlaiceholder(buffer);
+  //     return base64
+  //   })
+  // );
 
   // add photo urls and blurred photos
   const data = photosData.map((obj: Photo, i: number) => {
-    return { ...obj, "url": photoUrls[i], "base64": photoBase64[i] };
+    return {
+      ...obj,
+      "url": photoUrls[i],
+      // "base64": photoBase64[i]
+    };
   });
 
   return {
