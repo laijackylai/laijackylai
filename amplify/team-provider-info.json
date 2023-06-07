@@ -1,4 +1,25 @@
 {
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-laijackylai-dev-184317-authRole",
+      "UnauthRoleArn": "arn:aws:iam::232665835945:role/amplify-laijackylai-dev-184317-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::232665835945:role/amplify-laijackylai-dev-184317-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-laijackylai-dev-184317-deployment",
+      "UnauthRoleName": "amplify-laijackylai-dev-184317-unauthRole",
+      "StackName": "amplify-laijackylai-dev-184317",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:232665835945:stack/amplify-laijackylai-dev-184317/0bc3f8a0-341a-11ed-af7b-02d2a38b514c",
+      "AmplifyAppId": "d2ukbi00figpw1"
+    },
+    "categories": {
+      "auth": {
+        "laijackylai4dd07064": {}
+      },
+      "storage": {
+        "s3laijackylaistorage4ba35e56": {}
+      }
+    }
+  },
   "main": {
     "awscloudformation": {
       "AuthRoleName": "amplify-laijackylai-main-23621-authRole",

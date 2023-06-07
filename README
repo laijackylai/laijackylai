@@ -3,5 +3,13 @@
 ## Project structure
 
 - Frontend: Next.js
-- Frontend Hosting with SSR support: Vercel
+- Frontend Hosting with SSR support: AWS Amplify
 - Database: AWS Amplify
+
+## Before pushing to main
+
+``` bash
+npm intsall
+yarn
+amplify pull --appId d2ukbi00figpw1 --envName main
+```
