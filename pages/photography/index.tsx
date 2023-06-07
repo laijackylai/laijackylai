@@ -18,7 +18,7 @@ type Props = {
 }
 
 const Photography: NextPage<Props> = ({ photosData }) => {
-
+  // create random numbers
   const random = (min = 300, max = 600) => {
     let difference = max - min;
     let rand = Math.random();
@@ -40,7 +40,7 @@ const Photography: NextPage<Props> = ({ photosData }) => {
               const wh = random()
               return (
                 <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <Image
+                  {/* <Image
                     quality={75}
                     src={p.url}
                     alt={p.s3key}
@@ -48,7 +48,7 @@ const Photography: NextPage<Props> = ({ photosData }) => {
                     height={wh}
                     placeholder='blur'
                     blurDataURL={p.base64}
-                  />
+                  /> */}
                   <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
                     <div className='font-bold text-lg'>{p.type}</div>
                     <div>{p.id}</div>
@@ -65,27 +65,29 @@ const Photography: NextPage<Props> = ({ photosData }) => {
   );
 }
 
-const getPhotos = async () => {
-  try {
-    const res = await API.graphql(graphqlOperation(listPhotos))
-    if (res instanceof Object && 'data' in res) {
-      return res.data.listPhotos.items
-    }
-  } catch (error) {
-    console.log(error)
-    return []
-  }
-}
-
-const shuffleArray = (array: Object[]) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // get all photos data from datastore
+  const getPhotos = async () => {
+    try {
+      const res = await API.graphql(graphqlOperation(listPhotos))
+      if (res instanceof Object && 'data' in res) {
+        return res.data.listPhotos.items
+      }
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
+
+  // shuffle the input array
+  const shuffleArray = (array: Object[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
   // get all photos
   const photosData = await getPhotos()
 
@@ -105,6 +107,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     })
   );
 
+  // add photo urls and blurred photos
   const data = photosData.map((obj: Photo, i: number) => {
     return { ...obj, "url": photoUrls[i], "base64": photoBase64[i] };
   });
