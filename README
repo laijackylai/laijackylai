@@ -11,5 +11,5 @@
 ``` bash
 npm intsall
 yarn
-amplify pull --appId d2ukbi00figpw1 --envName main
+# amplify pull --appId d2ukbi00figpw1 --envName main
 ```

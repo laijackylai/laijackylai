@@ -9,6 +9,7 @@ import ResponsiveDrawer from '../../components/drawer'
 import ocra from '../../components/font'
 import Title from '../../components/title'
 import { getPlaiceholder } from 'plaiceholder';
+import { FaGithub } from 'react-icons/fa';
 
 type Props = {
   imageUrls: string[];
@@ -36,23 +37,42 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
                 <div>@loaders.gl</div>
               </a>
               <div>
-                (
-                <a className='underline' href="https://github.com/visgl/loaders.gl/pull/1372" target='_blank'>
-                  PR
+                <a href="https://github.com/visgl/loaders.gl/pull/1372" target="_blank" rel="noopener noreferrer">
+                  <FaGithub size={25} />
                 </a>
-                )
               </div>
             </div>
           </div>
-          <div className='text-sm'>• Added support for an alternative triangular mesh generation technique (
+          <div className='text-sm pb-2'>• Added support for an alternative triangular mesh generation technique (
             <a className='underline' href="https://github.com/mapbox/delatin" target='_blank'>
               Delatin
             </a>
             ) as an option for the terrain loader
           </div>
+          <a href='https://mapbox.github.io/delatin/' target="_blank" className='justify-center items-center self-center'>
+            <Image src="/images/delatin.png" alt="delatin" width={800} height={100} />
+          </a>
         </div>
-        <div className='pt-10'>
-          <div className='font-extrabold text-2xl'>Takcarly</div>
+        <div className='pt-20'>
+          <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+            NUXT Google Maps
+            <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer">
+              <FaGithub size={25} />
+            </a>
+          </div>
+          <div className=''>A Vue Google Maps demo showcasing google maps & map search</div>
+          <div className='text-sm pb-2'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
+          <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" className='justify-center items-center self-center'>
+            <Image src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
+          </a>
+        </div>
+        <div className='pt-20'>
+          <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+            Takcarly
+            <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer">
+              <FaGithub size={25} />
+            </a>
+          </div>
           <div className=''>A two in one app for taking care of elderly</div>
           <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
           <div className='flex overflow-x-auto pt-3 gap-5'>
@@ -73,7 +93,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             })}
           </div>
         </div>
-        <div className='pt-10'>
+        <div className='pt-20'>
           <div className='flex flex-row items-center'>
             <div className='font-extrabold text-2xl'>Senior Design Project</div>
           </div>
@@ -125,11 +145,10 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             </div>
             <div />
           </div>
-          <div className='p-3' />
           <MyPdfViewer />
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
