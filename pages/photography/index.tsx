@@ -7,7 +7,7 @@ import { listPhotos } from '../../src/graphql/queries';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
 import { getPlaiceholder } from 'plaiceholder';
-import { decode } from 'blurhash';
+// import { decode } from 'blurhash';
 
 interface PhotoData extends Photo {
   url: string
