@@ -7,6 +7,7 @@ import { listPhotos } from '../../src/graphql/queries';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
 import { getPlaiceholder } from 'plaiceholder';
+import { decode } from 'blurhash';
 
 interface PhotoData extends Photo {
   url: string
@@ -15,12 +16,10 @@ interface PhotoData extends Photo {
 
 type Props = {
   photosData: PhotoData[],
-  error: any,
 }
 
 const Photography: NextPage<Props> = ({
   photosData,
-  error
 }) => {
   // create random numbers
   const random = (min = 300, max = 500) => {
@@ -31,11 +30,24 @@ const Photography: NextPage<Props> = ({
     return rand;
   }
 
+  // // get blurred photos
+  // const getBlurredPhotos = async () => {
+  //   const photoBase64 = await Promise.all(
+  //     photosData.map(async (p: PhotoData) => {
+  //       const buffer = await fetch(p.url).then(async (res) =>
+  //         Buffer.from(await res.arrayBuffer())
+  //       );
+  //       const { base64 } = await getPlaiceholder(buffer);
+  //       return base64
+  //     })
+  //   );
+  // }
+
   return (
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
       <Title />
       <ResponsiveDrawer />
-      <div className='flex col-span-3 md:col-span-4 p-5 flex-col'>
+      <div className='flex col-span-4 p-5 flex-col'>
         <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div>
         <div>
           {
@@ -71,20 +83,9 @@ const Photography: NextPage<Props> = ({
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  let error = "";
 
   // get all photos data from datastore
   const getPhotos = async () => {
-    // try {
-    //   const res = await API.graphql(graphqlOperation(listPhotos))
-    //   if ('data' in res) {
-    //     return res.data.listPhotos.items
-    //   }
-    // } catch (e: any) {
-    //   console.log(e)
-    //   error = e
-    //   return []
-    // }
     const res = await DataStore.query(Photo).catch(e => console.error(e))
     return res
   }
@@ -104,7 +105,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       props: {
         photosData: [],
-        error: "error fetching photos"
       }
     }
   }
@@ -113,17 +113,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const photoUrls = await Promise.all(
     photosData.map((o: Photo) => Storage.get(o.s3key, { level: 'public' }))
   );
-
-  // get blurred photos
-  // const photoBase64 = await Promise.all(
-  //   photoUrls.map(async (url: string) => {
-  //     const buffer = await fetch(url).then(async (res) =>
-  //       Buffer.from(await res.arrayBuffer())
-  //     );
-  //     const { base64 } = await getPlaiceholder(buffer);
-  //     return base64
-  //   })
-  // );
 
   // add photo urls and blurred photos
   const data = photosData.map((obj: Photo, i: number) => {
@@ -137,7 +126,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       photosData: shuffleArray(data),
-      error: error
     }
   }
 }
