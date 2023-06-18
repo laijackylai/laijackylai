@@ -26,7 +26,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
       <Title />
       <ResponsiveDrawer />
-      <div className='flex col-span-3 md:col-span-4 p-5 flex-col'>
+      <div className='flex col-span-3 md:col-span-4 px-5 py-14 flex-col'>
         <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div>
         <div>
           <div className='font-extrabold text-2xl'>Open Source Contribution</div>
@@ -53,7 +53,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             <Image src="/images/delatin.png" alt="delatin" width={800} height={100} />
           </a>
         </div>
-        <div className='pt-20'>
+        <div className='pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             NUXT Google Maps
             <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer">
@@ -66,7 +66,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             <Image src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
           </a>
         </div>
-        <div className='pt-20'>
+        <div className='pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Takcarly
             <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer">
@@ -93,7 +93,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             })}
           </div>
         </div>
-        <div className='pt-20'>
+        <div className='pt-28'>
           <div className='flex flex-row items-center'>
             <div className='font-extrabold text-2xl'>Senior Design Project</div>
           </div>
