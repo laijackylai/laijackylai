@@ -101,9 +101,9 @@ const App: NextPage = () => {
                     }
                 </div>
             </div>
-            <div className='flex flex-col items-center gap-20 p-16'>
+            <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
                 <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
-                <div className='w-full px-32 pb-10 border-b flex flex-row justify-between items-center'>
+                <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                     <div className='flex flex-col gap-2 w-1/2'>
                         <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
                         <div className="font-['Sabon'] text-2xl">SOFTWARE ENGINEER @ VOTANIC LIMITED</div>
@@ -116,7 +116,7 @@ const App: NextPage = () => {
                         <div >- 2023</div>
                     </div>
                 </div>
-                <div className='w-full px-32 pb-10 border-b flex flex-row justify-between items-center'>
+                <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                     <div className='flex flex-col gap-2 w-1/2'>
                         <Image className="py-4" alt={"vivablee_logo"} src={VivableeLogo} height={400} width={200} />
                         <div className="font-['Sabon'] text-2xl">CO-FOUNDER @ VIVABLEE LIMITED</div>
@@ -129,7 +129,7 @@ const App: NextPage = () => {
                         <div >- Current</div>
                     </div>
                 </div>
-                <div className='w-full px-32 pb-10 border-b flex flex-row justify-between items-center'>
+                <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
                     <div className='flex flex-col gap-2 w-1/2'>
                         <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
                         <div className="font-['Sabon'] text-2xl">CO-OP @ HONG KONG OBSERVATORY</div>
@@ -142,7 +142,6 @@ const App: NextPage = () => {
                         <div >- 2021</div>
                     </div>
                 </div>
-
             </div>
         </div>
     )
