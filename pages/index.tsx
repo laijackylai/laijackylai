@@ -4,9 +4,13 @@ import Title from '../components/title'
 import ocra from '../components/font'
 import logo from '../assets/logo/logo_black.svg';
 import Image from 'next/image';
+import VotanicLogo from '../public/logos/votanic_logo.png'
+import VivableeLogo from '../public/logos/vivablee_logo.png'
+import HKOLogo from '../public/logos/hko_logo.png'
 
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
+    const [innerHeight, setInnerHeight] = useState(0)
 
     useEffect(() => {
         function handleScroll() {
@@ -15,6 +19,7 @@ const App: NextPage = () => {
         }
 
         if (typeof window !== "undefined") {
+            setInnerHeight(window.innerHeight)
             window.addEventListener("scroll", handleScroll);
 
             return () => {
@@ -22,6 +27,21 @@ const App: NextPage = () => {
             };
         }
     }, []);
+
+    const scrollDown = () => {
+        const scrollHeight = window.innerHeight / 3;
+        window.scrollTo({
+            top: window.pageYOffset + scrollHeight,
+            behavior: "smooth",
+        });
+    };
+
+    const scrollUp = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    }
 
     return (
         <div className={`global-font ${ocra.variable} font-sans w-full`}>
@@ -65,19 +85,64 @@ const App: NextPage = () => {
                         </div>
                     </div>
                     {
-                        typeof window !== "undefined" && (scroll < window.innerHeight * 2 / 3) ?
-                            <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
+                        scroll === 0
+                            ?
+                            <button onClick={scrollDown}>
+                                <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </button>
                             :
-                            <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                            </svg>
+                            <button onClick={scrollUp}>
+                                <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                </svg>
+                            </button>
                     }
                 </div>
             </div>
-            <div className='flex flex-col items-center gap-5 p-16'>
+            <div className='flex flex-col items-center gap-20 p-16'>
                 <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
+                <div className='w-full px-32 pb-10 border-b flex flex-row justify-between items-center'>
+                    <div className='flex flex-col gap-2 w-1/2'>
+                        <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
+                        <div className="font-['Sabon'] text-2xl">SOFTWARE ENGINEER @ VOTANIC LIMITED</div>
+                        <div className="font-['Sabon']">
+                            I redesigned software, enhanced performance, and expanded platform compatibility. I utilized Next.js, Electron, and WPF .NET for frontend development, implemented real-time communication, deployed full-stack solutions, conducted compatibility testing, and managed software installation and licensing.
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end font-['Sabon']">
+                        <div className="text-8xl">2022</div>
+                        <div >- 2023</div>
+                    </div>
+                </div>
+                <div className='w-full px-32 pb-10 border-b flex flex-row justify-between items-center'>
+                    <div className='flex flex-col gap-2 w-1/2'>
+                        <Image className="py-4" alt={"vivablee_logo"} src={VivableeLogo} height={400} width={200} />
+                        <div className="font-['Sabon'] text-2xl">CO-FOUNDER @ VIVABLEE LIMITED</div>
+                        <div className="font-['Sabon']">
+                            I oversaw strategic development to secure funding for continuous growth. I successfully developed the Vivablee Android and iOS app using React Native and AWS cloud services.
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end font-['Sabon']">
+                        <div className="text-8xl">2020</div>
+                        <div >- Current</div>
+                    </div>
+                </div>
+                <div className='w-full px-32 pb-10 border-b flex flex-row justify-between items-center'>
+                    <div className='flex flex-col gap-2 w-1/2'>
+                        <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
+                        <div className="font-['Sabon'] text-2xl">CO-OP @ HONG KONG OBSERVATORY</div>
+                        <div className="font-['Sabon']">
+                            I developed a backend data processing pipeline using Python and Cron for multiple meteorological products, utilizing distributed MongoDB instances. Additionally, I created a frontend visualization system for high-dimensional meteorological data using Deck.gl and the MERN stack. I successfully deployed the MVP on internal servers using Docker and Docker-compose.
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end font-['Sabon']">
+                        <div className="text-8xl">2020</div>
+                        <div >- 2021</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     )
