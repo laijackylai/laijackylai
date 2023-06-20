@@ -14,11 +14,13 @@ const App: NextPage = () => {
             setScroll(scrollTop)
         }
 
-        window.addEventListener("scroll", handleScroll);
+        if (typeof window !== "undefined") {
+            window.addEventListener("scroll", handleScroll);
 
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
+            return () => {
+                window.removeEventListener("scroll", handleScroll);
+            };
+        }
     }, []);
 
     return (
@@ -30,11 +32,6 @@ const App: NextPage = () => {
                     <div className='flex flex-row justify-between items-center self-start gap-5 w-96 overflow-auto'>
                         <a href="/" className='mr-10'>
                             <Image alt={"logo"} src={logo} height={25} width={25} />
-                        </a>
-                        <a href='/work'>
-                            <div className='cover-underline'>
-                                <div className='global-font'>Work</div>
-                            </div>
                         </a>
                         <a href='/tech'>
                             <div className='cover-underline'>
@@ -68,7 +65,7 @@ const App: NextPage = () => {
                         </div>
                     </div>
                     {
-                        scroll < window.innerHeight * 2 / 3 ?
+                        typeof window !== "undefined" && (scroll < window.innerHeight * 2 / 3) ?
                             <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
