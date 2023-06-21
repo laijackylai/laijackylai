@@ -39,7 +39,7 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
 
     return (
         <div className='top-0 relative' data-testid="drawer-component">
-            <div className='fixed flex flex-col col-span-2 md:col-span-1 h-full px-5'>
+            <div className='fixed flex flex-col lg:col-span-2 col-span-1 h-full px-5'>
                 <a href="/" className={`py-16 min-h-min`}>
                     <Image alt={"logo"} src={logo} height={imgWidth} width={imgWidth} />
                 </a>

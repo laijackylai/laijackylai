@@ -23,10 +23,10 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
   const hkradarURL = "https://github.com/laijackylai/hkradar"
 
   return (
-    <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
+    <div className={`grid lg:grid-cols-5 grid-cols-4 global-font ${ocra.variable} font-sans`}>
       <Title />
       <ResponsiveDrawer />
-      <div className='flex col-span-3 md:col-span-4 px-5 py-14 flex-col'>
+      <div className='flex col-span-3 lg:col-span-4 px-7 py-14 flex-col'>
         <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div>
         <div>
           <div className='font-extrabold text-2xl'>Open Source Contribution</div>
@@ -50,7 +50,23 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             ) as an option for the terrain loader
           </div>
           <a href='https://mapbox.github.io/delatin/' target="_blank" className='justify-center items-center self-center'>
-            <Image src="/images/delatin.png" alt="delatin" width={800} height={100} />
+            <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
+          </a>
+        </div>
+        <div className='pt-28'>
+          <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+            Canadian Fires
+            <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer">
+              <FaGithub size={25} />
+            </a>
+          </div>
+          <div className=''>Visualizing historical Canadian fires from 1930-2021 and predicting future fires in Ontario</div>
+          <div className='text-sm'>• Visualizing historical Canadian fires with Deck.gl</div>
+          <div className='text-sm'>• Natural language search with NLTK</div>
+          <div className='text-sm'>• Predicting future Ontario fires with XBGoost Regression</div>
+          <div className='text-sm pb-2'>• Flask and SQLite for backend</div>
+          <a href='https://canadian-fires.vercel.app/' target="_blank" className='justify-center items-center self-center'>
+            <Image className='bg-white rounded-md w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
           </a>
         </div>
         <div className='pt-28'>
@@ -63,7 +79,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
           <div className=''>A Vue Google Maps demo showcasing google maps & map search</div>
           <div className='text-sm pb-2'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
           <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" className='justify-center items-center self-center'>
-            <Image src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
+            <Image className='bg-white rounded-md w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
           </a>
         </div>
         <div className='pt-28'>
@@ -80,6 +96,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
               return (
                 <div className='rounded-lg' key={url}>
                   <Image
+                    className='bg-white rounded-md w-full'
                     quality={75}
                     src={url}
                     alt={url}
@@ -93,7 +110,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             })}
           </div>
         </div>
-        <div className='pt-28'>
+        <div className='pt-28 w-fit'>
           <div className='flex flex-row items-center'>
             <div className='font-extrabold text-2xl'>Senior Design Project</div>
           </div>
