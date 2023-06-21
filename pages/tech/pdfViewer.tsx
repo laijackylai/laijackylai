@@ -15,7 +15,7 @@ const MyPdfViewer = () => {
   });
 
   return (
-    <div className='p-5 shadow-lg'>
+    <div className='p-5 shadow-lg w-fit'>
       {!pdfDocument && <span>Loading...</span>}
       {(pdfDocument && pdfDocument.numPages) && (
         <nav>
