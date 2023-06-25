@@ -55,7 +55,7 @@ const Photography: NextPage<Props> = ({
               const isOdd = i % 2
               const wh = random()
               return (
-                <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'} hover:scale-90`}>
                   <Image
                     quality={75}
                     src={p.url}
@@ -65,6 +65,7 @@ const Photography: NextPage<Props> = ({
                     // placeholder='blur'
                     // blurDataURL={p.base64}
                     loading='lazy'
+                    className='hover:scale-110'
                   />
                   <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
                     <div className='font-bold text-lg'>{p.type}</div>
