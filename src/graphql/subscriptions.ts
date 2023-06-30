@@ -8,11 +8,14 @@ export const onCreatePhoto = /* GraphQL */ `
       id
       s3key
       type
+      aspectRatio
+      blurredBase64
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
+      __typename
     }
   }
 `;
@@ -22,11 +25,14 @@ export const onUpdatePhoto = /* GraphQL */ `
       id
       s3key
       type
+      aspectRatio
+      blurredBase64
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
+      __typename
     }
   }
 `;
@@ -36,11 +42,14 @@ export const onDeletePhoto = /* GraphQL */ `
       id
       s3key
       type
+      aspectRatio
+      blurredBase64
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
+      __typename
     }
   }
 `;

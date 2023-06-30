@@ -3,6 +3,6 @@ type Photo @model @auth(rules: [{allow: public}]) {
   s3key: String!
   type: String!
   aspectRatio: String
-  blurredUrl: String
+  blurredBase64: String
 }
  

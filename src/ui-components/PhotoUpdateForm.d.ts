@@ -17,13 +17,13 @@ export declare type PhotoUpdateFormInputValues = {
     s3key?: string;
     type?: string;
     aspectRatio?: string;
-    blurredUrl?: string;
+    blurredBase64?: string;
 };
 export declare type PhotoUpdateFormValidationValues = {
     s3key?: ValidationFunction<string>;
     type?: ValidationFunction<string>;
     aspectRatio?: ValidationFunction<string>;
-    blurredUrl?: ValidationFunction<string>;
+    blurredBase64?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PhotoUpdateFormOverridesProps = {
@@ -31,7 +31,7 @@ export declare type PhotoUpdateFormOverridesProps = {
     s3key?: PrimitiveOverrideProps<TextFieldProps>;
     type?: PrimitiveOverrideProps<TextFieldProps>;
     aspectRatio?: PrimitiveOverrideProps<TextFieldProps>;
-    blurredUrl?: PrimitiveOverrideProps<TextFieldProps>;
+    blurredBase64?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PhotoUpdateFormProps = React.PropsWithChildren<{
     overrides?: PhotoUpdateFormOverridesProps | undefined | null;

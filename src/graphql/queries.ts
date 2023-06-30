@@ -8,11 +8,14 @@ export const getPhoto = /* GraphQL */ `
       id
       s3key
       type
+      aspectRatio
+      blurredBase64
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
+      __typename
     }
   }
 `;
@@ -27,14 +30,18 @@ export const listPhotos = /* GraphQL */ `
         id
         s3key
         type
+        aspectRatio
+        blurredBase64
         createdAt
         updatedAt
         _version
         _deleted
         _lastChangedAt
+        __typename
       }
       nextToken
       startedAt
+      __typename
     }
   }
 `;
@@ -55,14 +62,18 @@ export const syncPhotos = /* GraphQL */ `
         id
         s3key
         type
+        aspectRatio
+        blurredBase64
         createdAt
         updatedAt
         _version
         _deleted
         _lastChangedAt
+        __typename
       }
       nextToken
       startedAt
+      __typename
     }
   }
 `;
