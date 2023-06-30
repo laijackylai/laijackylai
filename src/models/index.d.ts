@@ -10,6 +10,8 @@ type EagerPhoto = {
   readonly id: string;
   readonly s3key: string;
   readonly type: string;
+  readonly aspectRatio?: string | null;
+  readonly blurredUrl?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -18,6 +20,8 @@ type LazyPhoto = {
   readonly id: string;
   readonly s3key: string;
   readonly type: string;
+  readonly aspectRatio?: string | null;
+  readonly blurredUrl?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
