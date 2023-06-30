@@ -5,7 +5,7 @@ import ResponsiveDrawer from '../../components/drawer';
 import { DataStore, Storage, graphqlOperation } from 'aws-amplify';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
-import { getPlaiceholder } from 'plaiceholder';
+// import { getPlaiceholder } from 'plaiceholder';
 // import { decode } from 'blurhash';
 
 interface PhotoData extends Photo {
