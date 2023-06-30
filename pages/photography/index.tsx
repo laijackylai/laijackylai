@@ -58,8 +58,8 @@ const Photography: NextPage<Props> = ({
                     quality={75}
                     src={p.url}
                     alt={p.s3key}
-                    width={wh}
-                    height={wh / parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                    width={p.type === 'film' ? wh / parseFloat(p.aspectRatio ? p.aspectRatio : '1') : wh}
+                    height={p.type === 'film' ? wh : wh / parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
                     placeholder='blur'
                     blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
                     loading='lazy'

@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import { Photo } from '../../src/models';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import awsconfig from '../../src/aws-exports'
+import sizeOf from 'image-size'
 
 Amplify.configure(awsconfig)
 
@@ -18,6 +19,7 @@ const handler = async (
   await fs.readdir(folder, (_err, files) => {
     if (!files) return
     files.forEach(file => {
+      if (file.startsWith('.DS_Store')) return
       const filePath = `${folder}/${file}`;
 
       fs.stat(filePath, (err, stats) => {
@@ -26,73 +28,64 @@ const handler = async (
           return;
         }
 
-        const fileSizeInBytes = stats.size;
-        const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
         const fileType = file.startsWith('DSC') ? 'digital' : 'film';
         const s3Key = `photos/${fileType}/${file}`;
 
+        const dimensions = sizeOf(filePath)
+        if (!dimensions || !dimensions.width || !dimensions.height) return
+        const aspectRatio = (dimensions.orientation == 1 ? dimensions.height / dimensions.width : dimensions.width / dimensions.height).toFixed(3)
+
         sharp(filePath)
-          .metadata()
-          .then(metadata => {
-            const { width, height } = metadata;
-            if (width === undefined || height === undefined) return
-            const aspectRatio = (width / height).toFixed(3);
+          .resize({ width: 480, height: Math.round(480 * parseFloat(aspectRatio)) })
+          .blur(0.75)
+          .toBuffer(async (err, buffer) => {
+            if (err) {
+              console.error('Error processing image:', err);
+              return;
+            }
 
-            sharp(filePath)
-              .resize({ width: 480 })
-              .blur(0.75)
-              .toBuffer(async (err, buffer) => {
-                if (err) {
-                  console.error('Error processing image:', err);
-                  return;
+            const base64 = buffer.toString('base64');
+            const dataUrl = `data:image/png;base64,${base64}`;
+
+            try {
+              const photos = await DataStore.query(Photo, c => c.s3key.eq(s3Key));
+              if (!photos) return
+              if (photos.length > 0) {
+                const photo = photos[0]
+                if (photo.type != fileType || photo.aspectRatio != aspectRatio || photo.blurredBase64 != dataUrl) {
+                  console.log('Updating existing datastore...')
+                  await DataStore.save(
+                    Photo.copyOf(photo, u => {
+                      u.type = fileType;
+                      u.aspectRatio = aspectRatio;
+                      u.blurredBase64 = dataUrl
+                    })
+                  );
                 }
+              }
+              if (photos.length === 0) {
+                console.log('Creating new datastore...')
+                await DataStore.save(
+                  new Photo({
+                    s3key: s3Key,
+                    type: fileType,
+                    aspectRatio: aspectRatio,
+                    blurredBase64: dataUrl
+                  })
+                );
+              }
+            } catch (error) {
+              console.error('Error checking photo existence:', error);
+            }
 
-                const base64 = buffer.toString('base64');
-                const dataUrl = `data:image/png;base64,${base64}`;
-
-                try {
-                  const photos = await DataStore.query(Photo, c => c.s3key.eq(s3Key));
-                  if (!photos) return
-                  if (photos.length > 0) {
-                    const photo = photos[0]
-                    if (photo.type != fileType || photo.aspectRatio != aspectRatio || photo.blurredBase64 != dataUrl) {
-                      console.log('Updating existing datastore...')
-                      await DataStore.save(
-                        Photo.copyOf(photo, u => {
-                          u.type = fileType;
-                          u.aspectRatio = aspectRatio;
-                          u.blurredBase64 = dataUrl
-                        })
-                      );
-                    }
-                  }
-                  if (photos.length === 0) {
-                    console.log('Creating new datastore...')
-                    await DataStore.save(
-                      new Photo({
-                        s3key: s3Key,
-                        type: fileType,
-                        aspectRatio: aspectRatio,
-                        blurredBase64: dataUrl
-                      })
-                    );
-                  }
-                } catch (error) {
-                  console.error('Error checking photo existence:', error);
-                }
-
-                console.log(`File: ${file}`);
-                console.log('S3 Key:', s3Key);
-                console.log('Type:', fileType);
-                console.log('Aspect Ratio:', aspectRatio);
-                console.log('Data URL:', dataUrl.length);
-                console.log('\n-----------------------------------\n');
-              });
-          })
-          .catch(err => {
-            // res.status(400).json({ error: err })
-            console.error('Error getting metadata:', err, '\n');
+            console.log(`File: ${file}`);
+            console.log('S3 Key:', s3Key);
+            console.log('Type:', fileType);
+            console.log('Aspect Ratio:', aspectRatio);
+            console.log('Data URL:', dataUrl.length);
+            console.log('\n-----------------------------------\n');
           });
+
       });
     });
   });
