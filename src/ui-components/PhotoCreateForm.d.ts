@@ -16,13 +16,13 @@ export declare type PhotoCreateFormInputValues = {
     s3key?: string;
     type?: string;
     aspectRatio?: string;
-    blurredUrl?: string;
+    blurredBase64?: string;
 };
 export declare type PhotoCreateFormValidationValues = {
     s3key?: ValidationFunction<string>;
     type?: ValidationFunction<string>;
     aspectRatio?: ValidationFunction<string>;
-    blurredUrl?: ValidationFunction<string>;
+    blurredBase64?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PhotoCreateFormOverridesProps = {
@@ -30,7 +30,7 @@ export declare type PhotoCreateFormOverridesProps = {
     s3key?: PrimitiveOverrideProps<TextFieldProps>;
     type?: PrimitiveOverrideProps<TextFieldProps>;
     aspectRatio?: PrimitiveOverrideProps<TextFieldProps>;
-    blurredUrl?: PrimitiveOverrideProps<TextFieldProps>;
+    blurredBase64?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PhotoCreateFormProps = React.PropsWithChildren<{
     overrides?: PhotoCreateFormOverridesProps | undefined | null;

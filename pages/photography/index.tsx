@@ -2,16 +2,14 @@ import { GetServerSideProps, NextPage } from 'next';
 import ocra from '../../components/font';
 import Title from '../../components/title';
 import ResponsiveDrawer from '../../components/drawer';
-import { API, DataStore, Storage, graphqlOperation } from 'aws-amplify';
-import { listPhotos } from '../../src/graphql/queries';
+import { DataStore, Storage, graphqlOperation } from 'aws-amplify';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
 import { getPlaiceholder } from 'plaiceholder';
 // import { decode } from 'blurhash';
 
 interface PhotoData extends Photo {
-  url: string
-  // base64: string
+  url: string,
 }
 
 type Props = {
@@ -56,19 +54,17 @@ const Photography: NextPage<Props> = ({
               const wh = random()
               return (
                 <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className='bg-white object-contain' >
-                    <Image
-                      quality={75}
-                      src={p.url}
-                      alt={p.s3key}
-                      width={wh}
-                      height={wh}
-                      // placeholder='blur'
-                      // blurDataURL={p.base64}
-                      loading='lazy'
-                      className='object-cover hover:scale-105 transform ease-in duration-100'
-                    />
-                  </div>
+                  <Image
+                    quality={75}
+                    src={p.url}
+                    alt={p.s3key}
+                    width={wh}
+                    height={wh / parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                    placeholder='blur'
+                    blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
+                    loading='lazy'
+                    className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
+                  />
                   <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
                     <div className='font-bold text-lg'>{p.type}</div>
                     <div>{p.id}</div>

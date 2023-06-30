@@ -6,15 +6,20 @@ export type CreatePhotoInput = {
   id?: string | null,
   s3key: string,
   type: string,
+  aspectRatio?: string | null,
+  blurredBase64?: string | null,
   _version?: number | null,
 };
 
 export type ModelPhotoConditionInput = {
   s3key?: ModelStringInput | null,
   type?: ModelStringInput | null,
+  aspectRatio?: ModelStringInput | null,
+  blurredBase64?: ModelStringInput | null,
   and?: Array< ModelPhotoConditionInput | null > | null,
   or?: Array< ModelPhotoConditionInput | null > | null,
   not?: ModelPhotoConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
 };
 
 export type ModelStringInput = {
@@ -57,11 +62,20 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
+export type ModelBooleanInput = {
+  ne?: boolean | null,
+  eq?: boolean | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+};
+
 export type Photo = {
   __typename: "Photo",
   id: string,
   s3key: string,
   type: string,
+  aspectRatio?: string | null,
+  blurredBase64?: string | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
@@ -73,6 +87,8 @@ export type UpdatePhotoInput = {
   id: string,
   s3key?: string | null,
   type?: string | null,
+  aspectRatio?: string | null,
+  blurredBase64?: string | null,
   _version?: number | null,
 };
 
@@ -85,9 +101,12 @@ export type ModelPhotoFilterInput = {
   id?: ModelIDInput | null,
   s3key?: ModelStringInput | null,
   type?: ModelStringInput | null,
+  aspectRatio?: ModelStringInput | null,
+  blurredBase64?: ModelStringInput | null,
   and?: Array< ModelPhotoFilterInput | null > | null,
   or?: Array< ModelPhotoFilterInput | null > | null,
   not?: ModelPhotoFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
 };
 
 export type ModelIDInput = {
@@ -117,8 +136,11 @@ export type ModelSubscriptionPhotoFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   s3key?: ModelSubscriptionStringInput | null,
   type?: ModelSubscriptionStringInput | null,
+  aspectRatio?: ModelSubscriptionStringInput | null,
+  blurredBase64?: ModelSubscriptionStringInput | null,
   and?: Array< ModelSubscriptionPhotoFilterInput | null > | null,
   or?: Array< ModelSubscriptionPhotoFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
 };
 
 export type ModelSubscriptionIDInput = {
@@ -162,6 +184,8 @@ export type CreatePhotoMutation = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -181,6 +205,8 @@ export type UpdatePhotoMutation = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -200,6 +226,8 @@ export type DeletePhotoMutation = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -218,6 +246,8 @@ export type GetPhotoQuery = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -240,6 +270,8 @@ export type ListPhotosQuery = {
       id: string,
       s3key: string,
       type: string,
+      aspectRatio?: string | null,
+      blurredBase64?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -266,6 +298,8 @@ export type SyncPhotosQuery = {
       id: string,
       s3key: string,
       type: string,
+      aspectRatio?: string | null,
+      blurredBase64?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -287,6 +321,8 @@ export type OnCreatePhotoSubscription = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -305,6 +341,8 @@ export type OnUpdatePhotoSubscription = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -323,6 +361,8 @@ export type OnDeletePhotoSubscription = {
     id: string,
     s3key: string,
     type: string,
+    aspectRatio?: string | null,
+    blurredBase64?: string | null,
     createdAt: string,
     updatedAt: string,
     _version: number,

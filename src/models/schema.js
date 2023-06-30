@@ -31,8 +31,8 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "blurredUrl": {
-                    "name": "blurredUrl",
+                "blurredBase64": {
+                    "name": "blurredBase64",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -84,5 +84,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "b4012b2f3bf4e8251b0131d6b0575ac7"
+    "version": "64920719a07ede1d1d848155a72f5d85"
 };
