@@ -55,18 +55,20 @@ const Photography: NextPage<Props> = ({
               const isOdd = i % 2
               const wh = random()
               return (
-                <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'} hover:scale-90`}>
-                  <Image
-                    quality={75}
-                    src={p.url}
-                    alt={p.s3key}
-                    width={wh}
-                    height={wh}
-                    // placeholder='blur'
-                    // blurDataURL={p.base64}
-                    loading='lazy'
-                    className='hover:scale-110'
-                  />
+                <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div className='bg-white object-contain' >
+                    <Image
+                      quality={75}
+                      src={p.url}
+                      alt={p.s3key}
+                      width={wh}
+                      height={wh}
+                      // placeholder='blur'
+                      // blurDataURL={p.base64}
+                      loading='lazy'
+                      className='object-cover hover:scale-105 transform ease-in duration-100'
+                    />
+                  </div>
                   <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
                     <div className='font-bold text-lg'>{p.type}</div>
                     <div>{p.id}</div>

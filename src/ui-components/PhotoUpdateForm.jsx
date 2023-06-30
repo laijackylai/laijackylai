@@ -26,9 +26,15 @@ export default function PhotoUpdateForm(props) {
   const initialValues = {
     s3key: "",
     type: "",
+    aspectRatio: "",
+    blurredUrl: "",
   };
   const [s3key, setS3key] = React.useState(initialValues.s3key);
   const [type, setType] = React.useState(initialValues.type);
+  const [aspectRatio, setAspectRatio] = React.useState(
+    initialValues.aspectRatio
+  );
+  const [blurredUrl, setBlurredUrl] = React.useState(initialValues.blurredUrl);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = photoRecord
@@ -36,6 +42,8 @@ export default function PhotoUpdateForm(props) {
       : initialValues;
     setS3key(cleanValues.s3key);
     setType(cleanValues.type);
+    setAspectRatio(cleanValues.aspectRatio);
+    setBlurredUrl(cleanValues.blurredUrl);
     setErrors({});
   };
   const [photoRecord, setPhotoRecord] = React.useState(photoModelProp);
@@ -52,6 +60,8 @@ export default function PhotoUpdateForm(props) {
   const validations = {
     s3key: [{ type: "Required" }],
     type: [{ type: "Required" }],
+    aspectRatio: [],
+    blurredUrl: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -81,6 +91,8 @@ export default function PhotoUpdateForm(props) {
         let modelFields = {
           s3key,
           type,
+          aspectRatio,
+          blurredUrl,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -138,6 +150,8 @@ export default function PhotoUpdateForm(props) {
             const modelFields = {
               s3key: value,
               type,
+              aspectRatio,
+              blurredUrl,
             };
             const result = onChange(modelFields);
             value = result?.s3key ?? value;
@@ -163,6 +177,8 @@ export default function PhotoUpdateForm(props) {
             const modelFields = {
               s3key,
               type: value,
+              aspectRatio,
+              blurredUrl,
             };
             const result = onChange(modelFields);
             value = result?.type ?? value;
@@ -176,6 +192,60 @@ export default function PhotoUpdateForm(props) {
         errorMessage={errors.type?.errorMessage}
         hasError={errors.type?.hasError}
         {...getOverrideProps(overrides, "type")}
+      ></TextField>
+      <TextField
+        label="Aspect ratio"
+        isRequired={false}
+        isReadOnly={false}
+        value={aspectRatio}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              s3key,
+              type,
+              aspectRatio: value,
+              blurredUrl,
+            };
+            const result = onChange(modelFields);
+            value = result?.aspectRatio ?? value;
+          }
+          if (errors.aspectRatio?.hasError) {
+            runValidationTasks("aspectRatio", value);
+          }
+          setAspectRatio(value);
+        }}
+        onBlur={() => runValidationTasks("aspectRatio", aspectRatio)}
+        errorMessage={errors.aspectRatio?.errorMessage}
+        hasError={errors.aspectRatio?.hasError}
+        {...getOverrideProps(overrides, "aspectRatio")}
+      ></TextField>
+      <TextField
+        label="Blurred url"
+        isRequired={false}
+        isReadOnly={false}
+        value={blurredUrl}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              s3key,
+              type,
+              aspectRatio,
+              blurredUrl: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.blurredUrl ?? value;
+          }
+          if (errors.blurredUrl?.hasError) {
+            runValidationTasks("blurredUrl", value);
+          }
+          setBlurredUrl(value);
+        }}
+        onBlur={() => runValidationTasks("blurredUrl", blurredUrl)}
+        errorMessage={errors.blurredUrl?.errorMessage}
+        hasError={errors.blurredUrl?.hasError}
+        {...getOverrideProps(overrides, "blurredUrl")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -16,16 +16,22 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type PhotoUpdateFormInputValues = {
     s3key?: string;
     type?: string;
+    aspectRatio?: string;
+    blurredUrl?: string;
 };
 export declare type PhotoUpdateFormValidationValues = {
     s3key?: ValidationFunction<string>;
     type?: ValidationFunction<string>;
+    aspectRatio?: ValidationFunction<string>;
+    blurredUrl?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PhotoUpdateFormOverridesProps = {
     PhotoUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     s3key?: PrimitiveOverrideProps<TextFieldProps>;
     type?: PrimitiveOverrideProps<TextFieldProps>;
+    aspectRatio?: PrimitiveOverrideProps<TextFieldProps>;
+    blurredUrl?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PhotoUpdateFormProps = React.PropsWithChildren<{
     overrides?: PhotoUpdateFormOverridesProps | undefined | null;

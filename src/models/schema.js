@@ -24,6 +24,20 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "aspectRatio": {
+                    "name": "aspectRatio",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "blurredUrl": {
+                    "name": "blurredUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -69,6 +83,6 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "codegenVersion": "3.4.3",
-    "version": "9ea0b13118949d0595c9211eb2883979"
+    "codegenVersion": "3.4.4",
+    "version": "b4012b2f3bf4e8251b0131d6b0575ac7"
 };
