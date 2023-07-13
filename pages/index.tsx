@@ -11,6 +11,7 @@ import CentalineLogo from '../public/logos/centaline_logo.png'
 import LinkedinLogo from '../public/logos/linkedin.png'
 import GithubLogo from '../public/logos/github.png'
 import InstagramLogo from '../public/logos/instagram.png'
+import HorizontalDrawer from '../components/horizontalDrawer';
 
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
@@ -51,27 +52,9 @@ const App: NextPage = () => {
                 <Title />
                 {/* <ResponsiveDrawer /> */}
                 <div className='flex sm:flex-row flex-col md:justify-between lg:justify-between justify-start gap-5 md:items-center lg:items-center'>
-                    <div className='flex flex-row justify-between items-center self-start gap-5 w-96 overflow-auto'>
-                        <a href="/" className='mr-10'>
-                            <Image alt={"logo"} src={logo} height={25} width={25} />
-                        </a>
-                        <a href='/tech'>
-                            <div className='cover-underline'>
-                                <div className='global-font'>Tech</div>
-                            </div>
-                        </a>
-                        <a href='/photography'>
-                            <div className='cover-underline'>
-                                <div className='global-font'>Photography</div>
-                            </div>
-                        </a>
-                        <a href='/music'>
-                            <div className='cover-underline'>
-                                <div className='global-font'>music</div>
-                            </div>
-                        </a>
-                    </div>
-                    <div className='flex flex-row gap-7 items-center'>
+                    <HorizontalDrawer logoSize={25} width={28} />
+                    {/* contacts */}
+                    <div className='flex flex-row gap-7 items-center justify-end'>
                         <a href="https://linkedin.com/in/laijackylai" target='_blank'>
                             <Image className="grayscale" alt={"linkedin_logo"} src={LinkedinLogo} height={25} width={25} />
                         </a>
@@ -79,7 +62,7 @@ const App: NextPage = () => {
                             <Image className="grayscale" alt={"github_logo"} src={GithubLogo} height={25} width={25} />
                         </a>
                         <a href="https://www.instagram.com/laijackylai/" target='_blank'>
-                            <Image className="grayscale mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
+                            <Image className="grayscale mr-5 lg:mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
                         </a>
                         <a href="mailto:laijackylai@gmail.com" className="border border-black p-2 rounded-full relative overflow-hidden group w-fit">
                             <span className="text-black z-10 relative group-hover:text-white">contact</span>
@@ -117,54 +100,62 @@ const App: NextPage = () => {
             <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
                 <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
                 <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
-                    <div className='flex flex-col gap-2 w-1/2'>
-                        <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
-                        <div className="font-['Sabon'] text-2xl">SOFTWARE ENGINEER @ VOTANIC LIMITED</div>
+                    <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
+                        <a href='https://www.votanic.com' target='_blank'>
+                            <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
+                        </a>
+                        <div className="font-['Sabon'] text-2xl">SOFTWARE ENGINEER @ VOTANIC LIMITEDa</div>
                         <div className="font-['Sabon']">
                             I redesigned software, enhanced performance, and expanded platform compatibility. I utilized Next.js, Electron, and WPF .NET for frontend development, implemented real-time communication, deployed full-stack solutions, conducted compatibility testing, and managed software installation and licensing.
                         </div>
                     </div>
                     <div className="flex flex-col items-end font-['Sabon']">
-                        <div className="text-8xl">2022</div>
+                        <div className="text-4xl lg:text-8xl">2022</div>
                         <div >- 2023</div>
                     </div>
                 </div>
                 <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
-                    <div className='flex flex-col gap-2 w-1/2'>
-                        <Image className="py-4" alt={"vivablee_logo"} src={VivableeLogo} height={400} width={200} />
+                    <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
+                        <a href='https://www.vivablee.com' target='_blank'>
+                            <Image className="py-4" alt={"vivablee_logo"} src={VivableeLogo} height={400} width={200} />
+                        </a>
                         <div className="font-['Sabon'] text-2xl">CO-FOUNDER @ VIVABLEE LIMITED</div>
                         <div className="font-['Sabon']">
                             I oversaw strategic development to secure funding for continuous growth. I successfully developed the Vivablee Android and iOS app using React Native and AWS cloud services.
                         </div>
                     </div>
                     <div className="flex flex-col items-end font-['Sabon']">
-                        <div className="text-8xl">2020</div>
+                        <div className="text-4xl lg:text-8xl">2020</div>
                         <div >- Current</div>
                     </div>
                 </div>
                 <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
-                    <div className='flex flex-col gap-2 w-1/2'>
-                        <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
+                    <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
+                        <a href='https://www.hko.gov.hk/en/index.html' target='_blank'>
+                            <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
+                        </a>
                         <div className="font-['Sabon'] text-2xl">CO-OP @ HONG KONG OBSERVATORY</div>
                         <div className="font-['Sabon']">
                             I developed a backend data processing pipeline using Python and Cron for multiple meteorological products, utilizing distributed MongoDB instances. Additionally, I created a frontend visualization system for high-dimensional meteorological data using Deck.gl and the MERN stack. I successfully deployed the MVP on internal servers using Docker and Docker-compose.
                         </div>
                     </div>
                     <div className="flex flex-col items-end font-['Sabon']">
-                        <div className="text-8xl">2020</div>
+                        <div className="text-4xl lg:text-8xl">2020</div>
                         <div >- 2021</div>
                     </div>
                 </div>
                 <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
-                    <div className='flex flex-col gap-2 w-1/2'>
-                        <Image className="py-4" alt={"centaline_logo"} src={CentalineLogo} height={400} width={200} />
+                    <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
+                        <a href='https://hk.centanet.com/info/en/index' target='_blank'>
+                            <Image className="py-4" alt={"centaline_logo"} src={CentalineLogo} height={400} width={200} />
+                        </a>
                         <div className="font-['Sabon'] text-2xl">PART-TIME RESEARCH ANALYST @ CENTALINE PROPERTY AGENCY</div>
                         <div className="font-['Sabon']">
                             I developed scripts for data-mining latest property information on various platforms and websites using Python and automated data processing and Centa-City Leading Index report generation using Excel VBA and Python
                         </div>
                     </div>
                     <div className="flex flex-col items-end font-['Sabon']">
-                        <div className="text-8xl">2019</div>
+                        <div className="text-4xl lg:text-8xl">2019</div>
                         <div >- 2020</div>
                     </div>
                 </div>

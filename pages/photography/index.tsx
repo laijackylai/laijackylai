@@ -46,26 +46,26 @@ const Photography: NextPage<Props> = ({
       <Title />
       <ResponsiveDrawer />
       <div className='flex col-span-4 p-5 flex-col'>
-        <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div>
+        {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
         <div>
           {
             photosData && photosData.length > 0 && photosData.map((p, i) => {
               const isOdd = i % 2
               const wh = random()
               return (
-                <div key={p.id} className={`gap-5 py-20 flex ${isOdd ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div key={p.id} className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
                   <Image
                     quality={75}
                     src={p.url}
                     alt={p.s3key}
-                    width={p.type === 'film' ? wh / parseFloat(p.aspectRatio ? p.aspectRatio : '1') : wh}
-                    height={p.type === 'film' ? wh : wh / parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                    width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                    height={wh}
                     placeholder='blur'
                     blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
                     loading='lazy'
                     className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
                   />
-                  <div className={`flex flex-col text-xs ${isOdd ? 'text-right' : 'text-left'} overflow-clip`}  >
+                  <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
                     <div className='font-bold text-lg'>{p.type}</div>
                     <div>{p.id}</div>
                     <div>{p.s3key}</div>

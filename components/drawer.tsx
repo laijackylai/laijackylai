@@ -39,11 +39,11 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
 
     return (
         <div className='top-0 relative' data-testid="drawer-component">
-            <div className='fixed flex flex-col lg:col-span-2 col-span-1 h-full px-5'>
-                <a href="/" className={`py-16 min-h-min`}>
+            <div className='fixed flex flex-row justify-around lg:justify-normal lg:flex-col lg:col-span-2 col-span-1 lg:h-full px-5 gap-5 lg:gap-2 bg-white z-10 w-screen lg:w-fit'>
+                <a href="/" className={`lg:py-16 min-h-min`}>
                     <Image alt={"logo"} src={logo} height={imgWidth} width={imgWidth} />
                 </a>
-                <ul className={`flex flex-col font-sans font-normal text-base`} style={{ gap: `${gap}rem` }}>
+                <ul className={`flex flex-row lg:flex-col font-sans font-normal text-base`} style={{ gap: `${gap}rem` }}>
                     <li>
                         <Link href="/tech">
                             <div className='cover-underline'>
@@ -64,6 +64,14 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
                         <Link href="/music" >
                             <div className='cover-underline'>
                                 <div className='global-font'>Music</div>
+                                <div />
+                            </div>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/gis" >
+                            <div className='cover-underline'>
+                                <div className='global-font'>GIS</div>
                                 <div />
                             </div>
                         </Link>
