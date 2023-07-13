@@ -27,7 +27,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
       <Title />
       <ResponsiveDrawer />
       <div className='flex col-span-3 lg:col-span-4 px-7 py-14 flex-col'>
-        <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div>
+        {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
         <div>
           <div className='font-extrabold text-2xl'>Open Source Contribution</div>
           <div>
