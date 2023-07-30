@@ -15,6 +15,7 @@ import HorizontalDrawer from '../components/horizontalDrawer';
 
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
+    const [windowWidth, setWindowWidth] = useState(28)
 
     useEffect(() => {
         function handleScroll() {
@@ -24,6 +25,7 @@ const App: NextPage = () => {
 
         if (typeof window !== "undefined") {
             window.addEventListener("scroll", handleScroll);
+            setWindowWidth(window.innerWidth)
 
             return () => {
                 window.removeEventListener("scroll", handleScroll);
@@ -51,8 +53,8 @@ const App: NextPage = () => {
             <div className={`h-screen sm:p-16 p-5 flex flex-col justify-between`}>
                 <Title />
                 {/* <ResponsiveDrawer /> */}
-                <div className='flex sm:flex-row flex-col md:justify-between lg:justify-between justify-start gap-5 md:items-center lg:items-center'>
-                    <HorizontalDrawer logoSize={25} width={28} />
+                <div className='flex flex-col justify-between lg:justify-between gap-5 md:items-center lg:items-center'>
+                    <HorizontalDrawer logoSize={25} width={windowWidth} />
                     {/* contacts */}
                     <div className='flex flex-row gap-7 items-center justify-end'>
                         <a href="https://linkedin.com/in/laijackylai" target='_blank'>

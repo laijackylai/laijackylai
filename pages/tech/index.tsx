@@ -5,11 +5,12 @@ import githubLogo from '../../public/logos/github.png'
 import pythonLogo from '../../public/logos/python.png'
 import reactLogo from '../../public/logos/react.png'
 import { Storage } from 'aws-amplify'
-import ResponsiveDrawer from '../../components/drawer'
 import ocra from '../../components/font'
 import Title from '../../components/title'
 import { getPlaiceholder } from 'plaiceholder';
-import { FaGithub } from 'react-icons/fa';
+import { FaGithub, FaAppStoreIos } from 'react-icons/fa';
+import HorizontalDrawer from '../../components/horizontalDrawer'
+import { useEffect, useState } from 'react'
 
 type Props = {
   imageUrls: string[];
@@ -22,13 +23,48 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
   const hktidesURL = "https://github.com/laijackylai/hktides"
   const hkradarURL = "https://github.com/laijackylai/hkradar"
 
+  const [windowWidth, setWindowWidth] = useState(28)
+  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolledToTop(window.scrollY === 0);
+    };
+    window.addEventListener('scroll', handleScroll);
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth)
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+
+  }, []);
+
+
+  const openFYPPDF = () => {
+    window.open('../docs/FYP-Final-Report.pdf', '_blank')
+  }
+
+  const scrollUp = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
   return (
-    <div className={`grid lg:grid-cols-5 grid-cols-4 global-font ${ocra.variable} font-sans`}>
+    <div className={`global-font ${ocra.variable} font-sans`}>
       <Title />
-      <ResponsiveDrawer />
-      <div className='flex col-span-3 lg:col-span-4 px-7 py-14 flex-col'>
+      <div className='flex p-5 lg:p-14 flex-col'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
-        <div>
+        <HorizontalDrawer logoSize={25} width={windowWidth} />
+        <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+          <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+          </svg>
+        </button>
+        <div className='pt-10'>
           <div className='font-extrabold text-2xl'>Open Source Contribution</div>
           <div>
             <div className='flex flex-row gap-2'>
@@ -52,7 +88,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
           <a href='https://mapbox.github.io/delatin/' target="_blank" className='justify-center items-center self-center'>
             <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
           </a>
-        </div>
+          d</div>
         <div className='pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Canadian Fires
@@ -85,6 +121,9 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
         <div className='pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Takcarly
+            <a href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
+              <FaAppStoreIos size={30} />
+            </a>
             <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer">
               <FaGithub size={25} />
             </a>
@@ -162,7 +201,13 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             </div>
             <div />
           </div>
-          <MyPdfViewer />
+          <div>
+            <div className='pt-2 flex flex-row gap-2 items-center'>
+              <div>Technical Report:</div>
+              <button onClick={openFYPPDF} className='text-sm underline'>download</button>
+            </div>
+          </div>
+          {/* <MyPdfViewer /> */}
         </div>
       </div>
     </div >

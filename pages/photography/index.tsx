@@ -5,6 +5,8 @@ import ResponsiveDrawer from '../../components/drawer';
 import { DataStore, Storage, graphqlOperation } from 'aws-amplify';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import HorizontalDrawer from '../../components/horizontalDrawer'
 // import { getPlaiceholder } from 'plaiceholder';
 // import { decode } from 'blurhash';
 
@@ -28,6 +30,31 @@ const Photography: NextPage<Props> = ({
     return rand;
   }
 
+  const [windowWidth, setWindowWidth] = useState(28)
+  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolledToTop(window.scrollY === 0);
+    };
+    window.addEventListener('scroll', handleScroll);
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth)
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+
+  }, []);
+
+  const scrollUp = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
   // // get blurred photos
   // const getBlurredPhotos = async () => {
   //   const photoBase64 = await Promise.all(
@@ -44,9 +71,14 @@ const Photography: NextPage<Props> = ({
   return (
     <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
       <Title />
-      <ResponsiveDrawer />
-      <div className='flex col-span-4 p-5 flex-col'>
+      <div className='flex col-span-5 p-5 flex-col'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
+        <HorizontalDrawer logoSize={25} width={windowWidth} />
+        <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+          <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+          </svg>
+        </button>
         <div>
           {
             photosData && photosData.length > 0 && photosData.map((p, i) => {
