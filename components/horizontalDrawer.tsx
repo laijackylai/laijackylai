@@ -30,7 +30,7 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
 
   return isDesktop ?
     (
-      <div className={`flex flex-row justify-between items-center self-start gap-5 w-fit lg:w-[${width}rem] overflow-auto`}>
+      <div className={`flex flex-row justify-between items-center self-start gap-5 w-fit lg:w-[${width}rem] overflow-auto px-16 py-10`}>
         <a href="/" className='lg:mr-10'>
           <Image alt={"logo"} src={logo} height={50} width={50} />
         </a>
@@ -58,16 +58,19 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
     )
     :
     (
-      <div className='flex items-center'>
-        <div className='flex flex-row justify-between items-center w-screen pb-3'>
-          <button onClick={toggleDrawer} >
-            <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 6H20M4 12H14M4 18H9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-          <a href="/" className='lg:mr-10'>
-            <Image alt={"logo"} src={logo} height={30} width={30} />
-          </a>
+      <div className='flex items-center z-10'>
+        <div className='fixed top-0 left-0 w-screen'>
+          <div className='flex flex-row justify-between items-center bg-white p-5'>
+            <button onClick={toggleDrawer} >
+              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 6H20M4 12H14M4 18H9" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <a href="/" className='lg:mr-10'>
+              <Image alt={"logo"} src={logo} height={30} width={30} />
+            </a>
+          </div>
+          <div className='h-5 bg-gradient-to-b from-white to-transparent'></div>
         </div>
 
         <div

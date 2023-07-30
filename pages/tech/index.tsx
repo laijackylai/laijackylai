@@ -56,7 +56,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
   return (
     <div className={`global-font ${ocra.variable} font-sans`}>
       <Title />
-      <div className='flex p-5 lg:p-14 flex-col'>
+      <div className='flex p-5 pt-10 lg:p-14 flex-col'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
         <HorizontalDrawer logoSize={25} width={windowWidth} />
         <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
@@ -89,7 +89,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
           </a>
         </div>
-        <div className='pt-28'>
+        <div className='pt-14 lg:pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Canadian Fires
             <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer">
@@ -105,7 +105,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             <Image className='bg-white rounded-md w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
           </a>
         </div>
-        <div className='pt-28'>
+        <div className='pt-14 lg:pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             NUXT Google Maps
             <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer">
@@ -118,12 +118,12 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             <Image className='bg-white rounded-md w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
           </a>
         </div>
-        <div className='pt-28'>
+        <div className='pt-14 lg:pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Takcarly
             <div className='flex flex-row gap-2 items-end'>
               <div className='text-sm'>(Available on the App Store)</div>
-              <a href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
+              <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
                 <FaAppStoreIos size={30} />
               </a>
             </div>
@@ -152,7 +152,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
             })}
           </div>
         </div>
-        <div className='pt-28 w-fit'>
+        <div className='pt-14 lg:pt-28 w-fit'>
           <div className='flex flex-row items-center'>
             <div className='font-extrabold text-2xl'>Senior Design Project</div>
           </div>

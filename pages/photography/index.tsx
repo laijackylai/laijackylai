@@ -73,7 +73,6 @@ const Photography: NextPage<Props> = ({
       <Title />
       <div className='flex col-span-5 p-5 flex-col'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
-        <HorizontalDrawer logoSize={25} width={windowWidth} />
         <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
@@ -109,6 +108,7 @@ const Photography: NextPage<Props> = ({
           }
         </div>
       </div>
+      <HorizontalDrawer logoSize={25} width={windowWidth} />
     </div>
   );
 }
