@@ -69,9 +69,10 @@ const Photography: NextPage<Props> = ({
   // }
 
   return (
-    <div className={`grid grid-cols-5 global-font ${ocra.variable} font-sans`}>
+    <div className={`global-font ${ocra.variable} font-sans p-5 lg:p-10`}>
       <Title />
-      <div className='flex col-span-5 p-5 flex-col'>
+      <div className='flex flex-col'>
+        <HorizontalDrawer logoSize={25} width={windowWidth} />
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
         <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -108,7 +109,6 @@ const Photography: NextPage<Props> = ({
           }
         </div>
       </div>
-      <HorizontalDrawer logoSize={25} width={windowWidth} />
     </div>
   );
 }

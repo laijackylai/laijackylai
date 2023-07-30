@@ -30,7 +30,7 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
 
   return isDesktop ?
     (
-      <div className={`flex flex-row justify-between items-center self-start gap-5 w-fit lg:w-[${width}rem] overflow-auto px-16 py-10`}>
+      <div className={`flex flex-row justify-between items-center self-start gap-5 w-fit lg:w-[${width}rem] overflow-auto py-10`}>
         <a href="/" className='lg:mr-10'>
           <Image alt={"logo"} src={logo} height={50} width={50} />
         </a>

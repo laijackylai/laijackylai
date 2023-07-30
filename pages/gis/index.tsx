@@ -11,7 +11,7 @@ type Props = {
 
 const GIS: NextPage<Props> = () => {
   return (
-    <div className={`global-font ${ocra.variable} font-sans`}>
+    <div className={`global-font ${ocra.variable} font-sans lg:px-10`}>
       <Title />
       <HorizontalDrawer logoSize={50} width={40} />
       <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>GIS</div>
