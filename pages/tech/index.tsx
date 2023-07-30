@@ -56,7 +56,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
   return (
     <div className={`global-font ${ocra.variable} font-sans`}>
       <Title />
-      <div className='flex p-5 pt-10 lg:p-14 flex-col'>
+      <div className='flex p-5 pt-10 lg:pt-0 lg:p-14 flex-col'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
         <HorizontalDrawer logoSize={25} width={windowWidth} />
         <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>

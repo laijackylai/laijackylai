@@ -31,10 +31,12 @@ const Music: NextPage<Props> = () => {
   return (
     <div className={`global-font ${ocra.variable} font-sans`}>
       <Title />
-      <HorizontalDrawer logoSize={25} width={windowWidth} />
-      <div className='flex p-5 pt-24 lg:p-14'>
+      <div className='flex p-5 pt-24 lg:pt-0 lg:p-14'>
+        <HorizontalDrawer logoSize={25} width={windowWidth} />
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>MUSIC</div> */}
-        <div>Music Page</div>
+        <div className='flex pt-32'>
+          <div>Music Page</div>
+        </div>
       </div>
     </div>
   );
