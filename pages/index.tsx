@@ -53,7 +53,7 @@ const App: NextPage = () => {
             <div className={`h-screen sm:p-16 p-5 flex flex-col justify-between`}>
                 <Title />
                 {/* <ResponsiveDrawer /> */}
-                <div className='flex flex-col justify-between lg:justify-between gap-5 md:items-center lg:items-center'>
+                <div className='flex flex-col lg:flex-row justify-between lg:justify-between gap-5 md:items-center lg:items-center'>
                     <HorizontalDrawer logoSize={25} width={windowWidth} />
                     {/* contacts */}
                     <div className='flex flex-row gap-7 items-center justify-end'>
