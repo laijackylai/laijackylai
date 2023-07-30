@@ -88,7 +88,7 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
           <a href='https://mapbox.github.io/delatin/' target="_blank" className='justify-center items-center self-center'>
             <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
           </a>
-          d</div>
+        </div>
         <div className='pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Canadian Fires
@@ -121,14 +121,17 @@ const Tech: NextPage<Props> = ({ imageUrls, base64 }) => {
         <div className='pt-28'>
           <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
             Takcarly
-            <a href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
-              <FaAppStoreIos size={30} />
-            </a>
+            <div className='flex flex-row gap-2 items-end'>
+              <div className='text-sm'>(Available on the App Store)</div>
+              <a href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
+                <FaAppStoreIos size={30} />
+              </a>
+            </div>
             <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer">
               <FaGithub size={25} />
             </a>
           </div>
-          <div className=''>A two in one app for taking care of elderly</div>
+          <div className=''>A two in one app for taking care of elderlydi</div>
           <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
           <div className='flex overflow-x-auto pt-3 gap-5'>
             {imageUrls && imageUrls.map((url, i) => {
