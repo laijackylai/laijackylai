@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Title from '../components/title'
 import ocra from '../components/font'
 import Image from 'next/image';
@@ -10,7 +10,10 @@ import CentalineLogo from '../public/logos/centaline_logo.png'
 import LinkedinLogo from '../public/logos/linkedin.png'
 import GithubLogo from '../public/logos/github.png'
 import InstagramLogo from '../public/logos/instagram.png'
+import LightningLogo from '../public/logos/lightning.png'
 import HorizontalDrawer from '../components/horizontalDrawer';
+import AnimatedText from '../components/animatedText';
+import RevealOnScroll from '../components/reviewOnScroll';
 
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
@@ -72,16 +75,19 @@ const App: NextPage = () => {
                             </a>
                         </div>
                     </div>
-                    <div className='flex flex-col gap-10 items-center'>
+                    <div className="flex flex-col gap-10 items-center font-['Sabon']">
                         <div className='col-span-5 flex flex-col items-end justify-end gap-40'>
-                            <div className="flex flex-col lg:text-8xl text-6xl font-['Sabon'] p-2 text-end font-bold">
-                                <div>Full Stack</div>
+                            <div className="flex flex-col lg:text-8xl text-5xl p-2 text-end font-bold animate-fade-in-left">
+                                <div>Data Engineer</div>
+                                <div className='text-2xl lg:text-4xl font-normal'>&</div>
                                 <div>Software Engineer</div>
+
                             </div>
-                            <div className='text-lg text-right lg:w-1/3 w-full'>
-                                Hi, I am Jacky. A software engineer with expertise in full-stack development, co-founding Vivablee, the mental health platform, and a passion for pushing the limits of technology
+                            <div className='text-lg text-right lg:w-1/3 w-full motion-safe:animate-fade-in-right'>
+                                Hi, I am Jacky. I'm a junior Data Engineer with a background in software engineering and full-stack development. Co-founder of Vivablee mental health platform committed to continual growth, teamwork, and driving efficient data pipelines.
                             </div>
                         </div>
+                        {/* moving down or up arrow */}
                         {
                             scroll === 0
                                 ?
@@ -99,8 +105,80 @@ const App: NextPage = () => {
                         }
                     </div>
                 </div>
-                <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
-                    <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
+            </div>
+            <div className="py-20 flex flex-col gap-3 lg:gap-14 w-full bg-slate-800 text-white font-['Sabon']">
+                <div className='flex flex-row gap-3 justify-center items-center'>
+                    {/* <Image className="grayscale" alt={"lightning_logo"} src={LightningLogo} height={50} width={30} /> */}
+                    <div className="text-4xl font-extrabold pb-5">Skills</div>
+                </div>
+                <div className='flex flex-col gap-3 lg:gap-6 items-start w-fit self-center'>
+                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                        <div className="w-fit font-bold">Data Engineering:</div>
+                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center font-['Gluten']">
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none my-2" >
+                                Extract Load Transform
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:2s] my-2" >
+                                Data Pipelines
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:4s] my-2" >
+                                Data Modelling
+                            </span>
+                        </span>
+                    </div>
+                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                        <div className="w-fit font-bold">Data Science:</div>
+                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
+                                NumPy
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:2s] my-2" >
+                                Pandas
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:4s] my-2" >
+                                XGBoost
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:6s] my-2" >
+                                NLTK
+                            </span>
+                        </span>
+                    </div>
+                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                        <div className="w-fit font-bold">Full Stack:</div>
+                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
+                                ReactJS
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:2s] my-2" >
+                                NextJS
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:4s] my-2" >
+                                NodeJS
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:6s] my-2" >
+                                Django / Flask
+                            </span>
+                        </span>
+                    </div>
+                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                        <div className="w-fit font-bold">Cloud:</div>
+                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none my-2" >
+                                Amazon Web Services
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:2s] my-2" >
+                                Firebase
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:4s] my-2" >
+                                Vercel
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
+                <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
+                <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
                             <a href='https://www.votanic.com' target='_blank'>
@@ -116,6 +194,8 @@ const App: NextPage = () => {
                             <div >- 2023</div>
                         </div>
                     </div>
+                </RevealOnScroll>
+                <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
                             <a href='https://www.vivablee.com' target='_blank'>
@@ -131,7 +211,9 @@ const App: NextPage = () => {
                             <div >- Current</div>
                         </div>
                     </div>
-                    <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
+                </RevealOnScroll>
+                <RevealOnScroll>
+                    <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
                             <a href='https://www.hko.gov.hk/en/index.html' target='_blank'>
                                 <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
@@ -146,6 +228,8 @@ const App: NextPage = () => {
                             <div >- 2021</div>
                         </div>
                     </div>
+                </RevealOnScroll>
+                <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
                             <a href='https://hk.centanet.com/info/en/index' target='_blank'>
@@ -161,7 +245,7 @@ const App: NextPage = () => {
                             <div >- 2020</div>
                         </div>
                     </div>
-                </div>
+                </RevealOnScroll>
             </div>
         </div>
     )

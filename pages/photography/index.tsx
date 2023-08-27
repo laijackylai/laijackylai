@@ -7,6 +7,7 @@ import { Photo } from '../../src/models';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import HorizontalDrawer from '../../components/horizontalDrawer'
+import RevealOnScroll from '../../components/reviewOnScroll';
 // import { getPlaiceholder } from 'plaiceholder';
 // import { decode } from 'blurhash';
 
@@ -69,7 +70,7 @@ const Photography: NextPage<Props> = ({
   // }
 
   return (
-    <div className={`global-font ${ocra.variable} font-sans p-5 lg:p-10`}>
+    <div className={`global-font ${ocra.variable} font-sans p-5 lg:p-14`}>
       <Title />
       <div className='flex flex-col'>
         <HorizontalDrawer logoSize={25} width={windowWidth} />
@@ -85,25 +86,27 @@ const Photography: NextPage<Props> = ({
               const isOdd = i % 2
               const wh = random()
               return (
-                <div key={p.id} className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-                  <Image
-                    quality={75}
-                    src={p.url}
-                    alt={p.s3key}
-                    width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
-                    height={wh}
-                    placeholder='blur'
-                    blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
-                    loading='lazy'
-                    className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
-                  />
-                  <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
-                    <div className='font-bold text-lg'>{p.type}</div>
-                    <div>{p.id}</div>
-                    <div>{p.s3key}</div>
-                    <div>{p.createdAt}</div>
+                <RevealOnScroll key={p.id}>
+                  <div className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+                    <Image
+                      quality={75}
+                      src={p.url}
+                      alt={p.s3key}
+                      width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                      height={wh}
+                      placeholder='blur'
+                      blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
+                      loading='lazy'
+                      className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
+                    />
+                    <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
+                      <div className='font-bold text-lg'>{p.type}</div>
+                      <div>{p.id}</div>
+                      <div>{p.s3key}</div>
+                      <div>{p.createdAt}</div>
+                    </div>
                   </div>
-                </div>
+                </RevealOnScroll>
               )
             })
           }

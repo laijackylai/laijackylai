@@ -70,9 +70,9 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
                 </a>
                 <ul className={`flex flex-row lg:flex-col font-sans font-normal text-base items-center lg:items-start`} style={{ gap: `${gap}rem` }}>
                     <li>
-                        <Link href="/tech">
+                        <Link href="/projects">
                             <div className='cover-underline'>
-                                <div className='global-font'>Tech</div>
+                                <div className='global-font'>Projects</div>
                                 <div />
                             </div>
                         </Link>

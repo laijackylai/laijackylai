@@ -34,9 +34,9 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
         <a href="/" className='lg:mr-10'>
           <Image alt={"logo"} src={logo} height={50} width={50} />
         </a>
-        <a href='/tech'>
+        <a href='/projects'>
           <div className='cover-underline'>
-            <div className='global-font'>Tech</div>
+            <div className='global-font'>Projects</div>
           </div>
         </a>
         <a href='/photography'>
@@ -82,9 +82,9 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
               <a href="/" className='lg:mr-10'>
                 <Image alt={"logo"} src={logo} height={50} width={50} />
               </a>
-              <a href='/tech'>
+              <a href='/projects'>
                 <div className='cover-underline'>
-                  <div className='global-font'>Tech</div>
+                  <div className='global-font'>Projects</div>
                 </div>
               </a>
               <a href='/photography'>
