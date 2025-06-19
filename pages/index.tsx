@@ -8,6 +8,7 @@ import VivableeLogo from '../public/logos/vivablee_logo.png'
 import HKOLogo from '../public/logos/hko_logo.png'
 import CentalineLogo from '../public/logos/centaline_logo.png'
 import LinkedinLogo from '../public/logos/linkedin.png'
+import GDLogo from "../public/logos/g+d_logo.png"
 import GithubLogo from '../public/logos/github.png'
 import InstagramLogo from '../public/logos/instagram.png'
 import LightningLogo from '../public/logos/lightning.png'
@@ -76,7 +77,7 @@ const App: NextPage = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-10 items-center font-['Sabon']">
-                        <div className='col-span-5 flex flex-col items-end justify-end gap-40'>
+                        <div className='col-span-6 flex flex-col items-end justify-end gap-40 w-full'>
                             <div className="flex flex-col lg:text-8xl text-5xl p-2 text-end font-bold animate-fade-in-left">
                                 <div>Data Engineer</div>
                                 <div className='text-2xl lg:text-4xl font-normal'>&</div>
@@ -84,7 +85,9 @@ const App: NextPage = () => {
 
                             </div>
                             <div className='text-lg text-right lg:w-1/3 w-full motion-safe:animate-fade-in-right'>
-                                Hi, I am Jacky. I'm a junior Data Engineer with a background in software engineering and full-stack development. Co-founder of Vivablee mental health platform committed to continual growth, teamwork, and driving efficient data pipelines.
+                                Hi, I am Jacky. I'm a Data Engineer experienced in building and maintaining containerized data pipelines.
+                                <br />
+                                Skilled in Python, Bash, Kubernetes, and automation. Strong problem-solving and cross-team collaboration in high-scale, data-driven environments.
                             </div>
                         </div>
                         {/* moving down or up arrow */}
@@ -115,15 +118,19 @@ const App: NextPage = () => {
                     <div className="flex items-center text-lg lg:text-2xl font-medium">
                         <div className="w-fit font-bold">Data Engineering:</div>
                         <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center font-['Gluten']">
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none my-2" >
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
+                                Docker & Kubernetes
+                            </span>
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:2s] my-2" >
                                 Extract Load Transform
                             </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:2s] my-2" >
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:4s] my-2" >
                                 Data Pipelines
                             </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:4s] my-2" >
+                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:6s] my-2" >
                                 Data Modelling
                             </span>
+
                         </span>
                     </div>
                     <div className="flex items-center text-lg lg:text-2xl font-medium">
@@ -181,6 +188,23 @@ const App: NextPage = () => {
                 <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
+                            <a href='https://www.gi-de.com/en/' target='_blank'>
+                                <Image className="mb-8" alt={"g+d_logo"} src={GDLogo} height={400} width={300} />
+                            </a>
+                            <div className="font-['Sabon'] text-2xl">DATA GEN ENGINEER @ GIESECKE+DEVRIENT</div>
+                            <div className="font-['Sabon']">
+                                Operate and optimize high-scale, containerized data generation systems for SIM and eUICC products, focusing on automation, reliability, and cross-functional collaboration. Mainly Utilizing Docker, k8s, Python & Bash.
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-end font-['Sabon']">
+                            <div className="text-4xl lg:text-8xl">2023</div>
+                            <div className="font-bold">- Current</div>
+                        </div>
+                    </div>
+                </RevealOnScroll>
+                <RevealOnScroll>
+                    <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
+                        <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
                             <a href='https://www.votanic.com' target='_blank'>
                                 <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
                             </a>
@@ -208,7 +232,7 @@ const App: NextPage = () => {
                         </div>
                         <div className="flex flex-col items-end font-['Sabon']">
                             <div className="text-4xl lg:text-8xl">2020</div>
-                            <div >- Current</div>
+                            <div >- 2024</div>
                         </div>
                     </div>
                 </RevealOnScroll>
