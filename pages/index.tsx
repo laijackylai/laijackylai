@@ -11,14 +11,13 @@ import LinkedinLogo from '../public/logos/linkedin.png'
 import GDLogo from "../public/logos/g+d_logo.png"
 import GithubLogo from '../public/logos/github.png'
 import InstagramLogo from '../public/logos/instagram.png'
-import LightningLogo from '../public/logos/lightning.png'
 import HorizontalDrawer from '../components/horizontalDrawer';
 import AnimatedText from '../components/animatedText';
 import RevealOnScroll from '../components/reviewOnScroll';
 
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
-    const [windowWidth, setWindowWidth] = useState(28)
+    const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 28)
 
     useEffect(() => {
         function handleScroll() {
@@ -26,14 +25,17 @@ const App: NextPage = () => {
             setScroll(scrollTop)
         }
 
-        if (typeof window !== "undefined") {
-            window.addEventListener("scroll", handleScroll);
+        function handleResize() {
             setWindowWidth(window.innerWidth)
-
-            return () => {
-                window.removeEventListener("scroll", handleScroll);
-            };
         }
+
+        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
 
     const scrollDown = () => {
@@ -53,31 +55,27 @@ const App: NextPage = () => {
 
     return (
         <div className={`global-font ${ocra.variable} font-sans w-full`}>
-            <div className={`h-screen p-5 lg:p-16 pt-20 lg:pt-0 flex flex-col justify-between`}>
+            <div className={`relative h-screen p-5 lg:p-16 pt-0 lg:pt-0 flex flex-col justify-between bg-white z-20`}>
+                <div className='absolute right-5 top-20 z-10 flex flex-row gap-7 items-center lg:right-8 lg:top-6'>
+                    <a href="https://linkedin.com/in/laijackylai" target='_blank' rel="noopener noreferrer">
+                        <Image className="grayscale" alt={"linkedin_logo"} src={LinkedinLogo} height={25} width={25} />
+                    </a>
+                    <a href="https://github.com/laijackylai" target='_blank' rel="noopener noreferrer">
+                        <Image className="grayscale" alt={"github_logo"} src={GithubLogo} height={25} width={25} />
+                    </a>
+                    <a href="https://www.instagram.com/laijackylai/" target='_blank' rel="noopener noreferrer">
+                        <Image className="grayscale mr-5 lg:mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
+                    </a>
+                    <a href="mailto:laijackylai@gmail.com" className="border border-black p-2 rounded-full relative overflow-hidden group w-fit">
+                        <span className="text-black relative group-hover:text-white">contact</span>
+                        <span className="absolute inset-0 bg-gradient-to-t from-black to-black opacity-0 group-hover:opacity-100"></span>
+                    </a>
+                </div>
                 <Title />
                 <HorizontalDrawer logoSize={25} width={windowWidth} />
                 <div>
-                    {/* <ResponsiveDrawer /> */}
-                    <div className='flex flex-col lg:flex-row justify-between lg:justify-between gap-5 md:items-center lg:items-center'>
-                        {/* contacts */}
-                        <div className='flex flex-row gap-7 items-center justify-end'>
-                            <a href="https://linkedin.com/in/laijackylai" target='_blank'>
-                                <Image className="grayscale" alt={"linkedin_logo"} src={LinkedinLogo} height={25} width={25} />
-                            </a>
-                            <a href="https://github.com/laijackylai" target='_blank'>
-                                <Image className="grayscale" alt={"github_logo"} src={GithubLogo} height={25} width={25} />
-                            </a>
-                            <a href="https://www.instagram.com/laijackylai/" target='_blank'>
-                                <Image className="grayscale mr-5 lg:mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
-                            </a>
-                            <a href="mailto:laijackylai@gmail.com" className="border border-black p-2 rounded-full relative overflow-hidden group w-fit">
-                                <span className="text-black relative group-hover:text-white">contact</span>
-                                <span className="absolute inset-0 bg-gradient-to-t from-black to-black opacity-0 group-hover:opacity-100"></span>
-                            </a>
-                        </div>
-                    </div>
                     <div className="flex flex-col gap-10 items-center font-['Sabon']">
-                        <div className='col-span-6 flex flex-col items-end justify-end gap-40 w-full'>
+                        <div className='col-span-6 flex flex-col items-end justify-end gap-10 lg:gap-40 w-full'>
                             <div className="flex flex-col lg:text-8xl text-5xl p-2 text-end font-bold animate-fade-in-left">
                                 <div>Data Engineer</div>
                                 <div className='text-2xl lg:text-4xl font-normal'>&</div>
@@ -90,28 +88,11 @@ const App: NextPage = () => {
                                 Skilled in Python, Bash, Kubernetes, and automation. Strong problem-solving and cross-team collaboration in high-scale, data-driven environments.
                             </div>
                         </div>
-                        {/* moving down or up arrow */}
-                        {
-                            scroll === 0
-                                ?
-                                <button onClick={scrollDown}>
-                                    <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                    </svg>
-                                </button>
-                                :
-                                <button onClick={scrollUp}>
-                                    <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                    </svg>
-                                </button>
-                        }
                     </div>
                 </div>
             </div>
             <div className="py-20 flex flex-col gap-3 lg:gap-14 w-full bg-slate-800 text-white font-['Sabon']">
                 <div className='flex flex-row gap-3 justify-center items-center'>
-                    {/* <Image className="grayscale" alt={"lightning_logo"} src={LightningLogo} height={50} width={30} /> */}
                     <div className="text-4xl font-extrabold pb-5">Skills</div>
                 </div>
                 <div className='flex flex-col gap-3 lg:gap-6 items-start w-fit self-center'>
@@ -188,7 +169,7 @@ const App: NextPage = () => {
                 <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.gi-de.com/en/' target='_blank'>
+                            <a href='https://www.gi-de.com/en/' target='_blank' rel="noopener noreferrer">
                                 <Image className="mb-8" alt={"g+d_logo"} src={GDLogo} height={400} width={300} />
                             </a>
                             <div className="font-['Sabon'] text-2xl">DATA GEN ENGINEER @ GIESECKE+DEVRIENT</div>
@@ -205,7 +186,7 @@ const App: NextPage = () => {
                 <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.votanic.com' target='_blank'>
+                            <a href='https://www.votanic.com' target='_blank' rel="noopener noreferrer">
                                 <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
                             </a>
                             <div className="font-['Sabon'] text-2xl">SOFTWARE ENGINEER @ VOTANIC LIMITED</div>
@@ -222,7 +203,7 @@ const App: NextPage = () => {
                 <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.vivablee.com' target='_blank'>
+                            <a href='https://www.vivablee.com' target='_blank' rel="noopener noreferrer">
                                 <Image className="py-4" alt={"vivablee_logo"} src={VivableeLogo} height={400} width={200} />
                             </a>
                             <div className="font-['Sabon'] text-2xl">CO-FOUNDER @ VIVABLEE LIMITED</div>
@@ -239,7 +220,7 @@ const App: NextPage = () => {
                 <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.hko.gov.hk/en/index.html' target='_blank'>
+                            <a href='https://www.hko.gov.hk/en/index.html' target='_blank' rel="noopener noreferrer">
                                 <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
                             </a>
                             <div className="font-['Sabon'] text-2xl">CO-OP @ HONG KONG OBSERVATORY</div>
@@ -256,7 +237,7 @@ const App: NextPage = () => {
                 <RevealOnScroll>
                     <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
                         <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://hk.centanet.com/info/en/index' target='_blank'>
+                            <a href='https://hk.centanet.com/info/en/index' target='_blank' rel="noopener noreferrer">
                                 <Image className="py-4" alt={"centaline_logo"} src={CentalineLogo} height={400} width={200} />
                             </a>
                             <div className="font-['Sabon'] text-2xl">PART-TIME RESEARCH ANALYST @ CENTALINE PROPERTY AGENCY</div>

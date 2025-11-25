@@ -120,7 +120,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // get all photos data from datastore
   const getPhotos = async () => {
-    const res = await DataStore.query(Photo).catch(e => console.error(e))
+    const res = await DataStore.query(Photo).catch(e => {})
     return res
   }
 
