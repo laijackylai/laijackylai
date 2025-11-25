@@ -9,6 +9,12 @@ const awsconfig = {
   aws_appsync_region: process.env.NEXT_PUBLIC_AWS_REGION || 'ap-southeast-1',
   aws_appsync_authenticationType: 'API_KEY',
   aws_appsync_apiKey: process.env.NEXT_PUBLIC_APPSYNC_API_KEY || '',
+  Storage: {
+    AWSS3: {
+      bucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET_NAME || '',
+      region: process.env.NEXT_PUBLIC_STORAGE_REGION || 'ap-southeast-1',
+    }
+  }
 };
 
 export default awsconfig;
