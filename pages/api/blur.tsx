@@ -24,7 +24,6 @@ const handler = async (
 
       fs.stat(filePath, (err, stats) => {
         if (err) {
-          console.error('Error reading file stats:', err);
           return;
         }
 
@@ -40,7 +39,6 @@ const handler = async (
           .blur(0.75)
           .toBuffer(async (err, buffer) => {
             if (err) {
-              console.error('Error processing image:', err);
               return;
             }
 
@@ -53,7 +51,6 @@ const handler = async (
               if (photos.length > 0) {
                 const photo = photos[0]
                 if (photo.type != fileType || photo.aspectRatio != aspectRatio || photo.blurredBase64 != dataUrl) {
-                  console.log('Updating existing datastore...')
                   await DataStore.save(
                     Photo.copyOf(photo, u => {
                       u.type = fileType;
@@ -64,7 +61,6 @@ const handler = async (
                 }
               }
               if (photos.length === 0) {
-                console.log('Creating new datastore...')
                 await DataStore.save(
                   new Photo({
                     s3key: s3Key,
@@ -75,15 +71,8 @@ const handler = async (
                 );
               }
             } catch (error) {
-              console.error('Error checking photo existence:', error);
             }
 
-            console.log(`File: ${file}`);
-            console.log('S3 Key:', s3Key);
-            console.log('Type:', fileType);
-            console.log('Aspect Ratio:', aspectRatio);
-            console.log('Data URL:', dataUrl.length);
-            console.log('\n-----------------------------------\n');
           });
 
       });

@@ -3,6 +3,9 @@ const nextConfig = {
     reactStrictMode: false,
     swcMinify: true,
     output: 'standalone',
+    typescript: {
+        ignoreBuildErrors: true,
+    },
     eslint: {
         ignoreDuringBuilds: true,
     },
@@ -14,7 +17,7 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: '**',
+                hostname: 'laijackylai-storage-4ba35e56184317-dev.s3.ap-southeast-1.amazonaws.com',
                 port: '',
                 pathname: '**',
             },

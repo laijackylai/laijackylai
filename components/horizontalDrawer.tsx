@@ -58,8 +58,8 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
     )
     :
     (
-      <div className='flex items-center z-10'>
-        <div className='fixed top-0 left-0 w-screen'>
+      <div className='flex items-center z-0'>
+        <div className='fixed top-0 left-0 w-screen z-0'>
           <div className='flex flex-row justify-between items-center bg-white p-5'>
             <button onClick={toggleDrawer} >
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

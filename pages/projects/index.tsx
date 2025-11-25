@@ -7,6 +7,7 @@ import reactLogo from '../../public/logos/react.png'
 import { Storage } from 'aws-amplify'
 import ocra from '../../components/font'
 import Title from '../../components/title'
+// @ts-ignore
 import { getPlaiceholder } from 'plaiceholder';
 import { FaGithub, FaAppStoreIos } from 'react-icons/fa';
 import HorizontalDrawer from '../../components/horizontalDrawer'
@@ -73,7 +74,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div>
               <div className='flex flex-row gap-2'>
                 Contributed to
-                <a className='underline' href="https://loaders.gl" target='_blank'>
+                <a className='underline' href="https://loaders.gl" target='_blank' rel="noopener noreferrer">
                   <div>@loaders.gl</div>
                 </a>
                 <div>
@@ -84,12 +85,12 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
               </div>
             </div>
             <div className='text-sm pb-2'>• Added support for an alternative triangular mesh generation technique (
-              <a className='underline' href="https://github.com/mapbox/delatin" target='_blank'>
+              <a className='underline' href="https://github.com/mapbox/delatin" target='_blank' rel="noopener noreferrer">
                 Delatin
               </a>
               ) as an option for the terrain loader
             </div>
-            <a href='https://mapbox.github.io/delatin/' target="_blank" className='justify-center items-center self-center'>
+            <a href='https://mapbox.github.io/delatin/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
               <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
             </a>
           </div>

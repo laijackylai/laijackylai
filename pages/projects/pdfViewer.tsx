@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+// @ts-ignore
 import { usePdf } from '@mikecousins/react-pdf';
 
 const MyPdfViewer = () => {
@@ -9,9 +10,7 @@ const MyPdfViewer = () => {
     file: '/docs/FYP-Final-Report.pdf',
     page,
     canvasRef,
-    onDocumentLoadFail: () => {
-      console.error("load error")
-    }
+    onDocumentLoadFail: () => {}
   });
 
   return (

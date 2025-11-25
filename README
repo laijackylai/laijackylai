@@ -9,7 +9,7 @@
 ## Before pushing to main
 
 ``` bash
-npm intsall
+npm install
 yarn
 # amplify pull --appId d2ukbi00figpw1 --envName main
 ```
