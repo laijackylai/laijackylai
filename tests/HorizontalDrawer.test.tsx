@@ -21,8 +21,8 @@ describe('HorizontalDrawer', () => {
 
     render(<HorizontalDrawer logoSize={25} width={28} />);
 
-    const menuButton = screen.getByRole('button');
-    const overlay = document.querySelector('.bg-gray-400') as HTMLElement;
+    const menuButton = screen.getByRole('button', { name: 'Open navigation menu' });
+    const overlay = screen.getByRole('button', { name: 'Close navigation menu' });
     const drawer = overlay.parentElement?.parentElement as HTMLElement;
 
     expect(drawer.className).toContain('-translate-x-full');

@@ -65,7 +65,7 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
       <div className='flex items-center z-0'>
         <div className='fixed top-0 left-0 w-screen z-0'>
           <div className='flex flex-row justify-between items-center bg-white p-5'>
-            <button onClick={toggleDrawer} >
+            <button type="button" aria-label="Open navigation menu" onClick={toggleDrawer} >
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 6H20M4 12H14M4 18H9" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -107,7 +107,12 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
                 </div>
               </Link>
             </div>
-            <div className='w-52 bg-gray-400 opacity-30' onClick={toggleDrawer} />
+            <button
+              type="button"
+              aria-label="Close navigation menu"
+              className='w-52 bg-gray-400 opacity-30'
+              onClick={toggleDrawer}
+            />
           </div>
         </div>
       </div>

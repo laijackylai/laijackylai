@@ -63,7 +63,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
         <div className='lg:px-20'>
           <HorizontalDrawer logoSize={25} width={windowWidth} />
         </div>
-        <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
@@ -78,7 +78,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <div>@loaders.gl</div>
                 </a>
                 <div>
-                  <a href="https://github.com/visgl/loaders.gl/pull/1372" target="_blank" rel="noopener noreferrer">
+                  <a href="https://github.com/visgl/loaders.gl/pull/1372" target="_blank" rel="noopener noreferrer" aria-label="View loaders.gl pull request on GitHub">
                     <FaGithub size={25} />
                   </a>
                 </div>
@@ -99,7 +99,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           <div className='py-7 lg:py-20 px-5 lg:px-20 bg-amber-700 text-white'>
             <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
               Canadian Fires
-              <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer" aria-label="View Canadian Fires on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
@@ -117,7 +117,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           <div className='py-7 lg:py-20 px-5 lg:px-32'>
             <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
               NUXT Google Maps
-              <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer" aria-label="View NUXT Google Maps on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
@@ -134,11 +134,11 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
               Takcarly
               <div className='flex flex-row gap-2 items-end'>
                 <div className='text-sm'>(Available on the App Store)</div>
-                <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank" rel="noopener noreferrer">
+                <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank" rel="noopener noreferrer" aria-label="View Takcarly on the App Store">
                   <FaAppStoreIos size={30} />
                 </a>
               </div>
-              <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer" aria-label="View Takcarly on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>

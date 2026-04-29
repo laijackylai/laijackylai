@@ -163,6 +163,22 @@ const App: NextPage = () => {
                                 Skilled in Python, Bash, Kubernetes, and automation. Strong problem-solving and cross-team collaboration in high-scale, data-driven environments.
                             </div>
                         </div>
+                        {/* moving down or up arrow */}
+                        {
+                            scroll === 0
+                                ?
+                                <button type="button" aria-label="Scroll down" onClick={scrollDown}>
+                                    <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </button>
+                                :
+                                <button type="button" aria-label="Scroll to top" onClick={scrollUp}>
+                                    <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                    </svg>
+                                </button>
+                        }
                     </div>
                 </div>
             </div>
