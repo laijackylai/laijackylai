@@ -15,14 +15,85 @@ import HorizontalDrawer from '../components/horizontalDrawer';
 import AnimatedText from '../components/animatedText';
 import RevealOnScroll from '../components/reviewOnScroll';
 
+interface JourneyItem {
+    href: string
+    logoSrc: Parameters<typeof Image>[0]['src']
+    logoAlt: string
+    logoClassName: string
+    title: string
+    description: string
+    startYear: string
+    endYear: string
+}
+
+const journeyItems: JourneyItem[] = [
+    {
+        href: 'https://www.gi-de.com/en/',
+        logoSrc: GDLogo,
+        logoAlt: 'g+d_logo',
+        logoClassName: 'mb-8',
+        title: 'DATA GEN ENGINEER @ GIESECKE+DEVRIENT',
+        description: 'Operate and optimize high-scale, containerized data generation systems for SIM and eUICC products, focusing on automation, reliability, and cross-functional collaboration. Mainly Utilizing Docker, k8s, Python & Bash.',
+        startYear: '2023',
+        endYear: 'Current',
+    },
+    {
+        href: 'https://www.votanic.com',
+        logoSrc: VotanicLogo,
+        logoAlt: 'votanic_logo',
+        logoClassName: 'bg-[#5c4c87] p-4 mb-8',
+        title: 'SOFTWARE ENGINEER @ VOTANIC LIMITED',
+        description: 'I redesigned software, enhanced performance, and expanded platform compatibility. I utilized Next.js, Electron, and WPF .NET for frontend development, implemented real-time communication, deployed full-stack solutions, conducted compatibility testing, and managed software installation and licensing.',
+        startYear: '2022',
+        endYear: '2023',
+    },
+    {
+        href: 'https://www.vivablee.com',
+        logoSrc: VivableeLogo,
+        logoAlt: 'vivablee_logo',
+        logoClassName: 'py-4',
+        title: 'CO-FOUNDER @ VIVABLEE LIMITED',
+        description: 'I oversaw strategic development to secure funding for continuous growth. I successfully developed the Vivablee Android and iOS app using React Native and AWS cloud services.',
+        startYear: '2020',
+        endYear: '2024',
+    },
+    {
+        href: 'https://www.hko.gov.hk/en/index.html',
+        logoSrc: HKOLogo,
+        logoAlt: 'hko_logo',
+        logoClassName: 'py-4',
+        title: 'CO-OP @ HONG KONG OBSERVATORY',
+        description: 'I developed a backend data processing pipeline using Python and Cron for multiple meteorological products, utilizing distributed MongoDB instances. Additionally, I created a frontend visualization system for high-dimensional meteorological data using Deck.gl and the MERN stack. I successfully deployed the MVP on internal servers using Docker and Docker-compose.',
+        startYear: '2020',
+        endYear: '2021',
+    },
+    {
+        href: 'https://hk.centanet.com/info/en/index',
+        logoSrc: CentalineLogo,
+        logoAlt: 'centaline_logo',
+        logoClassName: 'py-4',
+        title: 'PART-TIME RESEARCH ANALYST @ CENTALINE PROPERTY AGENCY',
+        description: 'I developed scripts for data-mining latest property information on various platforms and websites using Python and automated data processing and Centa-City Leading Index report generation using Excel VBA and Python',
+        startYear: '2019',
+        endYear: '2020',
+    },
+]
+
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
-    const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 28)
+    const [windowWidth, setWindowWidth] = useState(0)
+    const scrollFrameRef = useRef<number | null>(null)
 
     useEffect(() => {
         function handleScroll() {
-            const scrollTop = window.scrollY;
-            setScroll(scrollTop)
+            if (scrollFrameRef.current !== null) {
+                return
+            }
+
+            scrollFrameRef.current = requestAnimationFrame(() => {
+                setScroll(window.scrollY)
+                scrollFrameRef.current = null
+            })
         }
 
         function handleResize() {
@@ -31,10 +102,14 @@ const App: NextPage = () => {
 
         window.addEventListener("scroll", handleScroll);
         window.addEventListener("resize", handleResize);
+        setWindowWidth(window.innerWidth)
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
             window.removeEventListener("resize", handleResize);
+            if (scrollFrameRef.current !== null) {
+                cancelAnimationFrame(scrollFrameRef.current)
+            }
         };
     }, []);
 
@@ -83,7 +158,7 @@ const App: NextPage = () => {
 
                             </div>
                             <div className='text-lg text-right lg:w-1/3 w-full motion-safe:animate-fade-in-right'>
-                                Hi, I am Jacky. I'm a Data Engineer experienced in building and maintaining containerized data pipelines.
+                                Hi, I am Jacky. I&apos;m a Data Engineer experienced in building and maintaining containerized data pipelines.
                                 <br />
                                 Skilled in Python, Bash, Kubernetes, and automation. Strong problem-solving and cross-team collaboration in high-scale, data-driven environments.
                             </div>
@@ -166,95 +241,26 @@ const App: NextPage = () => {
             </div>
             <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
                 <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
-                <RevealOnScroll>
-                    <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
-                        <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.gi-de.com/en/' target='_blank' rel="noopener noreferrer">
-                                <Image className="mb-8" alt={"g+d_logo"} src={GDLogo} height={400} width={300} />
-                            </a>
-                            <div className="font-['Sabon'] text-2xl">DATA GEN ENGINEER @ GIESECKE+DEVRIENT</div>
-                            <div className="font-['Sabon']">
-                                Operate and optimize high-scale, containerized data generation systems for SIM and eUICC products, focusing on automation, reliability, and cross-functional collaboration. Mainly Utilizing Docker, k8s, Python & Bash.
+                {journeyItems.map((item, index) => (
+                    <RevealOnScroll key={item.href}>
+                        <div className={`w-full lg:px-32 px-5 pb-10 ${index < journeyItems.length - 1 ? 'border-b' : ''} flex flex-row justify-between items-center`}>
+                            <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
+                                <a href={item.href} target='_blank' rel="noopener noreferrer">
+                                    <Image className={item.logoClassName} alt={item.logoAlt} src={item.logoSrc} height={400} width={index === 0 ? 300 : 200} />
+                                </a>
+                                <div className="font-['Sabon'] text-2xl">{item.title}</div>
+                                <div className="font-['Sabon']">{item.description}</div>
+                            </div>
+                            <div className="flex flex-col items-end font-['Sabon']">
+                                <div className="text-4xl lg:text-8xl">{item.startYear}</div>
+                                <div className={item.endYear === 'Current' ? 'font-bold' : ''}>- {item.endYear}</div>
                             </div>
                         </div>
-                        <div className="flex flex-col items-end font-['Sabon']">
-                            <div className="text-4xl lg:text-8xl">2023</div>
-                            <div className="font-bold">- Current</div>
-                        </div>
-                    </div>
-                </RevealOnScroll>
-                <RevealOnScroll>
-                    <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
-                        <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.votanic.com' target='_blank' rel="noopener noreferrer">
-                                <Image className="bg-[#5c4c87] p-4 mb-8" alt={"votanic_logo"} src={VotanicLogo} height={400} width={200} />
-                            </a>
-                            <div className="font-['Sabon'] text-2xl">SOFTWARE ENGINEER @ VOTANIC LIMITED</div>
-                            <div className="font-['Sabon']">
-                                I redesigned software, enhanced performance, and expanded platform compatibility. I utilized Next.js, Electron, and WPF .NET for frontend development, implemented real-time communication, deployed full-stack solutions, conducted compatibility testing, and managed software installation and licensing.
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end font-['Sabon']">
-                            <div className="text-4xl lg:text-8xl">2022</div>
-                            <div >- 2023</div>
-                        </div>
-                    </div>
-                </RevealOnScroll>
-                <RevealOnScroll>
-                    <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
-                        <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.vivablee.com' target='_blank' rel="noopener noreferrer">
-                                <Image className="py-4" alt={"vivablee_logo"} src={VivableeLogo} height={400} width={200} />
-                            </a>
-                            <div className="font-['Sabon'] text-2xl">CO-FOUNDER @ VIVABLEE LIMITED</div>
-                            <div className="font-['Sabon']">
-                                I oversaw strategic development to secure funding for continuous growth. I successfully developed the Vivablee Android and iOS app using React Native and AWS cloud services.
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end font-['Sabon']">
-                            <div className="text-4xl lg:text-8xl">2020</div>
-                            <div >- 2024</div>
-                        </div>
-                    </div>
-                </RevealOnScroll>
-                <RevealOnScroll>
-                    <div className='w-full lg:px-32 px-5 pb-10 border-b flex flex-row justify-between items-center'>
-                        <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://www.hko.gov.hk/en/index.html' target='_blank' rel="noopener noreferrer">
-                                <Image className="py-4" alt={"hko_logo"} src={HKOLogo} height={400} width={200} />
-                            </a>
-                            <div className="font-['Sabon'] text-2xl">CO-OP @ HONG KONG OBSERVATORY</div>
-                            <div className="font-['Sabon']">
-                                I developed a backend data processing pipeline using Python and Cron for multiple meteorological products, utilizing distributed MongoDB instances. Additionally, I created a frontend visualization system for high-dimensional meteorological data using Deck.gl and the MERN stack. I successfully deployed the MVP on internal servers using Docker and Docker-compose.
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end font-['Sabon']">
-                            <div className="text-4xl lg:text-8xl">2020</div>
-                            <div >- 2021</div>
-                        </div>
-                    </div>
-                </RevealOnScroll>
-                <RevealOnScroll>
-                    <div className='w-full lg:px-32 px-5 pb-10 flex flex-row justify-between items-center'>
-                        <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                            <a href='https://hk.centanet.com/info/en/index' target='_blank' rel="noopener noreferrer">
-                                <Image className="py-4" alt={"centaline_logo"} src={CentalineLogo} height={400} width={200} />
-                            </a>
-                            <div className="font-['Sabon'] text-2xl">PART-TIME RESEARCH ANALYST @ CENTALINE PROPERTY AGENCY</div>
-                            <div className="font-['Sabon']">
-                                I developed scripts for data-mining latest property information on various platforms and websites using Python and automated data processing and Centa-City Leading Index report generation using Excel VBA and Python
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end font-['Sabon']">
-                            <div className="text-4xl lg:text-8xl">2019</div>
-                            <div >- 2020</div>
-                        </div>
-                    </div>
-                </RevealOnScroll>
+                    </RevealOnScroll>
+                ))}
             </div>
         </div>
     )
 }
 
 export default App
-

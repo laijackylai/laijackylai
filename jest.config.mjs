@@ -13,6 +13,7 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   testEnvironment: 'jest-environment-jsdom',
+  modulePathIgnorePatterns: ['<rootDir>/.next/'],
   testMatch: [
     '<rootDir>/tests/**/*.test.(js|jsx|ts|tsx)'
   ],

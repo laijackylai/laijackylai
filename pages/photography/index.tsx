@@ -5,7 +5,7 @@ import ResponsiveDrawer from '../../components/drawer';
 import { DataStore, Storage, graphqlOperation } from 'aws-amplify';
 import { Photo } from '../../src/models';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HorizontalDrawer from '../../components/horizontalDrawer'
 import RevealOnScroll from '../../components/reviewOnScroll';
 // import { getPlaiceholder } from 'plaiceholder';
@@ -22,17 +22,15 @@ type Props = {
 const Photography: NextPage<Props> = ({
   photosData,
 }) => {
-  // create random numbers
-  const random = (min = 300, max = 500) => {
-    let difference = max - min;
-    let rand = Math.random();
-    rand = Math.floor(rand * difference);
-    rand = rand + min;
-    return rand;
-  }
-
   const [windowWidth, setWindowWidth] = useState(28)
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+  const imageHeightsById = useMemo(() => {
+    return photosData.reduce<Record<string, number>>((acc, photo) => {
+      const hash = Array.from(photo.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      acc[photo.id] = 300 + (hash % 200);
+      return acc;
+    }, {});
+  }, [photosData]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,7 +82,7 @@ const Photography: NextPage<Props> = ({
           {
             photosData && photosData.length > 0 && photosData.map((p, i) => {
               const isOdd = i % 2
-              const wh = random()
+              const wh = imageHeightsById[p.id] ?? 400
               return (
                 <RevealOnScroll key={p.id}>
                   <div className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
@@ -125,12 +123,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   // shuffle the input array
-  const shuffleArray = (array: Object[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
+  const shuffleArray = <T,>(array: T[]) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return array;
+    return shuffled;
   }
 
   // get all photos

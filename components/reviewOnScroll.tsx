@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
-  children: any
+  children: React.ReactNode
 }
 
 const RevealOnScroll: React.FC<Props> = ({ children }) => {
@@ -9,6 +9,7 @@ const RevealOnScroll: React.FC<Props> = ({ children }) => {
   const ref = useRef(null);
 
   useEffect(() => {
+    const element = ref.current;
     const scrollObserver = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setIsVisible(true);
@@ -16,13 +17,13 @@ const RevealOnScroll: React.FC<Props> = ({ children }) => {
       }
     });
 
-    if (ref.current) {
-      scrollObserver.observe(ref.current);
+    if (element) {
+      scrollObserver.observe(element);
     }
 
     return () => {
-      if (ref.current) {
-        scrollObserver.unobserve(ref.current);
+      if (element) {
+        scrollObserver.unobserve(element);
       }
     };
   }, []);

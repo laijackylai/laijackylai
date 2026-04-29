@@ -45,7 +45,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
 
 
   const openFYPPDF = () => {
-    window.open('../docs/FYP-Final-Report.pdf', '_blank')
+    window.open('/docs/FYP-Final-Report.pdf', '_blank')
   }
 
   const scrollUp = () => {
@@ -108,7 +108,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div className='text-sm'>• Natural language search with NLTK</div>
             <div className='text-sm'>• Predicting future Ontario fires with XBGoost Regression</div>
             <div className='text-sm pb-2'>• Flask and SQLite for backend</div>
-            <a href='https://canadian-fires.vercel.app/' target="_blank" className='justify-center items-center self-center'>
+            <a href='https://canadian-fires.vercel.app/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
               <Image className='bg-white rounded-md w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
             </a>
           </div>
@@ -123,7 +123,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             </div>
             <div className=''>A Vue Google Maps demo showcasing google maps & map search</div>
             <div className='text-sm pb-2'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
-            <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" className='justify-center items-center self-center'>
+            <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
               <Image className='bg-white rounded-md w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
             </a>
           </div>
@@ -134,7 +134,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
               Takcarly
               <div className='flex flex-row gap-2 items-end'>
                 <div className='text-sm'>(Available on the App Store)</div>
-                <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
+                <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank" rel="noopener noreferrer">
                   <FaAppStoreIos size={30} />
                 </a>
               </div>
@@ -180,7 +180,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
                   </a>
-                  <a href={hkdsmURL} target="_blank">
+                  <a href={hkdsmURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -189,7 +189,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
                   </a>
-                  <a href={hktidesURL} target="_blank">
+                  <a href={hktidesURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -198,7 +198,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
                   </a>
-                  <a href={hkradarURL} target="_blank">
+                  <a href={hkradarURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -210,7 +210,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={reactLogo} alt={'reactLogo'} height={15} width={15} />
                   </a>
-                  <a href={hkterrainURL} target="_blank">
+                  <a href={hkterrainURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
