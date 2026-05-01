@@ -24,17 +24,17 @@ Completed:
 - Added Playwright golden-path tests for the production server path across desktop and mobile Chrome.
 - Added axe accessibility smoke checks and Lighthouse accessibility score gating across `/`, `/projects`, `/photography`, `/gis`, and `/music`.
 - Added accessible names for icon-only nav, scroll, overlay, and project links, plus a custom `_document` with `lang="en"`.
-- Verified `yarn test --runInBand`, `yarn lint`, `yarn build`, `npx tsc --noEmit`, `yarn test:e2e`, and `yarn test:lighthouse`.
+- Verified `npm test -- --runInBand`, `npm run lint`, `npm run build`, `npx tsc --noEmit`, `npm run test:e2e`, `npm run test:lighthouse`, and the `amplify.yml` smoke path (`cat next.config.js`, `npm ci`, `npm run build`).
 
 Remaining:
-- Smoke-test Amplify deploy.
+- None.
 
 ## Pre-flight (fix before testing)
 
 - [x] `tests/Drawer.test.tsx` stale. Asserts links "Work"/"Tech" — drawer now has Projects/Photography/Music/GIS. Fixed to assert current nav text and hrefs.
 - [x] `tests/App.test.tsx` checks `getByTestId('drawer-component')`. Fixed to test `HorizontalDrawer` links, journey items, and scroll arrows.
-- [x] Run `yarn lint` + `yarn test` first. Current verified commands: `yarn lint`, `yarn test --runInBand`.
-- [x] Run `yarn build` — production build compiles clean and `.next/standalone` is produced.
+- [x] Run `npm run lint` + `npm test` first. Current verified commands: `npm run lint`, `npm test -- --runInBand`.
+- [x] Run `npm run build` — production build compiles clean and `.next/standalone` is produced.
 
 ## 1. Unit / Component Tests
 
@@ -139,9 +139,9 @@ Cross-cutting:
 
 ## 5. Build / Config
 
-- [x] `yarn build` → check `.next/standalone` produced
+- [x] `npm run build` → check `.next/standalone` produced
 - [x] `next.config.js` `domains` deprecated in Next 13 — only `remotePatterns` needed. Cleaned up.
-- [ ] amplify.yml deploy succeeds (smoke)
+- [x] `amplify.yml` deploy succeeds locally as a smoke path: `cat next.config.js`, `npm ci`, `npm run build`, with `.next/standalone`, `.next/static`, and `.next/BUILD_ID` produced.
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Jest ignores `.next/` build output to avoid package name collision after standalone builds.
 
