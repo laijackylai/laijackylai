@@ -44,6 +44,11 @@ brew upgrade awscli   # or reinstall per AWS docs
 
 Status: pending. Local AWS CLI is `2.2.13`; upgrade outside the repo before Gen 2 work.
 
+Attempted on 2026-05-01:
+- `brew upgrade awscli` cannot upgrade this install because AWS CLI came from the Amazon pkg installer (`com.amazon.aws.cli2`), not Homebrew.
+- Current binary is `/usr/local/bin/aws -> /usr/local/aws-cli/aws`.
+- Upgrade path: install a current AWS CLI v2 pkg from AWS, then verify `aws --version`.
+
 ### 1.4 Amplify Hosting service role
 
 Gen 2 backend pipeline needs an **app-level service role** distinct from Gen 1's auth/unauth roles.
@@ -71,6 +76,8 @@ nvm install 20 && nvm use 20
 ```
 
 Status: `.nvmrc` is committed with `20`. Current shell is still `v25.8.1`; run `nvm use` before migration commands.
+
+Update on 2026-05-01: `node@20` is installed via Homebrew at `/usr/local/opt/node@20/bin/node` (`v20.20.2`). `~/.zshrc` now prepends `/usr/local/opt/node@20/bin` for new interactive zsh shells. Noninteractive/login shells may still resolve the globally linked Node 25 unless they source `.zshrc` or set `PATH` explicitly.
 
 ### 2.2 Package manager
 
@@ -102,6 +109,8 @@ Speeds up Gen 2 work. AWS Labs publishes MCP servers via `uvx`.
 ```bash
 brew install uv
 ```
+
+Status: installed. `uv` and `uvx` are available from `~/.local/bin`.
 
 ### 3.2 Add to `~/.claude.json` `mcpServers`
 
@@ -143,6 +152,8 @@ No dedicated Amplify Gen 2 MCP exists yet. AWS docs MCP covers Gen 2 reference.
 
 `/mcp` to verify connection.
 
+Status: MCP server entries were added to `~/.claude.json` on 2026-05-01. Restart Claude Code and run `/mcp` to verify the servers connect in the client.
+
 ### 3.4 Optional: Playwright MCP
 
 Already installed (`plugin_playwright_playwright__*` tools visible). Use for Phase 3 photography-page smoke tests post-deploy.
@@ -171,6 +182,8 @@ Generate tokens:
 ```bash
 openssl rand -hex 32
 ```
+
+Status: `.env.local` was generated on 2026-05-01 with `BLUR_API_TOKEN`, `APPSYNC_URL`, `APPSYNC_API_KEY`, `REVALIDATE_TOKEN`, and `AWS_REGION`. `APPSYNC_ADMIN_KEY` remains blank until the Gen 2 write/admin key exists.
 
 ---
 
@@ -276,11 +289,11 @@ backend:
 
 - [x] IAM principal w/ Gen 2 deploy perms confirmed (`aws sts get-caller-identity`) — current `amplify-5dZdc` user has `AdministratorAccess` + `AdministratorAccess-Amplify`.
 - [x] CDK bootstrapped in `ap-southeast-1`
-- [ ] AWS CLI ≥ 2.15 — current local version is `2.2.13`.
+- [ ] AWS CLI ≥ 2.15 — current local version is `2.2.13`; installed from Amazon pkg, not Homebrew.
 - [x] Amplify Hosting service role attached to app `d2ukbi00figpw1`
-- [ ] Node 20 active locally — `.nvmrc` pins 20, but current shell is `v25.8.1`.
-- [ ] MCP servers configured + `/mcp` shows connected
-- [ ] All env var values generated + ready to paste
+- [x] Node 20 active locally — `node@20` installed via Homebrew and new interactive zsh shells resolve `v20.20.2`.
+- [ ] MCP servers configured + `/mcp` shows connected — config written; restart Claude Code and verify `/mcp`.
+- [ ] All env var values generated + ready to paste — `.env.local` generated; `APPSYNC_ADMIN_KEY` is pending Gen 2.
 - [ ] ISR smoke test on Amplify Hosting passed (or Vercel decision made)
 - [x] Gen 1 snapshots saved to `docs/gen1-*-snapshot.json`
 - [x] Phase 0.8 decision made (local script vs SSR bundling)
