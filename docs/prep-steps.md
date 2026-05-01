@@ -42,12 +42,18 @@ Local is `2.2.13` (2021). DynamoDB scan + S3 sync work but bump:
 brew upgrade awscli   # or reinstall per AWS docs
 ```
 
-Status: pending. Local AWS CLI is `2.2.13`; upgrade outside the repo before Gen 2 work.
+Status: completed on 2026-05-01. Local `aws` now resolves to AWS CLI `2.34.40`.
 
 Attempted on 2026-05-01:
 - `brew upgrade awscli` cannot upgrade this install because AWS CLI came from the Amazon pkg installer (`com.amazon.aws.cli2`), not Homebrew.
 - Current binary is `/usr/local/bin/aws -> /usr/local/aws-cli/aws`.
 - Upgrade path: install a current AWS CLI v2 pkg from AWS, then verify `aws --version`.
+
+Completed on 2026-05-01:
+- Removed the old Amazon pkg install files from `/usr/local/bin/aws`, `/usr/local/bin/aws_completer`, and `/usr/local/aws-cli`.
+- Installed Homebrew `awscli` `2.34.40`.
+- Replaced `/usr/local/bin/aws` with a wrapper that runs `/usr/local/opt/awscli/bin/aws` with Homebrew `expat` on `DYLD_LIBRARY_PATH`; this avoids the Python 3.14 `pyexpat` runtime error on macOS.
+- Verified `aws --version` and `aws sts get-caller-identity`.
 
 ### 1.4 Amplify Hosting service role
 
@@ -289,7 +295,7 @@ backend:
 
 - [x] IAM principal w/ Gen 2 deploy perms confirmed (`aws sts get-caller-identity`) — current `amplify-5dZdc` user has `AdministratorAccess` + `AdministratorAccess-Amplify`.
 - [x] CDK bootstrapped in `ap-southeast-1`
-- [ ] AWS CLI ≥ 2.15 — current local version is `2.2.13`; installed from Amazon pkg, not Homebrew.
+- [x] AWS CLI ≥ 2.15 — current local version is `2.34.40`.
 - [x] Amplify Hosting service role attached to app `d2ukbi00figpw1`
 - [x] Node 20 active locally — `node@20` installed via Homebrew and new interactive zsh shells resolve `v20.20.2`.
 - [ ] MCP servers configured + `/mcp` shows connected — config written; restart Claude Code and verify `/mcp`.
