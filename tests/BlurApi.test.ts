@@ -43,6 +43,7 @@ const createResponse = () => {
 };
 
 const createRequest = (headers = {}) => ({ headers } as any);
+const createAuthorizedRequest = () => createRequest({ authorization: 'Bearer secret' });
 
 describe('blur API', () => {
   beforeEach(() => {
@@ -57,7 +58,16 @@ describe('blur API', () => {
     });
   });
 
-  it('returns 401 when the configured token is missing', async () => {
+  it('returns 401 when BLUR_API_TOKEN is missing', async () => {
+    const res = createResponse();
+
+    await handler(createRequest({ authorization: 'Bearer secret' }), res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(DataStore.save).not.toHaveBeenCalled();
+  });
+
+  it('returns 401 when the provided token is missing', async () => {
     process.env.BLUR_API_TOKEN = 'secret';
     const res = createResponse();
 
@@ -68,10 +78,11 @@ describe('blur API', () => {
   });
 
   it('handles an empty folder without writes', async () => {
+    process.env.BLUR_API_TOKEN = 'secret';
     (fs.readdir as jest.Mock).mockResolvedValue([]);
     const res = createResponse();
 
-    await handler(createRequest(), res);
+    await handler(createAuthorizedRequest(), res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ result: 'Success', processed: 0 });
@@ -79,11 +90,12 @@ describe('blur API', () => {
   });
 
   it('creates datastore records for new photos and skips .DS_Store', async () => {
+    process.env.BLUR_API_TOKEN = 'secret';
     (fs.readdir as jest.Mock).mockResolvedValue(['.DS_Store', 'DSC001.jpg']);
     (DataStore.query as jest.Mock).mockResolvedValue([]);
     const res = createResponse();
 
-    await handler(createRequest(), res);
+    await handler(createAuthorizedRequest(), res);
 
     expect(DataStore.save).toHaveBeenCalledWith(expect.any(Photo));
     expect(DataStore.save).toHaveBeenCalledWith(expect.objectContaining({
@@ -96,6 +108,7 @@ describe('blur API', () => {
   });
 
   it('does not save an unchanged existing photo', async () => {
+    process.env.BLUR_API_TOKEN = 'secret';
     (fs.readdir as jest.Mock).mockResolvedValue(['film.jpg']);
     (DataStore.query as jest.Mock).mockResolvedValue([{
       s3key: 'photos/film/film.jpg',
@@ -105,12 +118,13 @@ describe('blur API', () => {
     }]);
     const res = createResponse();
 
-    await handler(createRequest(), res);
+    await handler(createAuthorizedRequest(), res);
 
     expect(DataStore.save).not.toHaveBeenCalled();
   });
 
   it('updates a changed existing photo', async () => {
+    process.env.BLUR_API_TOKEN = 'secret';
     (fs.readdir as jest.Mock).mockResolvedValue(['film.jpg']);
     (DataStore.query as jest.Mock).mockResolvedValue([{
       s3key: 'photos/film/film.jpg',
@@ -120,7 +134,7 @@ describe('blur API', () => {
     }]);
     const res = createResponse();
 
-    await handler(createRequest(), res);
+    await handler(createAuthorizedRequest(), res);
 
     expect(DataStore.save).toHaveBeenCalledWith(expect.objectContaining({
       s3key: 'photos/film/film.jpg',
@@ -130,6 +144,7 @@ describe('blur API', () => {
   });
 
   it('logs sharp failures without crashing the request', async () => {
+    process.env.BLUR_API_TOKEN = 'secret';
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     (fs.readdir as jest.Mock).mockResolvedValue(['film.jpg']);
     (sharp as unknown as jest.Mock).mockReturnValue({
@@ -139,7 +154,7 @@ describe('blur API', () => {
     });
     const res = createResponse();
 
-    await handler(createRequest(), res);
+    await handler(createAuthorizedRequest(), res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(DataStore.save).not.toHaveBeenCalled();

@@ -3,8 +3,6 @@ frontend:
   phases:
     preBuild:
       commands:
-        # - COPY --from=builder /app/next.config.js ./
-        - cat next.config.js
         - npm ci
     build:
       commands:
@@ -16,3 +14,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+      - .next/cache/**/*

@@ -17,7 +17,7 @@ const handler = async (
   const expectedToken = process.env.BLUR_API_TOKEN;
   const apiKeyHeader = req.headers['x-api-key'];
   const providedToken = req.headers.authorization?.replace(/^Bearer\s+/i, '') || (Array.isArray(apiKeyHeader) ? apiKeyHeader[0] : apiKeyHeader);
-  if (expectedToken && providedToken !== expectedToken) {
+  if (!expectedToken || providedToken !== expectedToken) {
     return res.status(401).json({ result: 'Unauthorized' });
   }
 
