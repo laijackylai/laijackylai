@@ -1,10 +1,13 @@
 import fs from 'fs/promises';
 import sharp from 'sharp';
 import sizeOf from 'image-size';
+import { loadEnvConfig } from '@next/env';
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
 import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { HttpRequest } from '@aws-sdk/protocol-http';
 import { Sha256 } from '@aws-crypto/sha256-js';
+
+loadEnvConfig(process.cwd());
 
 type ExistingPhoto = {
   id: string;
@@ -14,8 +17,35 @@ type ExistingPhoto = {
   blurredBase64?: string | null;
 };
 
-const folder = './assets/images';
+const folder = process.env.BLUR_IMAGE_DIR ?? './assets/images';
 const region = process.env.AWS_REGION ?? 'ap-southeast-1';
+
+type GraphqlClient = (query: string, variables: Record<string, unknown>) => Promise<any>;
+
+export const createApiKeyGraphqlClient = (
+  appSyncUrl = process.env.APPSYNC_URL,
+  apiKey = process.env.APPSYNC_API_KEY
+): GraphqlClient => {
+  if (!appSyncUrl || !apiKey) {
+    throw new Error('APPSYNC_URL and APPSYNC_API_KEY are required');
+  }
+
+  return async (query: string, variables: Record<string, unknown>) => {
+    const res = await fetch(appSyncUrl, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+      },
+      body: JSON.stringify({ query, variables }),
+    });
+    const json = await res.json();
+    if (json.errors) {
+      throw new Error(JSON.stringify(json.errors));
+    }
+    return json.data;
+  };
+};
 
 export const createSignedGraphqlClient = (appSyncUrl = process.env.APPSYNC_URL) => {
   if (!appSyncUrl) {
@@ -85,10 +115,11 @@ const updatePhotoMutation = /* GraphQL */ `
 `;
 
 const upsertPhoto = async (
-  gql: ReturnType<typeof createSignedGraphqlClient>,
+  readGql: GraphqlClient,
+  writeGql: GraphqlClient,
   input: Omit<ExistingPhoto, 'id'>
 ) => {
-  const data = await gql(listByS3KeyQuery, { s3key: input.s3key });
+  const data = await readGql(listByS3KeyQuery, { s3key: input.s3key });
   const existing = data.listPhotos?.items?.[0] as ExistingPhoto | undefined;
 
   if (existing) {
@@ -97,17 +128,17 @@ const upsertPhoto = async (
       existing.aspectRatio !== input.aspectRatio ||
       existing.blurredBase64 !== input.blurredBase64
     ) {
-      await gql(updatePhotoMutation, { input: { id: existing.id, ...input } });
+      await writeGql(updatePhotoMutation, { input: { id: existing.id, ...input } });
       return 'updated';
     }
     return 'unchanged';
   }
 
-  await gql(createPhotoMutation, { input });
+  await writeGql(createPhotoMutation, { input });
   return 'created';
 };
 
-export const processImage = async (file: string, gql: ReturnType<typeof createSignedGraphqlClient>) => {
+export const processImage = async (file: string, writeGql: GraphqlClient, readGql: GraphqlClient = writeGql) => {
   if (file.startsWith('.DS_Store')) return undefined;
 
   const filePath = `${folder}/${file}`;
@@ -131,7 +162,7 @@ export const processImage = async (file: string, gql: ReturnType<typeof createSi
     const base64 = buffer.toString('base64');
     const dataUrl = `data:image/png;base64,${base64}`;
 
-    return upsertPhoto(gql, {
+    return upsertPhoto(readGql, writeGql, {
       s3key: s3Key,
       type: fileType,
       aspectRatio,
@@ -143,10 +174,12 @@ export const processImage = async (file: string, gql: ReturnType<typeof createSi
   }
 };
 
-export const syncBlurImages = async (gql = createSignedGraphqlClient()) => {
+export const syncBlurImages = async (writeGql?: GraphqlClient, readGql?: GraphqlClient) => {
   try {
+    const writeClient = writeGql ?? createSignedGraphqlClient();
+    const readClient = readGql ?? createApiKeyGraphqlClient();
     const files = await fs.readdir(folder);
-    const results = await Promise.all(files.map((file) => processImage(file, gql)));
+    const results = await Promise.all(files.map((file) => processImage(file, writeClient, readClient)));
     const processed = results.filter(Boolean).length;
     console.log(`Blur sync complete. Processed ${processed} file(s).`);
     return processed;
@@ -157,7 +190,8 @@ export const syncBlurImages = async (gql = createSignedGraphqlClient()) => {
 };
 
 if (require.main === module) {
-  syncBlurImages().catch(() => {
+  syncBlurImages().catch((error) => {
+    console.error(error);
     process.exitCode = 1;
   });
 }

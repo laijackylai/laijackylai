@@ -45,6 +45,17 @@ describe('blur script image processing', () => {
     });
   });
 
+  it('uses the read client for lookups and the write client for mutations', async () => {
+    const readGql = jest.fn().mockResolvedValue({ listPhotos: { items: [] } });
+    const writeGql = jest.fn().mockResolvedValue({ createPhoto: { id: 'photo-1' } });
+
+    await expect(processImage('DSC001.jpg', writeGql as any, readGql as any)).resolves.toBe('created');
+    expect(readGql).toHaveBeenCalledTimes(1);
+    expect(writeGql).toHaveBeenCalledTimes(1);
+    expect(readGql.mock.calls[0][0]).toContain('query ListPhotosByS3Key');
+    expect(writeGql.mock.calls[0][0]).toContain('mutation CreatePhoto');
+  });
+
   it('updates a changed existing photo', async () => {
     const gql = jest
       .fn()

@@ -8,7 +8,7 @@
     "local-build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "blur": "ts-node scripts/blur.ts",
+    "blur": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/blur.ts",
     "test": "jest",
     "test:e2e": "playwright test",
     "test:lighthouse": "npm run build && start-server-and-test start http://127.0.0.1:3000 \"node tests/lighthouse/a11y.mjs\""
@@ -27,7 +27,7 @@
     "sharp": "^0.32.1"
   },
   "devDependencies": {
-    "@aws-amplify/backend": "^1.22.0",
+    "@aws-amplify/backend": "1.22.0",
     "@aws-amplify/backend-cli": "^1.8.2",
     "@aws-crypto/sha256-js": "^5.2.0",
     "@aws-sdk/credential-provider-node": "^3.972.39",

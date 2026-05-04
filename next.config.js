@@ -27,6 +27,12 @@ const nextConfig = {
                 port: '',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2.s3.ap-southeast-1.amazonaws.com',
+                port: '',
+                pathname: '/**',
+            },
         ],
     },
     // experimental: {

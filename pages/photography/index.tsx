@@ -135,6 +135,9 @@ const shuffleArray = <T,>(array: T[]) => {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new Error('APPSYNC_URL and APPSYNC_API_KEY are required to build /photography');
+    }
     return { props: { photosData: [] }, revalidate: 60 };
   }
 
@@ -162,6 +165,9 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       body: JSON.stringify({ query }),
     });
     const json = await res.json();
+    if (res.ok === false || json.errors) {
+      throw new Error(JSON.stringify(json.errors ?? { status: res.status }));
+    }
     const photos = (json.data?.listPhotos?.items ?? []) as Omit<PhotoData, 'url'>[];
     const photosData = photos.map((photo) => ({
       ...photo,
@@ -171,6 +177,9 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
     return { props: { photosData: shuffleArray(photosData) }, revalidate: 60 };
   } catch (error) {
+    if (process.env.NODE_ENV !== 'development') {
+      throw error;
+    }
     return { props: { photosData: [] }, revalidate: 60 };
   }
 }
