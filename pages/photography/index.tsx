@@ -118,8 +118,15 @@ const Photography: NextPage<Props> = ({
 
 const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
+const getStorageBaseUrl = () => {
+  if (!process.env.STORAGE_BASE_URL && process.env.NODE_ENV === 'production') {
+    throw new Error('STORAGE_BASE_URL is required to build /photography');
+  }
+  return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
+};
+
 const publicStorageUrl = (key: string) => {
-  const storageBaseUrl = process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
+  const storageBaseUrl = getStorageBaseUrl();
   const encodedKey = key.split('/').map(encodeURIComponent).join('/');
   return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
 };

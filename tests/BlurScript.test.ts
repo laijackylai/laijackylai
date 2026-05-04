@@ -1,10 +1,11 @@
 import fs from 'fs/promises';
 import sharp from 'sharp';
 import sizeOf from 'image-size';
-import { processImage } from '../scripts/blur';
+import { processImage, syncBlurImages } from '../scripts/blur';
 
 jest.mock('fs/promises', () => ({
   stat: jest.fn(),
+  readdir: jest.fn(),
 }));
 jest.mock('image-size', () => jest.fn());
 jest.mock('sharp', () => jest.fn());
@@ -82,5 +83,13 @@ describe('blur script image processing', () => {
         blurredBase64: 'data:image/png;base64,Ymx1cg==',
       },
     });
+  });
+
+  it('fails the sync when any image processing fails', async () => {
+    (fs.readdir as jest.Mock).mockResolvedValue(['bad.jpg']);
+    (fs.stat as jest.Mock).mockRejectedValueOnce(new Error('stat failed'));
+    const gql = jest.fn();
+
+    await expect(syncBlurImages(gql as any, gql as any)).rejects.toThrow('Blur sync failed for 1 file(s).');
   });
 });

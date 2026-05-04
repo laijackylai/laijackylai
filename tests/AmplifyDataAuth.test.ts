@@ -15,4 +15,12 @@ describe('Amplify data auth helpers', () => {
     expect(allow.authenticated).toHaveBeenCalledWith('identityPool');
     expect((authRule as any)[dataSymbol].provider).toBe('iam');
   });
+
+  it('fails loudly when the private auth symbol layout changes', () => {
+    const allow = {
+      authenticated: jest.fn().mockReturnValue({ to: jest.fn() }),
+    };
+
+    expect(() => iamAuthenticated(allow)).toThrow('iamAuthenticated: data-schema internal layout changed');
+  });
 });

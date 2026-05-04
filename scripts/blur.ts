@@ -1,7 +1,9 @@
 import fs from 'fs/promises';
+import pLimit from 'p-limit';
 import sharp from 'sharp';
 import sizeOf from 'image-size';
 import { loadEnvConfig } from '@next/env';
+import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
 import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { HttpRequest } from '@aws-sdk/protocol-http';
@@ -21,6 +23,14 @@ const folder = process.env.BLUR_IMAGE_DIR ?? './assets/images';
 const region = process.env.AWS_REGION ?? 'ap-southeast-1';
 
 type GraphqlClient = (query: string, variables: Record<string, unknown>) => Promise<any>;
+
+export const validateAwsCredentials = async () => {
+  const client = new STSClient({
+    region,
+    credentials: defaultProvider(),
+  });
+  await client.send(new GetCallerIdentityCommand({}));
+};
 
 export const createApiKeyGraphqlClient = (
   appSyncUrl = process.env.APPSYNC_URL,
@@ -139,7 +149,7 @@ const upsertPhoto = async (
 };
 
 export const processImage = async (file: string, writeGql: GraphqlClient, readGql: GraphqlClient = writeGql) => {
-  if (file.startsWith('.DS_Store')) return undefined;
+  if (file === '.DS_Store') return undefined;
 
   const filePath = `${folder}/${file}`;
 
@@ -176,10 +186,18 @@ export const processImage = async (file: string, writeGql: GraphqlClient, readGq
 
 export const syncBlurImages = async (writeGql?: GraphqlClient, readGql?: GraphqlClient) => {
   try {
+    if (!writeGql) {
+      await validateAwsCredentials();
+    }
     const writeClient = writeGql ?? createSignedGraphqlClient();
     const readClient = readGql ?? createApiKeyGraphqlClient();
     const files = await fs.readdir(folder);
-    const results = await Promise.all(files.map((file) => processImage(file, writeClient, readClient)));
+    const limit = pLimit(5);
+    const results = await Promise.all(files.map((file) => limit(() => processImage(file, writeClient, readClient))));
+    const errored = results.filter((result) => result === 'error').length;
+    if (errored > 0) {
+      throw new Error(`Blur sync failed for ${errored} file(s).`);
+    }
     const processed = results.filter(Boolean).length;
     console.log(`Blur sync complete. Processed ${processed} file(s).`);
     return processed;
