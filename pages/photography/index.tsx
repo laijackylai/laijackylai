@@ -1,17 +1,19 @@
-import { GetServerSideProps, NextPage } from 'next';
+import { GetStaticProps, NextPage } from 'next';
 import ocra from '../../components/font';
 import Title from '../../components/title';
-import ResponsiveDrawer from '../../components/drawer';
-import { DataStore, Storage, graphqlOperation } from 'aws-amplify';
-import { Photo } from '../../src/models';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import HorizontalDrawer from '../../components/horizontalDrawer'
 import RevealOnScroll from '../../components/reviewOnScroll';
 // import { getPlaiceholder } from 'plaiceholder';
-// import { decode } from 'blurhash';
 
-interface PhotoData extends Photo {
+export type PhotoData = {
+  id: string,
+  s3key: string,
+  type: string,
+  aspectRatio: string,
+  blurredBase64: string | null,
+  createdAt?: string | null,
   url: string,
 }
 
@@ -114,52 +116,62 @@ const Photography: NextPage<Props> = ({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
-  // get all photos data from datastore
-  const getPhotos = async () => {
-    const res = await DataStore.query(Photo).catch(e => {})
-    return res
+const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
+  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+
+const shuffleArray = <T,>(array: T[]) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
+    return { props: { photosData: [] }, revalidate: 60 };
   }
 
-  // shuffle the input array
-  const shuffleArray = <T,>(array: T[]) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }
-
-  // get all photos
-  const photosData = await getPhotos()
-  if (!photosData) {
-    return {
-      props: {
-        photosData: [],
+  try {
+    const query = /* GraphQL */ `
+      query ListPhotos {
+        listPhotos {
+          items {
+            id
+            s3key
+            type
+            aspectRatio
+            blurredBase64
+            createdAt
+          }
+        }
       }
-    }
-  }
+    `;
+    const res = await fetch(process.env.APPSYNC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.APPSYNC_API_KEY,
+      },
+      body: JSON.stringify({ query }),
+    });
+    const json = await res.json();
+    const photos = (json.data?.listPhotos?.items ?? []) as Omit<PhotoData, 'url'>[];
+    const photosData = photos.map((photo) => ({
+      ...photo,
+      id: photo.id || photo.s3key,
+      url: publicStorageUrl(photo.s3key),
+    }));
 
-  // get photo urls
-  const photoUrls = await Promise.all(
-    photosData.map((o: Photo) => Storage.get(o.s3key, { level: 'public' }))
-  );
-
-  // add photo urls and blurred photos
-  const data = photosData.map((obj: Photo, i: number) => {
-    return {
-      ...obj,
-      "url": photoUrls[i],
-      // "base64": photoBase64[i]
-    };
-  });
-
-  return {
-    props: {
-      photosData: shuffleArray(data),
-    }
+    return { props: { photosData: shuffleArray(photosData) }, revalidate: 60 };
+  } catch (error) {
+    return { props: { photosData: [] }, revalidate: 60 };
   }
 }
 

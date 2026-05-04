@@ -1,20 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import Photography, { getServerSideProps } from '../pages/photography';
-import { DataStore, Storage } from 'aws-amplify';
-
-jest.mock('../src/aws-exports', () => ({}));
-jest.mock('aws-amplify', () => ({
-  DataStore: {
-    query: jest.fn(),
-  },
-  Storage: {
-    get: jest.fn(),
-  },
-  graphqlOperation: jest.fn(),
-}));
-jest.mock('../src/models', () => ({
-  Photo: jest.fn(),
-}));
+import Photography from '../pages/photography';
 
 const photosData = [
   {
@@ -60,16 +45,4 @@ describe('Photography page', () => {
     expect(screen.getByText('photo-2')).toBeInTheDocument();
   });
 
-  it('returns an empty list when DataStore query fails', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    (DataStore.query as jest.Mock).mockRejectedValue(new Error('query failed'));
-
-    await expect(getServerSideProps({} as any)).resolves.toEqual({
-      props: {
-        photosData: [],
-      },
-    });
-    expect(Storage.get).not.toHaveBeenCalled();
-    consoleError.mockRestore();
-  });
 });

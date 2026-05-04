@@ -25,6 +25,7 @@ npm-debug.log*
 .env.local
 .env*.local
 amplify_outputs.json
+.amplify/
 
 # vercel
 .vercel
@@ -56,3 +57,12 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+
+# Moved Gen 1 Amplify project; keep generated/local artifacts out of source.
+amplify-gen1/\#current-cloud-backend
+amplify-gen1/.config/local-*
+amplify-gen1/logs
+amplify-gen1/mock-data
+amplify-gen1/mock-api-resources
+amplify-gen1/backend/amplify-meta.json
+amplify-gen1/backend/.temp

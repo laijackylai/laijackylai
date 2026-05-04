@@ -1,12 +1,8 @@
-import { Amplify } from 'aws-amplify'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import awsconfig from '../src/aws-exports'
 import Script from 'next/script'
 
-Amplify.configure(awsconfig)
-
-function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps) {
     return (
         <>
             <Script id="ms-clarity" strategy="afterInteractive">
@@ -20,5 +16,3 @@ function MyApp({ Component, pageProps }: AppProps) {
         </>
     )
 }
-
-export default MyApp

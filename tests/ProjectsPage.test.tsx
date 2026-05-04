@@ -1,13 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import Projects, { getServerSideProps } from '../pages/projects';
-import { Storage } from 'aws-amplify';
+import Projects, { getStaticProps } from '../pages/projects';
 
-jest.mock('../src/aws-exports', () => ({}));
-jest.mock('aws-amplify', () => ({
-  Storage: {
-    get: jest.fn(),
-  },
-}));
 jest.mock('plaiceholder', () => ({
   getPlaiceholder: jest.fn().mockResolvedValue({ base64: 'data:image/png;base64,placeholder' }),
 }));
@@ -50,10 +43,10 @@ describe('Projects page', () => {
     }
   });
 
-  it('returns empty image data when server-side project data loading fails', async () => {
-    (Storage.get as jest.Mock).mockRejectedValue(new Error('storage failed'));
+  it('returns empty image data when static project data loading fails', async () => {
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('fetch failed'));
 
-    await expect(getServerSideProps({} as any)).resolves.toEqual({
+    await expect(getStaticProps({} as any)).resolves.toEqual({
       props: {
         imageUrls: [],
         base64: [],

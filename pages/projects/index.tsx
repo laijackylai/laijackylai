@@ -1,10 +1,8 @@
-import type { GetServerSideProps, GetStaticProps, NextPage } from 'next'
-import MyPdfViewer from './pdfViewer'
+import type { GetStaticProps, NextPage } from 'next'
 import Image from 'next/image'
 import githubLogo from '../../public/logos/github.png'
 import pythonLogo from '../../public/logos/python.png'
 import reactLogo from '../../public/logos/react.png'
-import { Storage } from 'aws-amplify'
 import ocra from '../../components/font'
 import Title from '../../components/title'
 // @ts-ignore
@@ -233,12 +231,18 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
 
 export default Projects
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
+
+const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
+  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
     const imageKeys = ["takcarly/takcarly_1.png", "takcarly/takcarly_2.png", "takcarly/takcarly_3.png"]
-    const urls = await Promise.all(
-      imageKeys.map((key) => Storage.get(key, { level: 'public' }))
-    );
+    const urls = imageKeys.map(publicStorageUrl);
 
     // get blurred photos
     const photoBase64 = await Promise.all(

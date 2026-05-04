@@ -1,17 +1,113 @@
-/* eslint-disable no-console */
-/* eslint-disable no-shadow */
-import { Amplify, DataStore } from 'aws-amplify';
 import fs from 'fs/promises';
 import sharp from 'sharp';
-import { Photo } from '../src/models';
-import awsconfig from '../src/aws-exports';
 import sizeOf from 'image-size';
+import { defaultProvider } from '@aws-sdk/credential-provider-node';
+import { SignatureV4 } from '@aws-sdk/signature-v4';
+import { HttpRequest } from '@aws-sdk/protocol-http';
+import { Sha256 } from '@aws-crypto/sha256-js';
 
-Amplify.configure(awsconfig);
+type ExistingPhoto = {
+  id: string;
+  s3key: string;
+  type: string;
+  aspectRatio: string;
+  blurredBase64?: string | null;
+};
 
 const folder = './assets/images';
+const region = process.env.AWS_REGION ?? 'ap-southeast-1';
 
-const processImage = async (file: string) => {
+export const createSignedGraphqlClient = (appSyncUrl = process.env.APPSYNC_URL) => {
+  if (!appSyncUrl) {
+    throw new Error('APPSYNC_URL is required');
+  }
+
+  const url = new URL(appSyncUrl);
+  const signer = new SignatureV4({
+    service: 'appsync',
+    region,
+    credentials: defaultProvider(),
+    sha256: Sha256,
+  });
+
+  return async (query: string, variables: Record<string, unknown>) => {
+    const body = JSON.stringify({ query, variables });
+    const request = new HttpRequest({
+      method: 'POST',
+      protocol: url.protocol,
+      hostname: url.host,
+      path: url.pathname,
+      headers: { 'content-type': 'application/json', host: url.host },
+      body,
+    });
+    const signed = await signer.sign(request);
+    const res = await fetch(appSyncUrl, {
+      method: 'POST',
+      headers: signed.headers as Record<string, string>,
+      body,
+    });
+    const json = await res.json();
+    if (json.errors) {
+      throw new Error(JSON.stringify(json.errors));
+    }
+    return json.data;
+  };
+};
+
+const listByS3KeyQuery = /* GraphQL */ `
+  query ListPhotosByS3Key($s3key: String!) {
+    listPhotos(filter: { s3key: { eq: $s3key } }, limit: 1) {
+      items {
+        id
+        s3key
+        type
+        aspectRatio
+        blurredBase64
+      }
+    }
+  }
+`;
+
+const createPhotoMutation = /* GraphQL */ `
+  mutation CreatePhoto($input: CreatePhotoInput!) {
+    createPhoto(input: $input) {
+      id
+    }
+  }
+`;
+
+const updatePhotoMutation = /* GraphQL */ `
+  mutation UpdatePhoto($input: UpdatePhotoInput!) {
+    updatePhoto(input: $input) {
+      id
+    }
+  }
+`;
+
+const upsertPhoto = async (
+  gql: ReturnType<typeof createSignedGraphqlClient>,
+  input: Omit<ExistingPhoto, 'id'>
+) => {
+  const data = await gql(listByS3KeyQuery, { s3key: input.s3key });
+  const existing = data.listPhotos?.items?.[0] as ExistingPhoto | undefined;
+
+  if (existing) {
+    if (
+      existing.type !== input.type ||
+      existing.aspectRatio !== input.aspectRatio ||
+      existing.blurredBase64 !== input.blurredBase64
+    ) {
+      await gql(updatePhotoMutation, { input: { id: existing.id, ...input } });
+      return 'updated';
+    }
+    return 'unchanged';
+  }
+
+  await gql(createPhotoMutation, { input });
+  return 'created';
+};
+
+export const processImage = async (file: string, gql: ReturnType<typeof createSignedGraphqlClient>) => {
   if (file.startsWith('.DS_Store')) return undefined;
 
   const filePath = `${folder}/${file}`;
@@ -35,50 +131,33 @@ const processImage = async (file: string) => {
     const base64 = buffer.toString('base64');
     const dataUrl = `data:image/png;base64,${base64}`;
 
-    const photos = await DataStore.query(Photo, c => c.s3key.eq(s3Key));
-    if (!photos) return undefined;
-
-    if (photos.length > 0) {
-      const photo = photos[0];
-      if (photo.type !== fileType || photo.aspectRatio !== aspectRatio || photo.blurredBase64 !== dataUrl) {
-        await DataStore.save(
-          Photo.copyOf(photo, u => {
-            u.type = fileType;
-            u.aspectRatio = aspectRatio;
-            u.blurredBase64 = dataUrl;
-          })
-        );
-        return 'updated';
-      }
-
-      return 'unchanged';
-    }
-
-    await DataStore.save(
-      new Photo({
-        s3key: s3Key,
-        type: fileType,
-        aspectRatio,
-        blurredBase64: dataUrl,
-      })
-    );
-    return 'created';
+    return upsertPhoto(gql, {
+      s3key: s3Key,
+      type: fileType,
+      aspectRatio,
+      blurredBase64: dataUrl,
+    });
   } catch (error) {
     console.error(`Error processing ${file}:`, error);
     return 'error';
   }
 };
 
-const main = async () => {
+export const syncBlurImages = async (gql = createSignedGraphqlClient()) => {
   try {
     const files = await fs.readdir(folder);
-    const results = await Promise.all(files.map(processImage));
+    const results = await Promise.all(files.map((file) => processImage(file, gql)));
     const processed = results.filter(Boolean).length;
     console.log(`Blur sync complete. Processed ${processed} file(s).`);
+    return processed;
   } catch (error) {
     console.error('Error reading image folder:', error);
-    process.exitCode = 1;
+    throw error;
   }
 };
 
-void main();
+if (require.main === module) {
+  syncBlurImages().catch(() => {
+    process.exitCode = 1;
+  });
+}
