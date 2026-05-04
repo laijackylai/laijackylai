@@ -131,10 +131,6 @@ Status: installed. `uv` and `uvx` are available from `~/.local/bin`.
       "command": "uvx",
       "args": ["awslabs.cdk-mcp-server@latest"]
     },
-    "aws-frontend": {
-      "command": "uvx",
-      "args": ["awslabs.frontend-mcp-server@latest"]
-    },
     "aws-api": {
       "command": "uvx",
       "args": ["awslabs.aws-api-mcp-server@latest"],
@@ -149,7 +145,6 @@ Status: installed. `uv` and `uvx` are available from `~/.local/bin`.
 Why each:
 - `aws-docs` — Amplify Gen 2 docs lookup (training data stale on Gen 2)
 - `aws-cdk` — Gen 2 = CDK underneath; helps when extending `backend.ts` w/ raw CDK
-- `aws-frontend` — Next.js + Amplify integration patterns
 - `aws-api` — read-only AWS API calls (DynamoDB scan, S3 ls) without leaving Claude
 
 No dedicated Amplify Gen 2 MCP exists yet. AWS docs MCP covers Gen 2 reference.
@@ -158,7 +153,7 @@ No dedicated Amplify Gen 2 MCP exists yet. AWS docs MCP covers Gen 2 reference.
 
 `/mcp` to verify connection.
 
-Status: MCP server entries were added to `~/.claude.json` on 2026-05-01. Restart Claude Code and run `/mcp` to verify the servers connect in the client.
+Status: MCP server entries were added to `~/.claude.json` on 2026-05-01. `aws-api`, `aws-docs`, and `aws-cdk` were verified connected. `aws-frontend` was removed from the local MCP config.
 
 ### 3.4 Optional: Playwright MCP
 
@@ -176,7 +171,8 @@ Plan only names `BLUR_API_TOKEN`. Full list:
 | `APPSYNC_URL` | Amplify Hosting + `.env.local` | SSR fetch endpoint | 3.3 |
 | `APPSYNC_API_KEY` | Amplify Hosting + `.env.local` | read-only key for `getStaticProps` | 3.3 |
 | `APPSYNC_ADMIN_KEY` | Amplify Hosting only | write key for `/api/blur` | 3.5 |
-| `REVALIDATE_TOKEN` | Amplify Hosting only | `/api/revalidate` auth | 3.4 |
+| ~~`REVALIDATE_TOKEN`~~ | ~~Amplify Hosting only~~ | ~~`/api/revalidate` auth~~ | dropped 2026-05-04 (Phase 3.4) |
+| `STORAGE_BASE_URL` | Amplify Hosting + `.env.local` | Gen 2 S3 bucket base for `publicStorageUrl()` | 2/4 boundary |
 | `AWS_REGION` | implicit | `ap-southeast-1` | 1+ |
 
 Set in:
@@ -189,7 +185,7 @@ Generate tokens:
 openssl rand -hex 32
 ```
 
-Status: `.env.local` was generated on 2026-05-01 with `BLUR_API_TOKEN`, `APPSYNC_URL`, `APPSYNC_API_KEY`, `REVALIDATE_TOKEN`, and `AWS_REGION`. `APPSYNC_ADMIN_KEY` remains blank until the Gen 2 write/admin key exists.
+Status: `.env.local` generated 2026-05-01 with `BLUR_API_TOKEN`, `APPSYNC_URL`, `APPSYNC_API_KEY`, `REVALIDATE_TOKEN`, and `AWS_REGION`. `REVALIDATE_TOKEN` removed 2026-05-04 (Phase 3.4 dropped). `APPSYNC_ADMIN_KEY` blank until Gen 2 write/admin key exists.
 
 ---
 
@@ -298,7 +294,7 @@ backend:
 - [x] AWS CLI ≥ 2.15 — current local version is `2.34.40`.
 - [x] Amplify Hosting service role attached to app `d2ukbi00figpw1`
 - [x] Node 20 active locally — `node@20` installed via Homebrew and new interactive zsh shells resolve `v20.20.2`.
-- [ ] MCP servers configured + `/mcp` shows connected — config written; restart Claude Code and verify `/mcp`.
+- [x] MCP servers configured + `/mcp` shows connected — `aws-api`, `aws-docs`, and `aws-cdk` connected; `aws-frontend` removed.
 - [ ] All env var values generated + ready to paste — `.env.local` generated; `APPSYNC_ADMIN_KEY` is pending Gen 2.
 - [ ] ISR smoke test on Amplify Hosting passed (or Vercel decision made)
 - [x] Gen 1 snapshots saved to `docs/gen1-*-snapshot.json`
