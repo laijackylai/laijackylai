@@ -1,5 +1,5 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
-import { iamAuthenticated } from './iam-auth';
+import { iamAuthenticated } from './iam-auth.js';
 
 const schema = a.schema({
   Photo: a
