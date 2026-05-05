@@ -240,7 +240,7 @@ const getStorageBaseUrl = () => {
   return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
 };
 
-const publicStorageUrl = (key: string) => {
+export const publicStorageUrl = (key: string) => {
   const storageBaseUrl = getStorageBaseUrl();
   const encodedKey = key.split('/').map(encodeURIComponent).join('/');
   return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
@@ -248,7 +248,11 @@ const publicStorageUrl = (key: string) => {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
-    const imageKeys = ["takcarly/takcarly_1.png", "takcarly/takcarly_2.png", "takcarly/takcarly_3.png"]
+    const imageKeys = [
+      'public/takcarly/takcarly_1.png',
+      'public/takcarly/takcarly_2.png',
+      'public/takcarly/takcarly_3.png',
+    ];
     const urls = imageKeys.map(publicStorageUrl);
 
     // get blurred photos

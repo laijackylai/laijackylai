@@ -298,6 +298,8 @@ export const storage = defineStorage({
 
 Status: completed on 2026-05-03. Bucket `amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2` (`ap-southeast-1`). Add this hostname to `next.config.js` `remotePatterns` before Phase 3.3.
 
+**Superseded 2026-05-05 by §1.12.1**: access path changes from `'photos/*'` to `'public/*'` to match Gen 1 keys + Gen 2 SDK convention. Use the snippet here only for reference; the `'public/*'` form in 1.12.1 is canonical.
+
 ### 1.6 `amplify/backend.ts`
 
 ```ts
@@ -542,6 +544,265 @@ If 401 / `UnauthorizedException` / `NotAuthorizedException`:
 
 All four boxes green — Phase 2 unblocked.
 
+### 1.12 Gap A — Storage path / key prefix alignment
+
+**Surfaced 2026-05-05** during pipeline-deploy verification on Amplify Hosting (test branch `phase-1-amplify-gen2`, jobs 5–6). Frontend build failed:
+
+> `Error: Input buffer contains unsupported image format` (plaiceholder fed a 403 / XML body)
+
+Root cause: `pages/projects/index.tsx:251` declares `imageKeys = ["takcarly/takcarly_1.png", ...]` and pipes them through `publicStorageUrl()` (an unsigned `${STORAGE_BASE_URL}/${key}` builder). The Gen 1 prod bucket actually stores them at `public/takcarly/...` — the old code used Amplify v5 `Storage.get(key)` which auto-prepended `public/`. v6 has no such auto-prefix, and `publicStorageUrl()` does not add one.
+
+There is also a Gen 2 mirror of the same bug: `amplify/storage/resource.ts` declares the access path as `'photos/*'`, which neither matches the Gen 1 keys (`public/...`) nor the Gen 2 SDK convention (`public/*` is the documented guest-read prefix per [Amplify Storage authorization docs](https://docs.amplify.aws/react/build-a-backend/storage/authorization/)). Picking `photos/*` would force a per-key rename during Phase 2.3 S3 sync, which we do not want.
+
+**Decision**: align Gen 2 storage path to `public/*` so Gen 1 keys copy in-place during 2.3, then patch the Projects page to reference keys with the same `public/` prefix that `getStaticProps` will use for both buckets.
+
+#### 1.12.1 Switch Gen 2 storage path to `public/*`
+
+`amplify/storage/resource.ts`:
+
+```ts
+import { defineStorage } from '@aws-amplify/backend';
+
+export const storage = defineStorage({
+  name: 'laijackylai-storage',
+  access: (allow) => ({
+    'public/*': [
+      allow.guest.to(['read']),
+      allow.authenticated.to(['read', 'write', 'delete']),
+    ],
+  }),
+});
+```
+
+This is the Gen 2 canonical guest-read prefix. Documented in `aws-amplify/docs` storage authorization page; the `'photos/*'` value used in 1.5 was a mistake.
+
+#### 1.12.2 Fix `pages/projects/index.tsx` keys
+
+`pages/projects/index.tsx:251` — add `public/` prefix:
+
+```ts
+const imageKeys = [
+  'public/takcarly/takcarly_1.png',
+  'public/takcarly/takcarly_2.png',
+  'public/takcarly/takcarly_3.png',
+];
+const urls = imageKeys.map(publicStorageUrl);
+```
+
+Do not introduce a helper that prepends `public/` automatically — that just hides the prefix. Source-of-truth keys are stored verbatim.
+
+#### 1.12.3 Verify `pages/photography/index.tsx` keys
+
+`pages/photography/index.tsx:182` calls `publicStorageUrl(photo.s3key)`. The DynamoDB `s3key` column already contains `public/...` strings on Gen 1 (verified via `aws dynamodb scan ... | jq '.Items[0].s3key.S'` — capture in 1.12.6 acceptance). No code change needed; just confirm.
+
+If any row's `s3key` does **not** start with `public/`, fix it in `scripts/blur.ts` before Phase 2.2 so the migrated rows land with consistent prefixes.
+
+#### 1.12.4 Update Phase 2.3 sync command
+
+Phase 2.3 currently syncs `s3://laijackylai-storage-4ba35e5623621-main/photos/` → `s3://<gen2-bucket>/photos/`. After 1.12.1 the target prefix is `public/`, and Gen 1 source is also `public/` (the Gen 1 `Storage.put()` default). Replace with:
+
+```bash
+aws s3 sync \
+  s3://laijackylai-storage-4ba35e5623621-main/public/ \
+  s3://<gen2-bucket>/public/ \
+  --region ap-southeast-1
+```
+
+Bucket name comes from the prod `amplify_outputs.json` once the prod stack lands (different from the test-branch bucket). Update Phase 2.3 with the actual prod bucket name at cutover time.
+
+#### 1.12.5 Tests
+
+Add a regression in `tests/ProjectsPage.test.tsx` (or new `tests/PublicStorageUrl.test.ts`):
+
+```ts
+it('publicStorageUrl preserves public/ prefix', () => {
+  process.env.STORAGE_BASE_URL = 'https://example.s3.amazonaws.com';
+  expect(publicStorageUrl('public/takcarly/takcarly_1.png'))
+    .toBe('https://example.s3.amazonaws.com/public/takcarly/takcarly_1.png');
+});
+```
+
+Export `publicStorageUrl` from `pages/projects/index.tsx` (or move to a shared `lib/storage.ts` if both pages re-import — not required but reduces duplication).
+
+#### 1.12.6 Acceptance
+
+- [ ] `amplify/storage/resource.ts` access path = `'public/*'`
+- [ ] `pages/projects/index.tsx:251` keys all start with `public/`
+- [ ] `aws dynamodb scan --table-name Photo-gbzpma2elvdxnjqehhqdnf5wmy-main --region ap-southeast-1 --max-items 5 --projection-expression s3key | jq '.Items[].s3key.S'` shows every value starts with `public/` (paste output into PR description as evidence)
+- [ ] Phase 2.3 sync paths updated in this doc
+- [ ] Test added asserting `public/` prefix flows through `publicStorageUrl()`
+- [ ] `npm run lint && npm test && npm run build` green
+
+### 1.13 Gap B — Gen 2 bucket access strategy
+
+**Surfaced 2026-05-05** alongside Gap A. Gen 2 buckets created by `defineStorage` ship with a deny-by-default bucket policy:
+
+```json
+{ "Effect": "Deny",  "Principal": "*", "Condition": { "Bool": { "aws:SecureTransport": false } } }
+{ "Effect": "Allow", "Principal": { "AWS": "<auto-delete-objects-role>" }, ... }
+```
+
+Guest reads are routed through Cognito Identity Pool → unauth IAM role → SigV4-signed S3 GET. There is no public S3 read by default. `publicStorageUrl()` constructs **unsigned** direct S3 URLs — these will 403 against any Gen 2 bucket regardless of the `allow.guest.to(['read'])` rule, because that rule grants the IAM role permission, not the bucket policy.
+
+Gen 1 happened to work because the Gen 1 CLI created a bucket policy with `Principal: "*"` on `public/*`. Gen 2 does not.
+
+Migration plan §3.x assumed `STORAGE_BASE_URL` flip alone was sufficient. It is not. Choose one access strategy below before Phase 4 cutover.
+
+#### 1.13.1 Strategy comparison
+
+| Option | What it does | Build-time fetch in `getStaticProps`? | Auth | Effort | Drawback |
+|--------|-------------|----------------------------------------|------|--------|----------|
+| **A. Public-read policy on `public/*`** | CDK escape hatch in `amplify/backend.ts` adds `s3:GetObject` Allow for `Principal: "*"` on `arn:.../public/*` only | ✅ Yes — direct unsigned URL works | Public on `public/*`, deny elsewhere | Low | Anyone can fetch `public/*` objects directly. Same exposure as Gen 1 today. |
+| **B. Server-side presigned URLs via `getUrl()`** | `getStaticProps` calls `getUrl({ path })` per photo, returns signed URL through props | ✅ Yes — but URL expires at most 1h | IAM-signed via Identity Pool guest role | Medium | URLs expire. ISR re-runs every 60s → URL is regenerated on each rebuild → fine for ISR, but breaks if a CDN caches the HTML longer than `expiresIn`. Adds Amplify SDK config to server runtime. |
+| **C. CloudFront + OAC fronting bucket** | New CloudFront distribution, OAC reads bucket, public domain serves objects | ✅ Yes | Public via CDN; bucket private | Medium-high | Adds a distribution + cache-invalidation surface. Overkill for personal site unless edge caching is wanted anyway. |
+| **D. Server-side `s3:GetObject` in route handler** | Add `pages/api/photo/[...key].ts` that streams S3 objects through Lambda | ❌ Defeats `next/image` `remotePatterns` benefit | App-level | High | Wastes Lambda time + bandwidth for static assets. Not viable for ISR `<Image>` workflow. |
+
+**Recommendation: Option A (public-read on `public/*` only).**
+
+Rationale:
+- Matches existing Gen 1 exposure surface — no new threat model.
+- Zero client-side changes; `publicStorageUrl()` keeps working.
+- `next/image` continues to fetch directly via `remotePatterns` (best perf, no Lambda hop).
+- Survives ISR, on-demand revalidate, and any CDN cache layer.
+- Easiest to revert: if we later move to OAC/CloudFront, just remove the policy and add the distribution.
+
+Pick a different option only if the threat model changes (private photos, signed downloads required, etc.).
+
+#### 1.13.2 Implement Option A — public-read policy
+
+`amplify/backend.ts`:
+
+```ts
+import { defineBackend } from '@aws-amplify/backend';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { auth } from './auth/resource.js';
+import { data } from './data/resource.js';
+import { storage } from './storage/resource.js';
+
+const backend = defineBackend({ auth, data, storage });
+
+const bucket = backend.storage.resources.bucket;
+bucket.addToResourcePolicy(
+  new PolicyStatement({
+    sid: 'PublicReadOnPublicPrefix',
+    effect: Effect.ALLOW,
+    principals: [new (require('aws-cdk-lib/aws-iam').AnyPrincipal)()],
+    actions: ['s3:GetObject'],
+    resources: [`${bucket.bucketArn}/public/*`],
+  }),
+);
+```
+
+Cleaner ESM import shape:
+
+```ts
+import { defineBackend } from '@aws-amplify/backend';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { auth } from './auth/resource.js';
+import { data } from './data/resource.js';
+import { storage } from './storage/resource.js';
+
+const backend = defineBackend({ auth, data, storage });
+
+backend.storage.resources.bucket.addToResourcePolicy(
+  new PolicyStatement({
+    sid: 'PublicReadOnPublicPrefix',
+    effect: Effect.ALLOW,
+    principals: [new AnyPrincipal()],
+    actions: ['s3:GetObject'],
+    resources: [`${backend.storage.resources.bucket.bucketArn}/public/*`],
+  }),
+);
+```
+
+The `aws-cdk-lib` peer is already in the dependency tree (transitive of `@aws-amplify/backend`). If TypeScript surfaces `Cannot find module 'aws-cdk-lib/aws-iam'`, install explicitly:
+
+```bash
+npm install --save-dev aws-cdk-lib constructs
+```
+
+Pin at the exact major used by `@aws-amplify/backend@1.22.0` — currently `aws-cdk-lib@^2.158.0`. Verify with `npm ls aws-cdk-lib`.
+
+The `Bool: aws:SecureTransport: false` deny-by-default statement Amplify ships with takes precedence over allows for non-HTTPS requests, so the new public-read does **not** weaken HTTPS enforcement.
+
+#### 1.13.3 Verify policy after deploy
+
+Sandbox first:
+
+```bash
+npx ampx sandbox
+
+# Then check the bucket policy
+aws s3api get-bucket-policy \
+  --bucket <sandbox-bucket-from-amplify_outputs.json> \
+  --region ap-southeast-1 \
+  | jq -r '.Policy' | jq .
+
+# Spot-test guest read
+curl -I https://<sandbox-bucket>.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_1.png
+# Expect: HTTP/2 200 (after Phase 2.3 sync) or HTTP/2 404 (before sync). Must not be 403.
+
+# Confirm non-public/ prefix is still denied
+curl -I https://<sandbox-bucket>.s3.ap-southeast-1.amazonaws.com/protected/test.png
+# Expect: HTTP/2 403
+```
+
+#### 1.13.4 If picking Option B instead
+
+Implementation sketch (do not implement unless A is rejected):
+
+```ts
+// pages/photography/index.tsx getStaticProps
+import { Amplify } from 'aws-amplify';
+import { getUrl } from 'aws-amplify/storage';
+import outputs from '../../amplify_outputs.json';
+
+Amplify.configure(outputs, { ssr: true });
+
+const photosWithUrls = await Promise.all(
+  photos.map(async (p) => ({
+    ...p,
+    url: (await getUrl({ path: p.s3key, options: { expiresIn: 3600 } })).url.toString(),
+  })),
+);
+```
+
+Caveats:
+- Needs `@aws-amplify/adapter-nextjs` for ISR-safe SSR config (see [Amplify Next.js SSR guide](https://docs.amplify.aws/nextjs/build-a-backend/server-side-rendering/)).
+- Identity Pool unauth role needs `s3:GetObject` on `public/*` (already granted by `allow.guest.to(['read'])`).
+- `expiresIn` max 3600s. ISR window is 60s by default → URL is fresh on each rebuild. If CloudFront / Amplify Hosting CDN caches the rendered HTML longer than 1h, links 403 client-side. Set explicit `Cache-Control: max-age=3000` on the page or shorten ISR.
+- `aws-amplify` re-enters the client bundle (`Amplify.configure` is server-only, but tree-shaking is fragile). Verify `next build` First Load JS does not regress past 100KB (Phase 3.7 acceptance).
+
+#### 1.13.5 Acceptance
+
+- [ ] Strategy decision recorded in PR description (A / B / C / D + reason)
+- [ ] If A: `aws s3api get-bucket-policy` on sandbox bucket shows `s3:GetObject` Allow on `public/*` only (paste truncated output into PR)
+- [ ] If A: `curl -I https://<bucket>/public/<key>` returns 200 after Phase 2.3 sync
+- [ ] If A: `curl -I https://<bucket>/protected/test` returns 403 (verifies scope is bounded)
+- [ ] If B: `getUrl()` server-side returns signed URLs at build, ISR runs do not throw, First Load JS for `/photography` < 100KB
+- [ ] `next.config.js` `remotePatterns` already covers Gen 2 bucket hostname (verified 2026-05-04, 1.9 carry-over §2)
+
+### 1.14 Re-run pipeline-deploy verification
+
+After 1.12 + 1.13 land:
+
+1. Push to test branch `phase-1-amplify-gen2`.
+2. Wait for build job — backend should incrementally update (no stack recreate).
+3. Set/update branch env vars on the Amplify console for the test branch:
+   - `APPSYNC_URL`, `APPSYNC_API_KEY` — re-read from CFN data stack outputs after rebuild.
+   - `STORAGE_BASE_URL` — point at the test-branch Gen 2 bucket (`amplify-d2ukbi00figpw1-ph-laijackylaistoragebucket-rivk3jxqwkow.s3.ap-southeast-1.amazonaws.com`).
+4. Smoke-test:
+   - `https://phase-1-amplify-gen2.<app-id>.amplifyapp.com/projects` — page renders, all 3 takcarly images load (200, not 403/empty).
+   - `/photography` — at least one photo renders (DynamoDB will be empty until Phase 2.2; acceptance is "page builds without throwing", not "shows photos").
+5. After green: cleanup test branch (`aws amplify delete-branch --app-id d2ukbi00figpw1 --branch-name phase-1-amplify-gen2 --region ap-southeast-1`).
+
+#### 1.14.1 Acceptance
+
+- [ ] Latest job on test branch = SUCCEED
+- [ ] `/projects` returns 200 with all 3 images visible (network tab shows 200 on each `public/takcarly/...` URL)
+- [ ] `/photography` builds without throwing; empty list rendered (DynamoDB still empty pre-Phase 2.2)
+- [ ] Test branch deleted from Amplify Hosting
+
 ---
 
 ## Phase 2 — Data Migration
@@ -655,18 +916,20 @@ Notes:
 Source: `laijackylai-storage-4ba35e5623621-main` (Gen 1 prod, from `docs/gen1-storage-snapshot.json`).
 Target: `amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2` for sandbox; the prod stack's bucket name once pipeline-deploy lands (read from prod `amplify_outputs.json`).
 
+**Updated 2026-05-05 per §1.12.4**: prefix is `public/`, not `photos/`. The Gen 1 bucket stores keys at `public/...` (CLI default for v5 `Storage.put()`) and the Gen 2 path now matches via §1.12.1.
+
 ```bash
 aws s3 sync \
-  s3://laijackylai-storage-4ba35e5623621-main/photos/ \
-  s3://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2/photos/ \
+  s3://laijackylai-storage-4ba35e5623621-main/public/ \
+  s3://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2/public/ \
   --region ap-southeast-1
 ```
 
 Verify count parity:
 
 ```bash
-aws s3 ls s3://laijackylai-storage-4ba35e5623621-main/photos/ --recursive | wc -l
-aws s3 ls s3://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2/photos/ --recursive | wc -l
+aws s3 ls s3://laijackylai-storage-4ba35e5623621-main/public/ --recursive | wc -l
+aws s3 ls s3://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2/public/ --recursive | wc -l
 ```
 
 Counts must match.

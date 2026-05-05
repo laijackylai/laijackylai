@@ -158,7 +158,7 @@ export const processImage = async (file: string, writeGql: GraphqlClient, readGq
     if (!stats.isFile()) return undefined;
 
     const fileType = file.startsWith('DSC') ? 'digital' : 'film';
-    const s3Key = `photos/${fileType}/${file}`;
+    const s3Key = `public/${fileType}/${file}`;
 
     const dimensions = sizeOf(filePath);
     if (!dimensions || !dimensions.width || !dimensions.height) return undefined;

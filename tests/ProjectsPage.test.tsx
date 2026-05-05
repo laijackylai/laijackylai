@@ -1,11 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import Projects, { getStaticProps } from '../pages/projects';
+import Projects, { getStaticProps, publicStorageUrl } from '../pages/projects';
 
 jest.mock('plaiceholder', () => ({
   getPlaiceholder: jest.fn().mockResolvedValue({ base64: 'data:image/png;base64,placeholder' }),
 }));
 
 describe('Projects page', () => {
+  const originalStorageBaseUrl = process.env.STORAGE_BASE_URL;
+
   beforeEach(() => {
     jest.clearAllMocks();
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
@@ -15,6 +17,10 @@ describe('Projects page', () => {
     global.fetch = jest.fn().mockResolvedValue({
       arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(8)),
     }) as any;
+  });
+
+  afterEach(() => {
+    process.env.STORAGE_BASE_URL = originalStorageBaseUrl;
   });
 
   it('renders the five project sections and opens the senior design PDF', () => {
@@ -52,5 +58,13 @@ describe('Projects page', () => {
         base64: [],
       },
     });
+  });
+
+  it('preserves public/ prefixes in public storage URLs', () => {
+    process.env.STORAGE_BASE_URL = 'https://example.s3.amazonaws.com';
+
+    expect(publicStorageUrl('public/takcarly/takcarly_1.png')).toBe(
+      'https://example.s3.amazonaws.com/public/takcarly/takcarly_1.png'
+    );
   });
 });
