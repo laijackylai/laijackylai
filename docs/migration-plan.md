@@ -674,54 +674,40 @@ Pick a different option only if the threat model changes (private photos, signed
 
 ```ts
 import { defineBackend } from '@aws-amplify/backend';
-import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { auth } from './auth/resource.js';
 import { data } from './data/resource.js';
 import { storage } from './storage/resource.js';
 
 const backend = defineBackend({ auth, data, storage });
-
 const bucket = backend.storage.resources.bucket;
+const cfnBucket = bucket.node.defaultChild as CfnBucket;
+
+// Allow the scoped public/* bucket policy while keeping ACL blocking in place.
+cfnBucket.addPropertyOverride('PublicAccessBlockConfiguration.BlockPublicPolicy', false);
+cfnBucket.addPropertyOverride('PublicAccessBlockConfiguration.RestrictPublicBuckets', false);
+
 bucket.addToResourcePolicy(
   new PolicyStatement({
     sid: 'PublicReadOnPublicPrefix',
     effect: Effect.ALLOW,
-    principals: [new (require('aws-cdk-lib/aws-iam').AnyPrincipal)()],
+    principals: [new AnyPrincipal()],
     actions: ['s3:GetObject'],
     resources: [`${bucket.bucketArn}/public/*`],
   }),
 );
 ```
 
-Cleaner ESM import shape:
+The CDK override is required because Amplify's generated bucket has S3 Block Public Access enabled. Keep `BlockPublicAcls` and `IgnorePublicAcls` enabled; only turn off `BlockPublicPolicy` and `RestrictPublicBuckets` so CloudFormation can attach the scoped `s3:GetObject` policy for `public/*`.
 
-```ts
-import { defineBackend } from '@aws-amplify/backend';
-import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { auth } from './auth/resource.js';
-import { data } from './data/resource.js';
-import { storage } from './storage/resource.js';
-
-const backend = defineBackend({ auth, data, storage });
-
-backend.storage.resources.bucket.addToResourcePolicy(
-  new PolicyStatement({
-    sid: 'PublicReadOnPublicPrefix',
-    effect: Effect.ALLOW,
-    principals: [new AnyPrincipal()],
-    actions: ['s3:GetObject'],
-    resources: [`${backend.storage.resources.bucket.bucketArn}/public/*`],
-  }),
-);
-```
-
-The `aws-cdk-lib` peer is already in the dependency tree (transitive of `@aws-amplify/backend`). If TypeScript surfaces `Cannot find module 'aws-cdk-lib/aws-iam'`, install explicitly:
+The `aws-cdk-lib` peer is already in the dependency tree (transitive of `@aws-amplify/backend`). Install it explicitly because `amplify/backend.ts` imports CDK modules directly:
 
 ```bash
-npm install --save-dev aws-cdk-lib constructs
+npm install --save-dev aws-cdk-lib@^2.252.0 constructs@^10.6.0
 ```
 
-Pin at the exact major used by `@aws-amplify/backend@1.22.0` — currently `aws-cdk-lib@^2.158.0`. Verify with `npm ls aws-cdk-lib`.
+Pin at the exact major used by `@aws-amplify/backend@1.22.0`. Verify with `npm ls aws-cdk-lib constructs`.
 
 The `Bool: aws:SecureTransport: false` deny-by-default statement Amplify ships with takes precedence over allows for non-HTTPS requests, so the new public-read does **not** weaken HTTPS enforcement.
 
