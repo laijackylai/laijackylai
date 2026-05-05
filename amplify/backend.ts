@@ -9,6 +9,8 @@ const backend = defineBackend({ auth, data, storage });
 const bucket = backend.storage.resources.bucket;
 const cfnBucket = bucket.node.defaultChild as CfnBucket;
 
+cfnBucket.addPropertyOverride('PublicAccessBlockConfiguration.BlockPublicAcls', true);
+cfnBucket.addPropertyOverride('PublicAccessBlockConfiguration.IgnorePublicAcls', true);
 cfnBucket.addPropertyOverride('PublicAccessBlockConfiguration.BlockPublicPolicy', false);
 cfnBucket.addPropertyOverride('PublicAccessBlockConfiguration.RestrictPublicBuckets', false);
 
