@@ -233,8 +233,12 @@ export default Projects
 
 const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
+const shouldFailStaticBuild = () => (
+  process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
+);
+
 const getStorageBaseUrl = () => {
-  if (!process.env.STORAGE_BASE_URL && process.env.NODE_ENV === 'production') {
+  if (!process.env.STORAGE_BASE_URL && shouldFailStaticBuild()) {
     throw new Error('STORAGE_BASE_URL is required to build /projects');
   }
   return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
@@ -273,7 +277,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       },
     };
   } catch (error) {
-    if (process.env.NODE_ENV === 'production') {
+    if (shouldFailStaticBuild()) {
       throw error;
     }
     return {

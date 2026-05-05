@@ -118,8 +118,12 @@ const Photography: NextPage<Props> = ({
 
 const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
+const shouldFailStaticBuild = () => (
+  process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
+);
+
 const getStorageBaseUrl = () => {
-  if (!process.env.STORAGE_BASE_URL && process.env.NODE_ENV === 'production') {
+  if (!process.env.STORAGE_BASE_URL && shouldFailStaticBuild()) {
     throw new Error('STORAGE_BASE_URL is required to build /photography');
   }
   return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
@@ -142,7 +146,7 @@ const shuffleArray = <T,>(array: T[]) => {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
-    if (process.env.NODE_ENV !== 'development') {
+    if (shouldFailStaticBuild()) {
       throw new Error('APPSYNC_URL and APPSYNC_API_KEY are required to build /photography');
     }
     return { props: { photosData: [] }, revalidate: 60 };
@@ -184,7 +188,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
     return { props: { photosData: shuffleArray(photosData) }, revalidate: 60 };
   } catch (error) {
-    if (process.env.NODE_ENV !== 'development') {
+    if (shouldFailStaticBuild()) {
       throw error;
     }
     return { props: { photosData: [] }, revalidate: 60 };
