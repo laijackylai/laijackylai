@@ -360,7 +360,7 @@ Status: `amplify.yml` updated on 2026-05-03 with backend block + `npx ampx pipel
 - [x] `npx ampx sandbox` deploys clean — sandbox stack `CREATE_COMPLETE` 2026-05-03
 - [x] AppSync endpoint reachable, schema introspection works — `amplify_outputs.json` populated
 - [x] S3 bucket created, IAM policies on `photos/*` correct — `amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2`
-- [ ] Pipeline deploy succeeds on Amplify Hosting branch — pending push to a connected branch (only remaining 1.9 box)
+- [x] Pipeline deploy succeeds on Amplify Hosting branch — verified 2026-05-05 on test branch `phase-1-amplify-gen2`, job 12 SUCCEED (job 11 backend UPDATE_COMPLETE; frontend retried after transient `npm ci` ECONNRESET)
 
 **Carry-over before Phase 2**:
 
@@ -591,11 +591,55 @@ const urls = imageKeys.map(publicStorageUrl);
 
 Do not introduce a helper that prepends `public/` automatically — that just hides the prefix. Source-of-truth keys are stored verbatim.
 
-#### 1.12.3 Verify `pages/photography/index.tsx` keys
+#### 1.12.3 Compatibility shim in `publicStorageUrl()` (short-term)
 
-`pages/photography/index.tsx:182` calls `publicStorageUrl(photo.s3key)`. The DynamoDB `s3key` column already contains `public/...` strings on Gen 1 (verified via `aws dynamodb scan ... | jq '.Items[0].s3key.S'` — capture in 1.12.6 acceptance). No code change needed; just confirm.
+**Initial assumption was wrong.** Audit on 2026-05-05 of Gen 1 prod table `Photo-gbzpma2elvdxnjqehhqdnf5wmy-main` (sample of 10 rows):
 
-If any row's `s3key` does **not** start with `public/`, fix it in `scripts/blur.ts` before Phase 2.2 so the migrated rows land with consistent prefixes.
+```
+photos/film/000874080031.jpg
+photos/digital/DSC05884.jpg
+photos/film/000874100006.jpg
+photos/film/000044480026.jpg
+photos/digital/DSC05980.jpg
+photos/digital/DSC03523.jpg
+photos/film/000009540019.jpg
+photos/film/000060300003.jpg
+photos/film/000082500005.jpg
+photos/film/000009550014.jpg
+```
+
+Every row stores a **bare** key (no `public/` prefix). Actual S3 layout under `s3://laijackylai-storage-4ba35e5623621-main/`:
+
+```
+public/photos/film/000874080031.jpg
+public/photos/digital/DSC05884.jpg
+public/takcarly/takcarly_1.png
+```
+
+Gen 1 v5 `Storage.put({ key })` silently prepended `public/` before the S3 PUT but stored the bare key in DynamoDB. Without a fix, `publicStorageUrl(s3key)` constructs `${BASE}/photos/film/...` which 404s against any bucket whose objects live under `public/photos/...`.
+
+**Decision (2026-05-05): Option 1 short-term shim, Option 2 cleanup in Phase 2.**
+
+Patch `publicStorageUrl()` in both `pages/photography/index.tsx:132-136` and `pages/projects/index.tsx:247-251`:
+
+```ts
+// Gen 1 DynamoDB stores s3keys as bare paths (e.g. "photos/film/x.jpg"); Gen 1
+// v5 SDK silently prepended "public/" before talking to S3. This shim keeps the
+// same behavior so both bucket layouts resolve. Remove once Phase 2 migration
+// rewrites s3keys with the explicit "public/" prefix.
+const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = getStorageBaseUrl();
+  const normalizedKey = key.startsWith('public/') ? key : `public/${key}`;
+  const encodedKey = normalizedKey.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+```
+
+Helper is **idempotent**: passing `public/takcarly/...` (the explicit form used in `pages/projects/index.tsx:255-258`) is unchanged; passing bare `photos/film/...` (the shape stored in DynamoDB) gets the prefix added.
+
+Why short-term: hides a real schema convention behind code. Schema source-of-truth should hold full keys. Phase 2.2 migration script will rewrite s3keys with the prefix when copying Gen 1 → Gen 2 (see §2.2 Option 2 cleanup), at which point this shim is removed in §2.5.
+
+Test coverage: `tests/ProjectsPage.test.tsx` asserts both shapes round-trip (public/ preserved, bare prepended).
 
 #### 1.12.4 Update Phase 2.3 sync command
 
@@ -626,12 +670,12 @@ Export `publicStorageUrl` from `pages/projects/index.tsx` (or move to a shared `
 
 #### 1.12.6 Acceptance
 
-- [ ] `amplify/storage/resource.ts` access path = `'public/*'`
-- [ ] `pages/projects/index.tsx:251` keys all start with `public/`
-- [ ] `aws dynamodb scan --table-name Photo-gbzpma2elvdxnjqehhqdnf5wmy-main --region ap-southeast-1 --max-items 5 --projection-expression s3key | jq '.Items[].s3key.S'` shows every value starts with `public/` (paste output into PR description as evidence)
-- [ ] Phase 2.3 sync paths updated in this doc
-- [ ] Test added asserting `public/` prefix flows through `publicStorageUrl()`
-- [ ] `npm run lint && npm test && npm run build` green
+- [x] `amplify/storage/resource.ts` access path = `'public/*'` — verified 2026-05-05
+- [x] `pages/projects/index.tsx:255-258` keys all start with `public/` — verified 2026-05-05
+- [x] `aws dynamodb scan ... | jq '.Items[].s3key.S'` audit captured — output pasted in §1.12.3; **rows are bare (no `public/` prefix)**, hence the shim in §1.12.3 instead of an "all rows already prefixed" check
+- [x] Phase 2.3 sync paths updated in this doc — paths now `public/` (was `photos/`)
+- [x] `publicStorageUrl()` shim added + tested for both bare and prefixed keys — `tests/ProjectsPage.test.tsx`
+- [x] `npm run lint && npm test && npm run build` green — verified 2026-05-05 by user after commit `2061117`; re-verify after shim commit lands
 
 ### 1.13 Gap B — Gen 2 bucket access strategy
 
@@ -761,12 +805,12 @@ Caveats:
 
 #### 1.13.5 Acceptance
 
-- [ ] Strategy decision recorded in PR description (A / B / C / D + reason)
-- [ ] If A: `aws s3api get-bucket-policy` on sandbox bucket shows `s3:GetObject` Allow on `public/*` only (paste truncated output into PR)
-- [ ] If A: `curl -I https://<bucket>/public/<key>` returns 200 after Phase 2.3 sync
-- [ ] If A: `curl -I https://<bucket>/protected/test` returns 403 (verifies scope is bounded)
-- [ ] If B: `getUrl()` server-side returns signed URLs at build, ISR runs do not throw, First Load JS for `/photography` < 100KB
-- [ ] `next.config.js` `remotePatterns` already covers Gen 2 bucket hostname (verified 2026-05-04, 1.9 carry-over §2)
+- [x] Strategy decision recorded in PR description (A / B / C / D + reason) — Option A chosen 2026-05-05 (rationale in §1.13.1). PR body updated 2026-05-05.
+- [x] If A: `aws s3api get-bucket-policy` on test-branch bucket shows `s3:GetObject` Allow on `public/*` only — verified 2026-05-05, `PublicReadOnPublicPrefix` statement scoped to `arn:aws:s3:::<bucket>/public/*`
+- [x] If A: `curl -I https://<bucket>/public/<key>` returns 200 — verified 2026-05-05 on `public/takcarly/takcarly_1.png`
+- [x] If A: `curl -I https://<bucket>/protected/test` returns 403 — verified 2026-05-05 (scope bounded)
+- [ ] If B: not selected
+- [x] `next.config.js` `remotePatterns` covers Gen 2 bucket hostname (test-branch hostname `amplify-d2ukbi00figpw1-ph-laijackylaistoragebucket-rivk3jxqwkow.s3.ap-southeast-1.amazonaws.com` — note: prod stack will spawn a different bucket; add prod hostname to `remotePatterns` before flipping `main` env vars)
 
 ### 1.14 Re-run pipeline-deploy verification
 
@@ -784,10 +828,10 @@ After 1.12 + 1.13 land:
 
 #### 1.14.1 Acceptance
 
-- [ ] Latest job on test branch = SUCCEED
-- [ ] `/projects` returns 200 with all 3 images visible (network tab shows 200 on each `public/takcarly/...` URL)
-- [ ] `/photography` builds without throwing; empty list rendered (DynamoDB still empty pre-Phase 2.2)
-- [ ] Test branch deleted from Amplify Hosting
+- [x] Latest job on test branch = SUCCEED — job 12, 2026-05-05
+- [ ] `/projects` returns 200 with all 3 images visible (network tab shows 200 on each `public/takcarly/...` URL) — pending browser smoke after shim commit lands
+- [ ] `/photography` builds without throwing; empty list rendered (DynamoDB still empty pre-Phase 2.2) — pending browser smoke after shim commit lands
+- [ ] Test branch deleted from Amplify Hosting — defer until PR merged (keeps a green reference build until cutover)
 
 ---
 
@@ -856,10 +900,17 @@ const main = async () => {
   let failed = 0;
 
   for (const item of items) {
+    // Option 2 cleanup of §1.12.3 shim: rewrite bare s3keys with explicit
+    // `public/` prefix so Gen 2 schema matches the actual S3 layout 1:1.
+    // After this migration completes, the prefix shim in publicStorageUrl()
+    // (pages/photography/index.tsx + pages/projects/index.tsx) is removed in §2.5.
+    const rawKey = item.s3key.S;
+    const normalizedKey = rawKey.startsWith('public/') ? rawKey : `public/${rawKey}`;
+
     try {
       await gql(createPhotoMutation, {
         input: {
-          s3key: item.s3key.S,
+          s3key: normalizedKey,
           type: item.type.S,
           aspectRatio: item.aspectRatio.S,
           blurredBase64: item.blurredBase64?.S ?? null,
@@ -868,7 +919,7 @@ const main = async () => {
       created += 1;
     } catch (err) {
       failed += 1;
-      console.error(`Failed: ${item.s3key.S}`, err);
+      console.error(`Failed: ${normalizedKey}`, err);
     }
   }
 
@@ -928,6 +979,43 @@ Counts must match.
 - [ ] All S3 objects copied (compare `aws s3 ls --recursive | wc -l`)
 - [ ] Spot-check 5 photos load via Gen 2 bucket URL (after adding the Gen 2 hostname to `next.config.js` `remotePatterns`)
 - [ ] Migration script exit code 0, `failed` count zero
+- [ ] Every Gen 2 `Photo` row's `s3key` starts with `public/` (verifies §2.2 normalization fired): run `aws dynamodb scan --table-name <gen2-photo-table> --region ap-southeast-1 --projection-expression s3key | jq -r '.Items[].s3key.S' | grep -v '^public/' | wc -l` — must be 0
+
+### 2.5 Remove `publicStorageUrl()` shim (Option 2 cleanup)
+
+**Blocked on §2.4 acceptance** — only run after Gen 2 DynamoDB is fully populated with `public/`-prefixed s3keys.
+
+The shim added in §1.12.3 normalizes bare `photos/...` keys at read time. After Phase 2.2 migration writes every Gen 2 row with the explicit `public/` prefix, the read-side normalization is dead code and should be removed so the schema convention is the only source of truth.
+
+Edit `pages/photography/index.tsx:132-141` and `pages/projects/index.tsx:247-256`:
+
+```ts
+// Before (shim)
+const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = getStorageBaseUrl();
+  const normalizedKey = key.startsWith('public/') ? key : `public/${key}`;
+  const encodedKey = normalizedKey.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+
+// After (post-migration)
+const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = getStorageBaseUrl();
+  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+```
+
+Drop the "prepends public/ to bare keys" test case in `tests/ProjectsPage.test.tsx`. Keep the "preserves public/ prefixes" case — it now covers the only supported input shape.
+
+#### 2.5.1 Acceptance
+
+- [ ] Every Gen 2 `Photo` row's `s3key` starts with `public/` (re-run the §2.4 last check, must be 0 violations) before edit
+- [ ] Comment block above each `publicStorageUrl` removed
+- [ ] `key.startsWith('public/')` branch removed from both files
+- [ ] `tests/ProjectsPage.test.tsx` "prepends public/ to bare keys" case deleted
+- [ ] `npm run lint && npm test && npm run build` green
+- [ ] Browser smoke `/photography` after deploy: at least one photo renders, network tab shows 200 on `https://<gen2-bucket>/public/photos/...` URLs
 
 ---
 

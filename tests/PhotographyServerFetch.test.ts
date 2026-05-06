@@ -56,7 +56,7 @@ describe('Photography getStaticProps', () => {
           aspectRatio: '1.500',
           blurredBase64: null,
           createdAt: '2026-04-29',
-          url: 'https://storage.example.com/photos/digital/photo%201.jpg',
+          url: 'https://storage.example.com/public/photos/digital/photo%201.jpg',
         }],
       },
       revalidate: 60,

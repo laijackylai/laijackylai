@@ -244,9 +244,14 @@ const getStorageBaseUrl = () => {
   return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
 };
 
+// Gen 1 DynamoDB stores s3keys as bare paths (e.g. "photos/film/x.jpg"); Gen 1
+// v5 SDK silently prepended "public/" before talking to S3. This shim keeps the
+// same behavior so both bucket layouts resolve. Remove once Phase 2 migration
+// rewrites s3keys with the explicit "public/" prefix.
 export const publicStorageUrl = (key: string) => {
   const storageBaseUrl = getStorageBaseUrl();
-  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+  const normalizedKey = key.startsWith('public/') ? key : `public/${key}`;
+  const encodedKey = normalizedKey.split('/').map(encodeURIComponent).join('/');
   return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
 };
 

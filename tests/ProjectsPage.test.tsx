@@ -67,4 +67,12 @@ describe('Projects page', () => {
       'https://example.s3.amazonaws.com/public/takcarly/takcarly_1.png'
     );
   });
+
+  it('prepends public/ to bare keys (Gen 1 DynamoDB compatibility shim)', () => {
+    process.env.STORAGE_BASE_URL = 'https://example.s3.amazonaws.com';
+
+    expect(publicStorageUrl('photos/film/000874080031.jpg')).toBe(
+      'https://example.s3.amazonaws.com/public/photos/film/000874080031.jpg'
+    );
+  });
 });
