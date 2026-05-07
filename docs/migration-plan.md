@@ -812,6 +812,50 @@ Caveats:
 - [ ] If B: not selected
 - [x] `next.config.js` `remotePatterns` covers Gen 2 bucket hostname (test-branch hostname `amplify-d2ukbi00figpw1-ph-laijackylaistoragebucket-rivk3jxqwkow.s3.ap-southeast-1.amazonaws.com` — note: prod stack will spawn a different bucket; add prod hostname to `remotePatterns` before flipping `main` env vars)
 
+### 1.13a SSR-runtime env vars (Amplify Hosting gotcha)
+
+**Surfaced 2026-05-07** during browser smoke. `/photography` returned 500 on first request. CloudWatch `/aws/amplify/d2ukbi00figpw1` showed:
+
+```
+Error: APPSYNC_URL and APPSYNC_API_KEY are required to build /photography
+  at getStaticProps (/tmp/app/.next/server/pages/photography.js:231:19)
+  at Object.renderToHTML (/var/task/node_modules/next/dist/server/render.js:389:26)
+  ...
+```
+
+Build prebuilt `/photography` (ISR 60s) cleanly because env vars **were** present at build. Static page got served on first request OK initially, but Cloudfront cache miss + ISR revalidate triggered the SSR Lambda to re-run `getStaticProps` in the runtime env — where Amplify branch env vars **do not propagate** by default. The pre-existing `shouldFailStaticBuild()` guard (in `pages/photography/index.tsx:121-123`) only allows missing env vars in dev → throws in production runtime → 500.
+
+**Fix**: write Amplify branch env vars to `.env.production` in `amplify.yml` preBuild so Next.js bakes them into the standalone build artifact. Same artifact is loaded by the SSR Lambda; values are present at runtime.
+
+```yaml
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+        - echo "APPSYNC_URL=$APPSYNC_URL" >> .env.production
+        - echo "APPSYNC_API_KEY=$APPSYNC_API_KEY" >> .env.production
+        - echo "STORAGE_BASE_URL=$STORAGE_BASE_URL" >> .env.production
+```
+
+Drawback: `APPSYNC_API_KEY` ends up in `.next/server/...` files. Acceptable because the schema's `apiKey` rule is read-only; the key is intended for unauthenticated public reads (same exposure model as Gen 1). Write paths use SigV4 (no key in build).
+
+If a private key ever lands here (e.g. Lambda-authorizer shared secret in §1.4 option 1), switch to AWS-side env injection: AWS Systems Manager Parameter Store + a custom build-time fetch into `.env.production`.
+
+#### 1.13a.1 Acceptance
+
+- [x] `amplify.yml` preBuild writes 3 env vars into `.env.production` — verified 2026-05-07 (commit `93f974e`)
+- [x] `/photography` returns 200 after deploy — verified via Playwright 2026-05-07 on test branch
+- [x] CloudWatch `/aws/amplify/d2ukbi00figpw1` no longer logs the required-env error after job 15
+
+### 1.13b `next.config.js` remotePatterns per-bucket (Phase 4 prep)
+
+Each Amplify Hosting branch spawns a fresh Gen 2 stack with its own S3 bucket name. `next/image` requires the hostname in `remotePatterns` or returns 400 ("url not matched by domains or remotePatterns"). Test-branch hostname added 2026-05-07 (`amplify-d2ukbi00figpw1-ph-laijackylaistoragebucket-rivk3jxqwkow.s3.ap-southeast-1.amazonaws.com`).
+
+**Phase 4 cutover requires**: append the **prod** stack's bucket hostname to `next.config.js` `remotePatterns` before flipping `main` env vars. Read prod hostname from `aws cloudformation describe-stacks --stack-name amplify-laijackylai-main-... --query 'Stacks[0].Outputs[?OutputKey==\`bucketName\`].OutputValue'` once the prod stack lands.
+
+Alternative: switch to a wildcard pattern `**.s3.ap-southeast-1.amazonaws.com` (Next.js 13.x supports `**` in `hostname`) — covers all current and future Gen 2 bucket names without per-stack maintenance. Trade-off: any S3 bucket in `ap-southeast-1` becomes loadable by the optimizer. Acceptable for personal site; flag if scope changes.
+
 ### 1.14 Re-run pipeline-deploy verification
 
 After 1.12 + 1.13 land:
@@ -828,9 +872,9 @@ After 1.12 + 1.13 land:
 
 #### 1.14.1 Acceptance
 
-- [x] Latest job on test branch = SUCCEED — job 12, 2026-05-05
-- [ ] `/projects` returns 200 with all 3 images visible (network tab shows 200 on each `public/takcarly/...` URL) — pending browser smoke after shim commit lands
-- [ ] `/photography` builds without throwing; empty list rendered (DynamoDB still empty pre-Phase 2.2) — pending browser smoke after shim commit lands
+- [x] Latest job on test branch = SUCCEED — job 15, 2026-05-07 (after env-var-runtime fix)
+- [x] `/projects` returns 200 with all 3 images visible — verified via Playwright 2026-05-07; `/_next/image` returned 200 on all 3 `public/takcarly/...` URLs after `next.config.js` remotePatterns picked up the test-branch Gen 2 hostname
+- [x] `/photography` builds without throwing; empty list rendered — verified via Playwright 2026-05-07 after `amplify.yml` preBuild bakes branch env vars into `.env.production` for SSR Lambda runtime; AppSync `listPhotos` returns `{ items: [] }` (DynamoDB empty pre-Phase 2.2)
 - [ ] Test branch deleted from Amplify Hosting — defer until PR merged (keeps a green reference build until cutover)
 
 ---
