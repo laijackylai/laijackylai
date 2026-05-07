@@ -1,11 +1,21 @@
 version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - npm ci --cache .npm --prefer-offline
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
 frontend:
   phases:
     preBuild:
       commands:
-        # - COPY --from=builder /app/next.config.js ./
-        - cat next.config.js
         - npm ci
+        # Amplify branch env vars only reach BUILD by default. Write them to
+        # .env.production so Next.js bakes them into the build artifact and the
+        # SSR Lambda has them at ISR-regen runtime too.
+        - echo "APPSYNC_URL=$APPSYNC_URL" >> .env.production
+        - echo "APPSYNC_API_KEY=$APPSYNC_API_KEY" >> .env.production
+        - echo "STORAGE_BASE_URL=$STORAGE_BASE_URL" >> .env.production
     build:
       commands:
         - npm run build
@@ -16,3 +26,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+      - .next/cache/**/*

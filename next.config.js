@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
+    reactStrictMode: true,
     swcMinify: true,
     output: 'standalone',
     typescript: {
         ignoreBuildErrors: true,
     },
     eslint: {
-        ignoreDuringBuilds: true,
+        ignoreDuringBuilds: false,
     },
     // distDir: "build",
     images: {
@@ -19,12 +19,26 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'laijackylai-storage-4ba35e56184317-dev.s3.ap-southeast-1.amazonaws.com',
                 port: '',
-                pathname: '**',
+                pathname: '/**',
             },
-        ],
-        domains: [
-            'localhost',
-            'laijackylai-storage-4ba35e56184317-dev.s3.ap-southeast-1.amazonaws.com'
+            {
+                protocol: 'https',
+                hostname: 'laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2.s3.ap-southeast-1.amazonaws.com',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'amplify-d2ukbi00figpw1-ph-laijackylaistoragebucket-rivk3jxqwkow.s3.ap-southeast-1.amazonaws.com',
+                port: '',
+                pathname: '/**',
+            },
         ],
     },
     // experimental: {
