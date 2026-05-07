@@ -1,17 +1,19 @@
-import { GetServerSideProps, NextPage } from 'next';
+import { GetStaticProps, NextPage } from 'next';
 import ocra from '../../components/font';
 import Title from '../../components/title';
-import ResponsiveDrawer from '../../components/drawer';
-import { DataStore, Storage, graphqlOperation } from 'aws-amplify';
-import { Photo } from '../../src/models';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HorizontalDrawer from '../../components/horizontalDrawer'
 import RevealOnScroll from '../../components/reviewOnScroll';
 // import { getPlaiceholder } from 'plaiceholder';
-// import { decode } from 'blurhash';
 
-interface PhotoData extends Photo {
+export type PhotoData = {
+  id: string,
+  s3key: string,
+  type: string,
+  aspectRatio: string,
+  blurredBase64: string | null,
+  createdAt?: string | null,
   url: string,
 }
 
@@ -22,17 +24,15 @@ type Props = {
 const Photography: NextPage<Props> = ({
   photosData,
 }) => {
-  // create random numbers
-  const random = (min = 300, max = 500) => {
-    let difference = max - min;
-    let rand = Math.random();
-    rand = Math.floor(rand * difference);
-    rand = rand + min;
-    return rand;
-  }
-
   const [windowWidth, setWindowWidth] = useState(28)
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+  const imageHeightsById = useMemo(() => {
+    return photosData.reduce<Record<string, number>>((acc, photo) => {
+      const hash = Array.from(photo.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      acc[photo.id] = 300 + (hash % 200);
+      return acc;
+    }, {});
+  }, [photosData]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +75,7 @@ const Photography: NextPage<Props> = ({
       <div className='flex flex-col'>
         <HorizontalDrawer logoSize={25} width={windowWidth} />
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
-        <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
@@ -84,7 +84,7 @@ const Photography: NextPage<Props> = ({
           {
             photosData && photosData.length > 0 && photosData.map((p, i) => {
               const isOdd = i % 2
-              const wh = random()
+              const wh = imageHeightsById[p.id] ?? 400
               return (
                 <RevealOnScroll key={p.id}>
                   <div className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
@@ -116,51 +116,87 @@ const Photography: NextPage<Props> = ({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
-  // get all photos data from datastore
-  const getPhotos = async () => {
-    const res = await DataStore.query(Photo).catch(e => {})
-    return res
+const shouldFailStaticBuild = () => (
+  process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
+);
+
+const getStorageBaseUrl = () => {
+  if (!process.env.STORAGE_BASE_URL && shouldFailStaticBuild()) {
+    throw new Error('STORAGE_BASE_URL is required to build /photography');
   }
+  return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
+};
 
-  // shuffle the input array
-  const shuffleArray = (array: Object[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+// Gen 1 DynamoDB stores s3keys as bare paths (e.g. "photos/film/x.jpg"); Gen 1
+// v5 SDK silently prepended "public/" before talking to S3. This shim keeps the
+// same behavior so both bucket layouts resolve. Remove once Phase 2 migration
+// rewrites s3keys with the explicit "public/" prefix.
+const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = getStorageBaseUrl();
+  const normalizedKey = key.startsWith('public/') ? key : `public/${key}`;
+  const encodedKey = normalizedKey.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+
+const shuffleArray = <T,>(array: T[]) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
+    if (shouldFailStaticBuild()) {
+      throw new Error('APPSYNC_URL and APPSYNC_API_KEY are required to build /photography');
     }
-    return array;
+    return { props: { photosData: [] }, revalidate: 60 };
   }
 
-  // get all photos
-  const photosData = await getPhotos()
-  if (!photosData) {
-    return {
-      props: {
-        photosData: [],
+  try {
+    const query = /* GraphQL */ `
+      query ListPhotos {
+        listPhotos {
+          items {
+            id
+            s3key
+            type
+            aspectRatio
+            blurredBase64
+            createdAt
+          }
+        }
       }
+    `;
+    const res = await fetch(process.env.APPSYNC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.APPSYNC_API_KEY,
+      },
+      body: JSON.stringify({ query }),
+    });
+    const json = await res.json();
+    if (res.ok === false || json.errors) {
+      throw new Error(JSON.stringify(json.errors ?? { status: res.status }));
     }
-  }
+    const photos = (json.data?.listPhotos?.items ?? []) as Omit<PhotoData, 'url'>[];
+    const photosData = photos.map((photo) => ({
+      ...photo,
+      id: photo.id || photo.s3key,
+      url: publicStorageUrl(photo.s3key),
+    }));
 
-  // get photo urls
-  const photoUrls = await Promise.all(
-    photosData.map((o: Photo) => Storage.get(o.s3key, { level: 'public' }))
-  );
-
-  // add photo urls and blurred photos
-  const data = photosData.map((obj: Photo, i: number) => {
-    return {
-      ...obj,
-      "url": photoUrls[i],
-      // "base64": photoBase64[i]
-    };
-  });
-
-  return {
-    props: {
-      photosData: shuffleArray(data),
+    return { props: { photosData: shuffleArray(photosData) }, revalidate: 60 };
+  } catch (error) {
+    if (shouldFailStaticBuild()) {
+      throw error;
     }
+    return { props: { photosData: [] }, revalidate: 60 };
   }
 }
 

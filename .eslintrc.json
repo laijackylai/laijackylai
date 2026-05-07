@@ -3,14 +3,7 @@
         "browser": true,
         "es2021": true
     },
-    "extends": [
-        "plugin:react/recommended",
-        "airbnb",
-        "prettier",
-        "plugin:@next/next/recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
+    "extends": ["next/core-web-vitals", "prettier"],
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
@@ -18,16 +11,6 @@
         "ecmaVersion": 12,
         "sourceType": "module"
     },
-    "plugins": ["react", "@typescript-eslint"],
-    "ignorePatterns": ["src/ui-components/**", "src/models/**"],
-    "rules": {
-        "react/react-in-jsx-scope": "off",
-        "react/jsx-filename-extension": ["warn", { "extensions": [".ts", ".tsx"] }],
-        "react/function-component-definition": "off",
-        "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": ["warn"],
-        "react/button-has-type": "off",
-        "import/extensions": "off",
-        "import/no-unresolved": "off"
-    }
+    "plugins": ["react"],
+    "rules": {}
 }

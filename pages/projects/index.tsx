@@ -1,10 +1,8 @@
-import type { GetServerSideProps, GetStaticProps, NextPage } from 'next'
-import MyPdfViewer from './pdfViewer'
+import type { GetStaticProps, NextPage } from 'next'
 import Image from 'next/image'
 import githubLogo from '../../public/logos/github.png'
 import pythonLogo from '../../public/logos/python.png'
 import reactLogo from '../../public/logos/react.png'
-import { Storage } from 'aws-amplify'
 import ocra from '../../components/font'
 import Title from '../../components/title'
 // @ts-ignore
@@ -45,7 +43,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
 
 
   const openFYPPDF = () => {
-    window.open('../docs/FYP-Final-Report.pdf', '_blank')
+    window.open('/docs/FYP-Final-Report.pdf', '_blank')
   }
 
   const scrollUp = () => {
@@ -63,7 +61,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
         <div className='lg:px-20'>
           <HorizontalDrawer logoSize={25} width={windowWidth} />
         </div>
-        <button onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
@@ -78,7 +76,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <div>@loaders.gl</div>
                 </a>
                 <div>
-                  <a href="https://github.com/visgl/loaders.gl/pull/1372" target="_blank" rel="noopener noreferrer">
+                  <a href="https://github.com/visgl/loaders.gl/pull/1372" target="_blank" rel="noopener noreferrer" aria-label="View loaders.gl pull request on GitHub">
                     <FaGithub size={25} />
                   </a>
                 </div>
@@ -99,7 +97,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           <div className='py-7 lg:py-20 px-5 lg:px-20 bg-amber-700 text-white'>
             <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
               Canadian Fires
-              <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer" aria-label="View Canadian Fires on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
@@ -108,7 +106,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div className='text-sm'>• Natural language search with NLTK</div>
             <div className='text-sm'>• Predicting future Ontario fires with XBGoost Regression</div>
             <div className='text-sm pb-2'>• Flask and SQLite for backend</div>
-            <a href='https://canadian-fires.vercel.app/' target="_blank" className='justify-center items-center self-center'>
+            <a href='https://canadian-fires.vercel.app/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
               <Image className='bg-white rounded-md w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
             </a>
           </div>
@@ -117,13 +115,13 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           <div className='py-7 lg:py-20 px-5 lg:px-32'>
             <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
               NUXT Google Maps
-              <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer" aria-label="View NUXT Google Maps on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
             <div className=''>A Vue Google Maps demo showcasing google maps & map search</div>
             <div className='text-sm pb-2'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
-            <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" className='justify-center items-center self-center'>
+            <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
               <Image className='bg-white rounded-md w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
             </a>
           </div>
@@ -134,11 +132,11 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
               Takcarly
               <div className='flex flex-row gap-2 items-end'>
                 <div className='text-sm'>(Available on the App Store)</div>
-                <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank">
+                <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank" rel="noopener noreferrer" aria-label="View Takcarly on the App Store">
                   <FaAppStoreIos size={30} />
                 </a>
               </div>
-              <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/laijackylai/takcarly" target="_blank" rel="noopener noreferrer" aria-label="View Takcarly on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
@@ -180,7 +178,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
                   </a>
-                  <a href={hkdsmURL} target="_blank">
+                  <a href={hkdsmURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -189,7 +187,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
                   </a>
-                  <a href={hktidesURL} target="_blank">
+                  <a href={hktidesURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -198,7 +196,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
                   </a>
-                  <a href={hkradarURL} target="_blank">
+                  <a href={hkradarURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -210,7 +208,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   <a>
                     <Image src={reactLogo} alt={'reactLogo'} height={15} width={15} />
                   </a>
-                  <a href={hkterrainURL} target="_blank">
+                  <a href={hkterrainURL} target="_blank" rel="noopener noreferrer">
                     <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
                   </a>
                 </div>
@@ -233,12 +231,38 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
 
 export default Projects
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
+
+const shouldFailStaticBuild = () => (
+  process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
+);
+
+const getStorageBaseUrl = () => {
+  if (!process.env.STORAGE_BASE_URL && shouldFailStaticBuild()) {
+    throw new Error('STORAGE_BASE_URL is required to build /projects');
+  }
+  return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
+};
+
+// Gen 1 DynamoDB stores s3keys as bare paths (e.g. "photos/film/x.jpg"); Gen 1
+// v5 SDK silently prepended "public/" before talking to S3. This shim keeps the
+// same behavior so both bucket layouts resolve. Remove once Phase 2 migration
+// rewrites s3keys with the explicit "public/" prefix.
+export const publicStorageUrl = (key: string) => {
+  const storageBaseUrl = getStorageBaseUrl();
+  const normalizedKey = key.startsWith('public/') ? key : `public/${key}`;
+  const encodedKey = normalizedKey.split('/').map(encodeURIComponent).join('/');
+  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
+};
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
-    const imageKeys = ["takcarly/takcarly_1.png", "takcarly/takcarly_2.png", "takcarly/takcarly_3.png"]
-    const urls = await Promise.all(
-      imageKeys.map((key) => Storage.get(key, { level: 'public' }))
-    );
+    const imageKeys = [
+      'public/takcarly/takcarly_1.png',
+      'public/takcarly/takcarly_2.png',
+      'public/takcarly/takcarly_3.png',
+    ];
+    const urls = imageKeys.map(publicStorageUrl);
 
     // get blurred photos
     const photoBase64 = await Promise.all(
@@ -258,7 +282,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
       },
     };
   } catch (error) {
-
+    if (shouldFailStaticBuild()) {
+      throw error;
+    }
     return {
       props: {
         imageUrls: [],

@@ -1,0 +1,16 @@
+{
+  "s3laijackylaistorage4ba35e56": {
+    "dependsOn": [],
+    "providerPlugin": "awscloudformation",
+    "service": "S3",
+    "output": {
+      "BucketName": "laijackylai-storage-4ba35e5623621-main",
+      "Region": "ap-southeast-1"
+    },
+    "lastPushTimeStamp": "2023-07-01T19:31:54.862Z",
+    "providerMetadata": {
+      "s3TemplateURL": "https://s3.amazonaws.com/amplify-laijackylai-main-23621-deployment/amplify-cfn-templates/storage/cloudformation-template.json",
+      "logicalId": "storages3laijackylaistorage4ba35e56"
+    }
+  }
+}

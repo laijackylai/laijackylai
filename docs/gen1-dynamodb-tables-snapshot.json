@@ -1,0 +1,19 @@
+{
+  "region": "ap-southeast-1",
+  "photoTables": [
+    "Photo-ftwk5vevu5g6fgfchpi7ob4lpm-dev",
+    "Photo-gbzpma2elvdxnjqehhqdnf5wmy-main"
+  ],
+  "allTables": [
+    "AmplifyDataStore-ftwk5vevu5g6fgfchpi7ob4lpm-dev",
+    "AmplifyDataStore-gbzpma2elvdxnjqehhqdnf5wmy-main",
+    "AmplifyDataStore-i6zvnria6jgdfjrw2w4qyd7iva-staging",
+    "AmplifyDataStore-xjkfbv5invdp7pffave5bwdyfu-dev",
+    "Elderly-i6zvnria6jgdfjrw2w4qyd7iva-staging",
+    "Photo-ftwk5vevu5g6fgfchpi7ob4lpm-dev",
+    "Photo-gbzpma2elvdxnjqehhqdnf5wmy-main",
+    "ScheduledItem-i6zvnria6jgdfjrw2w4qyd7iva-staging",
+    "User-i6zvnria6jgdfjrw2w4qyd7iva-staging",
+    "User-xjkfbv5invdp7pffave5bwdyfu-dev"
+  ]
+}
