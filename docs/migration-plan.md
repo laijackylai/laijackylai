@@ -881,46 +881,230 @@ After 1.12 + 1.13 land:
 
 ## Phase 2 — Data Migration
 
-**Target stack decision** — decide before 2.1:
+**State entering Phase 2 (2026-05-07 post-cutover):**
 
-- **Sandbox-first (safer)**: migrate to `amplify-laijackylai-laijackylai-sandbox-e87c5d3fcf` as a dry run. After verifying counts + spot checks, push a backend-touching commit on `main` to trigger pipeline-deploy → wait for the prod Gen 2 stack → re-run 2.1–2.3 against prod. Sync runs twice; prod data is fresh.
-- **Prod-first (single shot)**: push the backend commit *before* Phase 2, wait for pipeline-deploy green, then migrate once into the prod stack. Skip the sandbox sync. Requires confidence the script works because the first run is the real one.
+- Prod Gen 2 stack live on `main` (Amplify app `d2ukbi00figpw1`, job 59 SUCCEED).
+- Prod Gen 2 bucket `amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc` already populated via `aws s3 sync` from Gen 1 prod bucket (74 source / 69 target objects, 5-object diff = directory markers, no real photo loss). **§2.3 S3 sync therefore already executed for prod.**
+- Prod Gen 2 DynamoDB `Photo` table empty. `/photography` returns 200 but renders an empty list. **§2.2 migration is the remaining write.**
+- `next.config.js` `remotePatterns` already covers prod hostname (commit `d5c5d4d`).
+- `main` branch env vars set on Amplify Hosting console (`APPSYNC_URL`, `APPSYNC_API_KEY`, `STORAGE_BASE_URL`); `amplify.yml` preBuild bakes them into `.env.production` for SSR Lambda runtime (§1.13a).
+- §1.12.3 read-side compatibility shim is live in production. Phase 2.2 normalization writes `public/`-prefixed s3keys to Gen 2 → §2.5 then removes the shim.
 
-Whichever is picked, set `APPSYNC_URL` + (if used) `APPSYNC_API_KEY` in `.env.local` to match the **target** stack before each run. Default `.env.local` is currently the sandbox; remember to flip for prod-targeted runs.
+**Target stack decision** (revised 2026-05-07):
+
+- ~~Sandbox-first~~ — sandbox is **stale** (sandbox `amplify_outputs.json` last regenerated pre-§1.12.1 storage path change; sandbox stack still has `photos/*` access path, not `public/*`). Running migration into sandbox without re-deploying it would not exercise the prod-shaped schema. Skip unless sandbox is freshly re-deployed via `npx ampx sandbox` first.
+- **Prod-direct (default)** — single migration run targeting prod AppSync (`https://dxrdpkha7raqradp27aqqgnkui.appsync-api.ap-southeast-1.amazonaws.com/graphql`). Idempotency wrapper added in §2.2 makes re-runs safe; first run also serves as the dry run.
+
+**Phase 1 learnings carried into Phase 2 (codex MUST honor):**
+
+1. **plaiceholder fails on 403/XML when target bucket empty** (§1.13a postmortem). Mitigation: §2.3 must complete *before* any pipeline-deploy fires, and it already has for prod. If anyone re-runs §2.3 against an empty target, do NOT push a backend-touching commit until S3 sync finishes.
+2. **Amplify Hosting branch env vars only reach BUILD, not SSR runtime** (§1.13a). Already mitigated via `amplify.yml` preBuild bake. No action in Phase 2 unless adding new env vars.
+3. **Pipeline-deploy webhook auto-fires on every `main` push.** Pause auto-build on `main` for the migration window (§2.0.3) so a stray commit cannot redeploy the backend mid-migration and rotate `STORAGE_BASE_URL`.
+4. **Schema has no GSI on `s3key`.** §2.2 idempotency uses `listPhotos(filter: { s3key: { eq } })` which scans — O(N) per row, O(N²) total. Acceptable for ~70 rows; add a `secondaryIndexes` directive on the schema if the table grows past low thousands.
+5. **IAM `appsync:GraphQL` grant is per-API-id.** §1.11 verified the sandbox API id only. Prod AppSync API id is **different** — re-grant before §2.2 runs (§2.0.2).
+6. **DynamoDB rows store bare keys; S3 stores `public/`-prefixed keys** (§1.12.3 audit). §2.2 normalizes on write so Gen 2 rows have explicit `public/` prefix — after which §2.5 removes the read-side shim.
+
+### 2.0 Pre-flight (BLOCKING — run before §2.1)
+
+#### 2.0.1 Verify prod stack identifiers
+
+Confirm the four prod-stack values §2.x commands depend on. Source of truth: prod stack CloudFormation outputs.
+
+```bash
+# Capture once into the shell session; re-use across §2.1–§2.4
+PROD_APPSYNC_URL='https://dxrdpkha7raqradp27aqqgnkui.appsync-api.ap-southeast-1.amazonaws.com/graphql'
+PROD_APPSYNC_API_KEY='da2-svpb6qfiivb4zlbgjnjxzglnu4'
+PROD_BUCKET='amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc'
+PROD_APPSYNC_API_ID="$(echo "$PROD_APPSYNC_URL" | awk -F'[/.]' '{print $4}')"   # dxrdpkha7raqradp27aqqgnkui
+GEN1_TABLE='Photo-gbzpma2elvdxnjqehhqdnf5wmy-main'
+GEN1_BUCKET='laijackylai-storage-4ba35e5623621-main'
+REGION='ap-southeast-1'
+
+# Sanity-check derived value
+echo "$PROD_APPSYNC_API_ID"
+# expect: dxrdpkha7raqradp27aqqgnkui
+```
+
+If any value drifts from the doc (e.g. stack rebuild produces a new bucket suffix), re-read from prod CFN before continuing:
+
+```bash
+aws cloudformation describe-stacks \
+  --stack-name amplify-laijackylai-main-branch-... \
+  --region "$REGION" \
+  --query 'Stacks[0].Outputs'
+```
+
+#### 2.0.2 Verify IAM `appsync:GraphQL` grant on prod API
+
+§1.11.3 verified sandbox; prod has a different API id. Without the grant the migration script returns `NotAuthorizedException` on `createPhoto`.
+
+```bash
+# Confirm caller identity
+aws sts get-caller-identity
+# Note the ARN (expect: arn:aws:iam::232665835945:user/amplify-5dZdc per §1.11.3).
+
+# Confirm the grant covers the prod API. Either the existing wildcard policy
+# (`appsync:GraphQL` on `arn:aws:appsync:ap-southeast-1:232665835945:apis/*`)
+# already covers it, OR an API-specific policy needs an extra Resource.
+aws iam list-attached-user-policies --user-name amplify-5dZdc
+aws iam list-user-policies --user-name amplify-5dZdc
+
+# For each managed/inline policy that grants appsync:GraphQL, dump it and grep
+# for the prod API id or `*`. If neither matches, attach an inline policy:
+aws iam put-user-policy \
+  --user-name amplify-5dZdc \
+  --policy-name appsync-graphql-prod \
+  --policy-document "$(cat <<EOF
+{ "Version": "2012-10-17", "Statement": [{
+    "Effect": "Allow",
+    "Action": "appsync:GraphQL",
+    "Resource": "arn:aws:appsync:${REGION}:232665835945:apis/${PROD_APPSYNC_API_ID}/*"
+}] }
+EOF
+)"
+```
+
+Smoke-test the grant **before** the bulk run. Plain `node` cannot resolve `.ts` imports, so use `ts-node -e`:
+
+```bash
+APPSYNC_URL="$PROD_APPSYNC_URL" \
+AWS_REGION="$REGION" \
+npx ts-node -e "
+import { createSignedGraphqlClient } from './scripts/blur';
+(async () => {
+  const gql = createSignedGraphqlClient(process.env.APPSYNC_URL!);
+  const d = await gql('query { listPhotos(limit: 1) { items { id } } }', {});
+  console.log('OK', JSON.stringify(d));
+})().catch((e) => { console.error('FAIL', e.message); process.exit(1); });
+"
+```
+
+Expect `OK {"listPhotos":{"items":[]}}` (or `{...items:[<rows>]}` if §2.2 was already partially run). If `NotAuthorizedException` / `UnauthorizedException`, the IAM grant did not propagate yet; wait 30s and retry. If `Could not find a declaration file for module 'X'`, ensure `tsconfig.json` `compilerOptions.esModuleInterop` is true (already verified in repo).
+
+#### 2.0.3 Pause `main` auto-build
+
+Prevent a stray commit (or a webhook on this PR being merged) from redeploying the backend during the migration window. CFN drift mid-write would rotate AppSync URL / API key / bucket name and orphan the export.
+
+```bash
+aws amplify update-branch \
+  --app-id d2ukbi00figpw1 \
+  --branch-name main \
+  --no-enable-auto-build \
+  --region "$REGION"
+
+# Verify
+aws amplify get-branch \
+  --app-id d2ukbi00figpw1 \
+  --branch-name main \
+  --region "$REGION" \
+  --query 'branch.enableAutoBuild'
+# expect: false
+```
+
+Re-enable in §2.4 acceptance after migration verifies green.
+
+#### 2.0.4 Snapshot Gen 1 row count (drift guard)
+
+```bash
+aws dynamodb scan \
+  --table-name "$GEN1_TABLE" \
+  --region "$REGION" \
+  --select COUNT \
+  --query 'Count'
+```
+
+Capture the integer. §2.4 compares Gen 2 count to this number — must match exactly.
+
+#### 2.0.5 Acceptance
+
+- [ ] Shell session has `PROD_APPSYNC_URL`, `PROD_APPSYNC_API_KEY`, `PROD_BUCKET`, `PROD_APPSYNC_API_ID`, `GEN1_TABLE`, `GEN1_BUCKET`, `REGION` exported
+- [ ] `aws sts get-caller-identity` ARN granted `appsync:GraphQL` on prod API id (verified by signed `listPhotos` returning 200, not 401)
+- [ ] `aws amplify get-branch ... --query 'branch.enableAutoBuild'` returns `false`
+- [ ] Gen 1 row count captured (record below)
+
+```
+Gen 1 row count snapshot: ____  (date: 2026-05-__)
+```
 
 ### 2.1 Export from Gen 1 DynamoDB
 
-Gen 1 prod table (from `docs/gen1-dynamodb-tables-snapshot.json`): `Photo-gbzpma2elvdxnjqehhqdnf5wmy-main`.
+Gen 1 prod table: `$GEN1_TABLE` (= `Photo-gbzpma2elvdxnjqehhqdnf5wmy-main`).
 
-**Freeze writes first**: ensure no one runs the (soon-to-be-removed) `/api/blur` route during the window. Pause Amplify Hosting auto-build for `main` for the migration window so a redeploy cannot rotate creds mid-cutover.
+**Freeze writes** is implicit because `/api/blur` no longer exists (removed in Phase 1.10). Auto-build pause from §2.0.3 covers the redeploy risk.
 
 Verify single-row shape before bulk run:
 
 ```bash
 aws dynamodb scan \
-  --table-name Photo-gbzpma2elvdxnjqehhqdnf5wmy-main \
-  --region ap-southeast-1 \
-  --max-items 1 | jq '.Items[0]'   # expect { s3key: { S }, type: { S }, aspectRatio: { S }, blurredBase64: { S } }
+  --table-name "$GEN1_TABLE" \
+  --region "$REGION" \
+  --max-items 1 | jq '.Items[0]'
+# expect keys: s3key (S), type (S), aspectRatio (S), blurredBase64 (S, optional)
 ```
 
-Then full export:
+Confirm bare-key shape (per §1.12.3 audit):
 
 ```bash
 aws dynamodb scan \
-  --table-name Photo-gbzpma2elvdxnjqehhqdnf5wmy-main \
-  --region ap-southeast-1 \
-  > gen1-photos.json
+  --table-name "$GEN1_TABLE" \
+  --region "$REGION" \
+  --projection-expression s3key \
+  | jq -r '.Items[].s3key.S' \
+  | grep -c '^public/'
+# expect: 0  (none of the Gen 1 rows are pre-prefixed; the migration script adds the prefix)
 ```
+
+Then full export. `aws dynamodb scan` paginates at 1MB / 1000 items per call; for ~70 rows a single page suffices, but use the loop pattern for safety:
+
+```bash
+aws dynamodb scan \
+  --table-name "$GEN1_TABLE" \
+  --region "$REGION" \
+  --output json \
+  > gen1-photos.json
+
+# Sanity-check the export matches the live count
+EXPORTED_COUNT=$(jq '.Items | length' gen1-photos.json)
+LIVE_COUNT=$(aws dynamodb scan --table-name "$GEN1_TABLE" --region "$REGION" --select COUNT --query 'Count')
+echo "exported=$EXPORTED_COUNT live=$LIVE_COUNT"
+# Must match. If LIVE_COUNT > EXPORTED_COUNT, the scan paginated; re-export with
+# the LastEvaluatedKey loop or use `aws dynamodb export-table-to-point-in-time`.
+```
+
+`gen1-photos.json` is gitignored (large; contains base64 blur previews). Do **not** commit.
 
 ### 2.2 Migration script
 
-Use SigV4 against the `'iam'` write rule (same auth path as `scripts/blur.ts`). `generateClient<Schema>()` defaults to `apiKey` mode and the schema's `apiKey` rule only allows `read` — so the SDK client path 401s on `create()`. Reuse the helper from `scripts/blur.ts`.
+Reuse `scripts/blur.ts` helpers (already export `createSignedGraphqlClient` for write, `createApiKeyGraphqlClient` for read). The schema's `apiKey` rule allows `read` only, so write goes via SigV4 against the `'iam'` rule (verified §1.11.3 sandbox + §2.0.2 prod).
 
-Create `scripts/migrate-photos.ts`:
+**Idempotency contract** (per §2 Phase 1 learning #4): every iteration first runs `listPhotosByS3Key` against the target stack. If a row with that `s3key` already exists, skip the write. This makes re-runs after partial failure safe and lets the same script work for sandbox dry-runs followed by prod runs without manual truncation. Re-uses the `listByS3KeyQuery` already defined in `scripts/blur.ts`; export it from blur.ts (currently module-private).
+
+#### 2.2.1 Export `listByS3KeyQuery` from `scripts/blur.ts`
+
+Edit `scripts/blur.ts:97`:
+
+```ts
+// Before
+const listByS3KeyQuery = /* GraphQL */ `
+// After
+export const listByS3KeyQuery = /* GraphQL */ `
+```
+
+No other change to `blur.ts`. The query is already correctly shaped for the migration script.
+
+#### 2.2.2 Create `scripts/migrate-photos.ts`
 
 ```ts
 import gen1 from '../gen1-photos.json';
-import { createSignedGraphqlClient } from './blur';
+import { loadEnvConfig } from '@next/env';
+import {
+  createApiKeyGraphqlClient,
+  createSignedGraphqlClient,
+  listByS3KeyQuery,
+  validateAwsCredentials,
+} from './blur';
+
+loadEnvConfig(process.cwd());
 
 const createPhotoMutation = /* GraphQL */ `
   mutation CreatePhoto($input: CreatePhotoInput!) {
@@ -938,23 +1122,39 @@ type Gen1Item = {
 };
 
 const main = async () => {
-  const gql = createSignedGraphqlClient();
+  // Fail fast if local creds missing (same pattern as scripts/blur.ts)
+  await validateAwsCredentials();
+
+  // Read via API key (cheap, no SigV4 cost), write via signed IAM path.
+  const readGql = createApiKeyGraphqlClient();
+  const writeGql = createSignedGraphqlClient();
+
   const items = (gen1 as { Items: Gen1Item[] }).Items;
   let created = 0;
+  let skipped = 0;
   let failed = 0;
 
   for (const item of items) {
-    // Option 2 cleanup of §1.12.3 shim: rewrite bare s3keys with explicit
-    // `public/` prefix so Gen 2 schema matches the actual S3 layout 1:1.
-    // After this migration completes, the prefix shim in publicStorageUrl()
-    // (pages/photography/index.tsx + pages/projects/index.tsx) is removed in §2.5.
+    // Phase 1 §1.12.3 audit: Gen 1 stores bare keys ("photos/film/x.jpg").
+    // Normalize to "public/..." here so Gen 2 rows match the actual S3 layout
+    // and the §1.12.3 read-side shim becomes dead code (removed in §2.5).
     const rawKey = item.s3key.S;
-    const normalizedKey = rawKey.startsWith('public/') ? rawKey : `public/${rawKey}`;
+    const s3key = rawKey.startsWith('public/') ? rawKey : `public/${rawKey}`;
 
     try {
-      await gql(createPhotoMutation, {
+      // Idempotency check — skip if this s3key already exists in the target.
+      // The schema has no GSI on s3key (see Phase 2 learning #4), so this
+      // filter scans the table — O(N²) total. Acceptable for ~70 rows; add
+      // `secondaryIndexes` on the schema if the table grows past low thousands.
+      const existing = await readGql(listByS3KeyQuery, { s3key });
+      if (existing.listPhotos?.items?.length) {
+        skipped += 1;
+        continue;
+      }
+
+      await writeGql(createPhotoMutation, {
         input: {
-          s3key: normalizedKey,
+          s3key,
           type: item.type.S,
           aspectRatio: item.aspectRatio.S,
           blurredBase64: item.blurredBase64?.S ?? null,
@@ -963,11 +1163,11 @@ const main = async () => {
       created += 1;
     } catch (err) {
       failed += 1;
-      console.error(`Failed: ${normalizedKey}`, err);
+      console.error(`Failed: ${s3key}`, err);
     }
   }
 
-  console.log(`Migration complete. Created: ${created}. Failed: ${failed}.`);
+  console.log(`Migration complete. Created=${created} Skipped=${skipped} Failed=${failed}.`);
   if (failed > 0) process.exitCode = 1;
 };
 
@@ -980,50 +1180,136 @@ Add to `package.json` `scripts`:
 "migrate-photos": "ts-node scripts/migrate-photos.ts"
 ```
 
-Run once per target stack:
+#### 2.2.3 Point `.env.local` at prod **before running**
+
+Default `.env.local` points at sandbox. For prod-direct migration, override:
 
 ```bash
+# Confirm current pointer
+grep '^APPSYNC_URL=' .env.local
+# expect: sandbox URL (kkjkxcxd3bf7rcp5vne6njng6m...)
+
+# Run migration with prod values inline (does NOT mutate .env.local on disk)
+APPSYNC_URL="$PROD_APPSYNC_URL" \
+APPSYNC_API_KEY="$PROD_APPSYNC_API_KEY" \
+AWS_REGION="$REGION" \
 npm run migrate-photos
 ```
 
-Notes:
+Inline override is preferred over editing `.env.local` so the working tree stays sandbox-pointed for `scripts/blur.ts` dev use after migration.
 
-- Reuses `createSignedGraphqlClient` from `scripts/blur.ts` — must `export` that helper from blur.ts (already does).
-- No idempotency check — assumes the target table is empty. If a re-run is needed, either truncate the Gen 2 `Photo` table first or wrap the loop with a `listPhotosByS3Key` lookup before `create`.
-- Blocked by 1.11 acceptance — do not run until SigV4 + IAM write path is verified.
+#### 2.2.4 Expected output
+
+```
+Migration complete. Created=N Skipped=0 Failed=0.
+```
+
+Where `N` equals the Gen 1 row count snapshot from §2.0.4. If `Failed > 0`:
+
+- Exit code = 1 (script enforces).
+- Re-run after fixing — idempotency skips the rows that succeeded on the previous attempt.
+
+If `Created + Skipped < Gen 1 count`: scan pagination missed rows during §2.1 export. Re-run §2.1 with the `LastEvaluatedKey` loop and re-execute §2.2.
+
+#### 2.2.5 Acceptance
+
+- [ ] `scripts/blur.ts` exports `listByS3KeyQuery`
+- [ ] `scripts/migrate-photos.ts` created per §2.2.2
+- [ ] `package.json` has `"migrate-photos"` script
+- [ ] `npm run migrate-photos` against prod exits 0, `Failed=0`
+- [ ] `Created + Skipped` equals the §2.0.4 Gen 1 count snapshot
+- [ ] Blocked-on chain satisfied: §1.11 + §2.0 acceptance both green
 
 ### 2.3 S3 photo migration
 
-Source: `laijackylai-storage-4ba35e5623621-main` (Gen 1 prod, from `docs/gen1-storage-snapshot.json`).
-Target: `amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2` for sandbox; the prod stack's bucket name once pipeline-deploy lands (read from prod `amplify_outputs.json`).
+Source: `$GEN1_BUCKET` (= `laijackylai-storage-4ba35e5623621-main`, Gen 1 prod).
+Target: `$PROD_BUCKET` (= `amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc`, Gen 2 prod, current bucket name as of 2026-05-07).
 
-**Updated 2026-05-05 per §1.12.4**: prefix is `public/`, not `photos/`. The Gen 1 bucket stores keys at `public/...` (CLI default for v5 `Storage.put()`) and the Gen 2 path now matches via §1.12.1.
+Prefix is `public/` on both sides per §1.12.1 + §1.12.4.
+
+**Status 2026-05-07: ALREADY EXECUTED for prod** during the prod cutover recovery. `aws s3 sync` ran with no `--delete`, idempotent re-runs are safe (sync only copies missing/changed objects).
 
 ```bash
 aws s3 sync \
-  s3://laijackylai-storage-4ba35e5623621-main/public/ \
-  s3://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2/public/ \
-  --region ap-southeast-1
+  "s3://${GEN1_BUCKET}/public/" \
+  "s3://${PROD_BUCKET}/public/" \
+  --region "$REGION"
 ```
 
-Verify count parity:
+#### 2.3.1 Re-verify count parity
+
+Even though the sync already ran, re-verify before declaring §2.4 acceptance — Gen 1 may have gained objects since the original sync:
 
 ```bash
-aws s3 ls s3://laijackylai-storage-4ba35e5623621-main/public/ --recursive | wc -l
-aws s3 ls s3://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2/public/ --recursive | wc -l
+SRC_COUNT=$(aws s3 ls "s3://${GEN1_BUCKET}/public/" --recursive --region "$REGION" | grep -v '/$' | wc -l | tr -d ' ')
+DST_COUNT=$(aws s3 ls "s3://${PROD_BUCKET}/public/" --recursive --region "$REGION" | grep -v '/$' | wc -l | tr -d ' ')
+echo "src=$SRC_COUNT dst=$DST_COUNT"
 ```
 
-Counts must match.
+Filter `grep -v '/$'` excludes directory placeholder objects (the source of the original 5-object diff). `src` and `dst` should now match. If not, re-run the sync — it is idempotent.
+
+#### 2.3.2 Spot-check 5 random objects
+
+```bash
+aws s3 ls "s3://${PROD_BUCKET}/public/" --recursive --region "$REGION" \
+  | awk '{print $4}' | grep -v '/$' | shuf -n 5 \
+  | while read -r key; do
+      url="https://${PROD_BUCKET}.s3.${REGION}.amazonaws.com/${key}"
+      printf '%s -> %s\n' "$key" "$(curl -sI "$url" | head -1)"
+    done
+```
+
+Each line should report `HTTP/1.1 200`. 403 means §1.13 bucket policy did not propagate or `$PROD_BUCKET` drifted; re-check `aws s3api get-bucket-policy`.
 
 ### 2.4 Phase 2 acceptance
 
-- [x] 1.11 preflight all green — verified 2026-05-04
-- [ ] Target stack decision logged (sandbox-first vs prod-first) in PR description
-- [ ] Photo count matches between Gen 1 and Gen 2 DynamoDB (count via AppSync `listPhotos` vs `aws dynamodb scan --select COUNT`)
-- [ ] All S3 objects copied (compare `aws s3 ls --recursive | wc -l`)
-- [ ] Spot-check 5 photos load via Gen 2 bucket URL (after adding the Gen 2 hostname to `next.config.js` `remotePatterns`)
-- [ ] Migration script exit code 0, `failed` count zero
-- [ ] Every Gen 2 `Photo` row's `s3key` starts with `public/` (verifies §2.2 normalization fired): run `aws dynamodb scan --table-name <gen2-photo-table> --region ap-southeast-1 --projection-expression s3key | jq -r '.Items[].s3key.S' | grep -v '^public/' | wc -l` — must be 0
+- [x] §1.11 preflight all green — verified 2026-05-04
+- [ ] §2.0 pre-flight all green (env shell, IAM grant, auto-build paused, Gen 1 count snapshot)
+- [x] Target stack decision logged: prod-direct (sandbox stale per Phase 2 header)
+- [ ] **Photo count matches between Gen 1 and Gen 2 DynamoDB.**
+  - Gen 2 count via signed `listPhotos` (paginate `nextToken` if total > 1000):
+    ```bash
+    APPSYNC_URL="$PROD_APPSYNC_URL" AWS_REGION="$REGION" \
+      ts-node -e "
+        import { createSignedGraphqlClient } from './scripts/blur';
+        (async () => {
+          const gql = createSignedGraphqlClient('$PROD_APPSYNC_URL');
+          let total = 0; let nextToken = null;
+          do {
+            const d = await gql('query (\$nt: String) { listPhotos(limit: 1000, nextToken: \$nt) { items { id } nextToken } }', { nt: nextToken });
+            total += d.listPhotos.items.length; nextToken = d.listPhotos.nextToken;
+          } while (nextToken);
+          console.log('gen2 count =', total);
+        })();
+      "
+    ```
+  - Compare to §2.0.4 Gen 1 snapshot. Equal = pass.
+- [ ] **All S3 objects copied** — re-run §2.3.1 parity check; `src == dst`
+- [ ] **Spot-check 5 photos load** via §2.3.2 (all return HTTP 200)
+- [ ] **Migration script exit code 0**, `Failed=0`
+- [ ] **Every Gen 2 `Photo` row's `s3key` starts with `public/`** (verifies §2.2 normalization fired):
+  ```bash
+  GEN2_TABLE=$(aws cloudformation list-stack-resources \
+    --stack-name $(aws cloudformation list-stacks --region "$REGION" \
+      --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE \
+      --query "StackSummaries[?contains(StackName, 'amplify-laijackylai-main') && contains(StackName, 'data')].StackName | [0]" --output text) \
+    --region "$REGION" \
+    --query "StackResourceSummaries[?ResourceType=='AWS::DynamoDB::Table' && contains(LogicalResourceId, 'Photo')].PhysicalResourceId | [0]" --output text)
+  echo "$GEN2_TABLE"
+
+  aws dynamodb scan --table-name "$GEN2_TABLE" --region "$REGION" \
+    --projection-expression s3key \
+    | jq -r '.Items[].s3key.S' \
+    | grep -vc '^public/'
+  ```
+  Expect: `0`.
+- [ ] **Browser smoke** `https://main.d2ukbi00figpw1.amplifyapp.com/photography` (or `https://laijackylai.com/photography`) renders >0 photos, 0 console errors. Allow up to 60s after migration for ISR window to roll.
+- [ ] **Re-enable `main` auto-build** — undo §2.0.3:
+  ```bash
+  aws amplify update-branch \
+    --app-id d2ukbi00figpw1 --branch-name main \
+    --enable-auto-build --region "$REGION"
+  ```
 
 ### 2.5 Remove `publicStorageUrl()` shim (Option 2 cleanup)
 
@@ -1060,6 +1346,56 @@ Drop the "prepends public/ to bare keys" test case in `tests/ProjectsPage.test.t
 - [ ] `tests/ProjectsPage.test.tsx` "prepends public/ to bare keys" case deleted
 - [ ] `npm run lint && npm test && npm run build` green
 - [ ] Browser smoke `/photography` after deploy: at least one photo renders, network tab shows 200 on `https://<gen2-bucket>/public/photos/...` URLs
+
+### 2.6 Codex execution runbook (linear order)
+
+This is the canonical step-by-step for a Codex agent. **Do not reorder.** Each step gates the next.
+
+```
+1.  Read §2.0; export shell variables (§2.0.1)
+2.  Verify IAM grant on prod API (§2.0.2)            [BLOCKER if FAIL]
+3.  Pause main auto-build (§2.0.3)                   [BLOCKER if FAIL]
+4.  Snapshot Gen 1 row count (§2.0.4); record below
+5.  Export Gen 1 DynamoDB → gen1-photos.json (§2.1)  [verify exported == live count]
+6.  Re-verify S3 parity (§2.3.1)                     [src must == dst]
+7.  Spot-check 5 S3 objects (§2.3.2)                 [all must be 200]
+8.  Export listByS3KeyQuery from scripts/blur.ts (§2.2.1)
+9.  Create scripts/migrate-photos.ts (§2.2.2)
+10. Add migrate-photos npm script (§2.2.2)
+11. Run migration with prod env inline (§2.2.3)      [Failed must == 0]
+12. Verify Gen 2 count == Gen 1 count (§2.4 first box)
+13. Verify all Gen 2 s3keys start with public/ (§2.4)
+14. Browser smoke /photography on prod (§2.4)
+15. Re-enable main auto-build (§2.4 last box)
+16. (Optional, blocked on §2.4 green) §2.5 shim removal
+17. (Optional) Delete Phase 1 test branch:
+    aws amplify delete-branch --app-id d2ukbi00figpw1 \
+      --branch-name phase-1-amplify-gen2 --region ap-southeast-1
+```
+
+**Failure handling per step:**
+
+| Step fails | Action |
+|------------|--------|
+| 2 (IAM) | Apply policy in §2.0.2; wait 30s; retry. Do not proceed. |
+| 5 (export count mismatch) | Re-export with pagination loop; do not write to Gen 2 with a partial export. |
+| 6 (S3 parity) | Re-run `aws s3 sync` (idempotent); do not proceed if still diverged after 2 attempts. |
+| 11 (migration `Failed > 0`) | Read stderr per-row; common causes: NotAuthorized (re-check step 2), throttling (DynamoDB write capacity — bursts can throttle; insert `await new Promise(r => setTimeout(r, 50))` between iterations if hit). Re-run; idempotency skips successful rows. |
+| 12 (count mismatch) | Diff `gen1-photos.json` keys vs Gen 2 `listPhotos` keys; re-run migration on the missing set only. |
+| 13 (rows missing `public/`) | A code path bypassed the normalizer in §2.2.2 — **do not** ship §2.5 shim removal until this is `0`. |
+| 14 (browser 500 / 0 photos) | Check CloudWatch `/aws/amplify/d2ukbi00figpw1`; common cause is ISR cache stale — wait 60s + hard reload. If still failing, check `STORAGE_BASE_URL` env var on `main` branch matches `$PROD_BUCKET`. |
+| 15 (auto-build re-enable) | Verify with `aws amplify get-branch ... enableAutoBuild`. Critical — leaving `false` in prod silently breaks future deploys. |
+
+**Recording:**
+
+```
+Gen 1 row count snapshot (step 4):       ____  date: 2026-05-__
+Migration script result (step 11):       Created=____ Skipped=____ Failed=____
+Gen 2 count after migration (step 12):   ____
+Gen 2 rows missing public/ (step 13):    ____  (must be 0)
+Browser smoke (step 14):                 PASS / FAIL
+Auto-build re-enabled (step 15):         true / false
+```
 
 ---
 
