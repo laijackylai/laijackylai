@@ -94,7 +94,7 @@ export const createSignedGraphqlClient = (appSyncUrl = process.env.APPSYNC_URL) 
   };
 };
 
-const listByS3KeyQuery = /* GraphQL */ `
+export const listByS3KeyQuery = /* GraphQL */ `
   query ListPhotosByS3Key($s3key: String!) {
     listPhotos(filter: { s3key: { eq: $s3key } }, limit: 1) {
       items {
