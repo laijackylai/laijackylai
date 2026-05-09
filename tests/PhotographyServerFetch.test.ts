@@ -17,7 +17,7 @@ describe('Photography getStaticProps', () => {
           listPhotos: {
             items: [{
               id: 'photo-1',
-              s3key: 'photos/digital/photo 1.jpg',
+              s3key: 'public/photos/digital/photo 1.jpg',
               type: 'digital',
               aspectRatio: '1.500',
               blurredBase64: null,
@@ -51,7 +51,7 @@ describe('Photography getStaticProps', () => {
       props: {
         photosData: [{
           id: 'photo-1',
-          s3key: 'photos/digital/photo 1.jpg',
+          s3key: 'public/photos/digital/photo 1.jpg',
           type: 'digital',
           aspectRatio: '1.500',
           blurredBase64: null,
