@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn dev *)",
+      "Bash(echo \"PID: $!\")",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_close",
+      "Bash(uvx --version)",
+      "Bash(timeout 30 uvx awslabs.cdk-mcp-server@latest --help)",
+      "Bash(gtimeout 45 uvx awslabs.cdk-mcp-server@latest --help)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(uvx awslabs.cdk-mcp-server@latest --help)",
+      "Bash(uvx awslabs.aws-iac-mcp-server@latest --help)",
+      "Bash(claude mcp *)",
+      "Bash(uvx awslabs.frontend-mcp-server@latest --help)",
+      "Bash(awk *)",
+      "Bash(npm test *)",
+      "Bash(gh pr *)",
+      "Bash(npm view *)",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(npm ls *)",
+      "Bash(rtk proxy *)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_playwright_playwright__browser_network_requests"
+    ]
+  }
+}

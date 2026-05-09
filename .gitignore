@@ -26,6 +26,7 @@ npm-debug.log*
 .env.local
 .env*.local
 amplify_outputs.json
+gen1-photos.json
 .amplify/
 
 # vercel

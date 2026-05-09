@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "blur": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/blur.ts",
+    "migrate-photos": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/migrate-photos.ts",
     "test": "jest",
     "test:e2e": "playwright test",
     "test:lighthouse": "npm run build && start-server-and-test start http://127.0.0.1:3000 \"node tests/lighthouse/a11y.mjs\""
