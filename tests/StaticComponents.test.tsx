@@ -20,7 +20,7 @@ describe('static components', () => {
     const { container } = render(<Title />);
 
     expect(container.querySelector('title')).toHaveTextContent('HKLai');
-    expect(container.querySelector('link[rel="icon"]')).toHaveAttribute('href', 'logos/logo_black.ico');
+    expect(container.querySelector('link[rel="icon"]')).toHaveAttribute('href', '/logos/logo_black.svg');
   });
 
   it('exports the local font variable class', () => {
