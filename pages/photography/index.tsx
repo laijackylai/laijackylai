@@ -96,7 +96,8 @@ const Photography: NextPage<Props> = ({
                       height={wh}
                       placeholder='blur'
                       blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
-                      loading='lazy'
+                      priority={i === 0}
+                      sizes='(min-width: 1024px) 50vw, 100vw'
                       className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
                     />
                     <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
@@ -135,14 +136,25 @@ const publicStorageUrl = (key: string) => {
   return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
 };
 
-const shuffleArray = <T,>(array: T[]) => {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+const maxInlineBlurDataUrlLength = 2048;
+
+const normalizeBlurDataUrl = (blurredBase64: string | null) => {
+  if (!blurredBase64 || blurredBase64.length > maxInlineBlurDataUrlLength) {
+    return null;
   }
-  return shuffled;
-}
+  return blurredBase64;
+};
+
+const sortPhotosForInitialLoad = (photos: PhotoData[]) => {
+  return [...photos].sort((a, b) => {
+    const aIsDigital = a.s3key.includes('/digital/');
+    const bIsDigital = b.s3key.includes('/digital/');
+    if (aIsDigital !== bIsDigital) {
+      return aIsDigital ? 1 : -1;
+    }
+    return a.s3key.localeCompare(b.s3key);
+  });
+};
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
@@ -183,10 +195,11 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     const photosData = photos.map((photo) => ({
       ...photo,
       id: photo.id || photo.s3key,
+      blurredBase64: normalizeBlurDataUrl(photo.blurredBase64),
       url: publicStorageUrl(photo.s3key),
     }));
 
-    return { props: { photosData: shuffleArray(photosData) }, revalidate: 60 };
+    return { props: { photosData: sortPhotosForInitialLoad(photosData) }, revalidate: 60 };
   } catch (error) {
     if (shouldFailStaticBuild()) {
       throw error;

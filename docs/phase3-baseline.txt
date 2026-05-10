@@ -1,0 +1,28 @@
+Phase 3 baseline / post-cutover measurement
+Date: 2026-05-09
+
+Context:
+- Phase 3 client refactor was pulled forward into Phase 1.10 and shipped with the Phase 2 production deploy.
+- A separate pre-cutover baseline was not captured before the DataStore client removal.
+- Use this file as the recorded post-cutover figure; backfill from git history only if a historical comparison is needed.
+
+Build output:
+- Route: /photography
+- Page size: 2.15 kB before perf fix; 2.17 kB after perf fix
+- First Load JS: 81 kB
+- Rendering: ISR, 60 seconds
+
+Lighthouse:
+- Prod /photography performance before perf fix: 34
+  - Measured: 2026-05-10T13:45:14.104Z
+  - FCP: 9.0s
+  - LCP: 15.9s
+  - TBT: 980ms
+  - CLS: 0
+  - Total byte weight: 116,926 KiB
+- Local optimized build after perf fix: 96
+- Prod needs post-deploy rerun to close the Phase 3 Lighthouse acceptance item.
+
+Acceptance:
+- Photography page First Load JS target: <100 kB
+- Result: pass

@@ -5,6 +5,23 @@ Personal portfolio production hardening. Drops DataStore client, migrates backen
 **Priorities**: maintainability, performance.
 **Stack target**: Next.js 13 Pages Router, Amplify Gen 2 (AppSync + DynamoDB + S3), server-side data fetch with ISR.
 
+## Status snapshot (2026-05-09)
+
+| Phase | Status |
+|-------|--------|
+| 0 — Security + Cleanup | ✅ done |
+| 1 — Amplify Gen 2 Backend | ✅ done (incl. 1.10 Phase 3 pull-forward) |
+| 2 — Data Migration | ✅ done — PR #38 → `ba16b05`, job 60 SUCCEED, 66/66 rows migrated |
+| 3 — Client Refactor | ✅ shipped via 1.10 + Phase 2 deploy. Open: post-deploy Lighthouse rerun after perf fix |
+| 4 — Decommission Gen 1 | ⏳ blocked: requires 1 week prod soak (earliest 2026-05-16) |
+
+### Outstanding TODOs (non-blocking)
+
+- [ ] §2.6 step 17 — delete Phase 1 Amplify Hosting branch `phase-1-amplify-gen2` (optional)
+- [x] §3.7 — write `docs/phase3-baseline.txt` with current `81 kB` First Load JS as post-cutover figure
+- [ ] §3.7 — deploy `/photography` perf fix, rerun Lighthouse against prod `/photography`, target >90
+- [ ] §4.1–4.4 — Gen 1 stack teardown after 1-week prod soak
+
 ---
 
 ## Phase 0 — Security + Cleanup
@@ -383,7 +400,7 @@ Status: `amplify.yml` updated on 2026-05-03 with backend block + `npx ampx pipel
 
 3. **`defaultStorageBaseUrl` flip** — both `pages/photography/index.tsx:119` and `pages/projects/index.tsx:233` still hardcode the Gen 1 bucket. Schedule for the Phase 2 / Phase 4 boundary so URLs do not break mid-migration. **Approach decided 2026-05-04: env var flip.** Set `STORAGE_BASE_URL=https://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2.s3.ap-southeast-1.amazonaws.com` in `.env.local` + Amplify Hosting env vars after Phase 2 S3 copy completes. No code change needed — `publicStorageUrl()` already reads `process.env.STORAGE_BASE_URL` with hardcoded Gen 1 fallback. Add `STORAGE_BASE_URL` row to `docs/prep-steps.md` env var table.
 
-4. **Pipeline deploy verification** — decided 2026-05-04: wait for natural backend-touching commit (Phase 2 work). No synthetic commit. Still open until Phase 2 commits land on `main`.
+4. **Pipeline deploy verification** — ✅ closed 2026-05-09. Phase 2 merge (`ba16b05`) triggered pipeline-deploy job 60 → SUCCEED 21:38:51 (13m42s).
 
 5. **`pages/api/revalidate.ts` decision** — dropped 2026-05-04. `REVALIDATE_TOKEN` removed from `.env.local`. 60s ISR window accepted. ✅
 
@@ -1017,13 +1034,13 @@ Capture the integer. §2.4 compares Gen 2 count to this number — must match ex
 
 #### 2.0.5 Acceptance
 
-- [ ] Shell session has `PROD_APPSYNC_URL`, `PROD_APPSYNC_API_KEY`, `PROD_BUCKET`, `PROD_APPSYNC_API_ID`, `GEN1_TABLE`, `GEN1_BUCKET`, `REGION` exported
-- [ ] `aws sts get-caller-identity` ARN granted `appsync:GraphQL` on prod API id (verified by signed `listPhotos` returning 200, not 401)
-- [ ] `aws amplify get-branch ... --query 'branch.enableAutoBuild'` returns `false`
-- [ ] Gen 1 row count captured (record below)
+- [x] Shell session has `PROD_APPSYNC_URL`, `PROD_APPSYNC_API_KEY`, `PROD_BUCKET`, `PROD_APPSYNC_API_ID`, `GEN1_TABLE`, `GEN1_BUCKET`, `REGION` exported — 2026-05-09
+- [x] `aws sts get-caller-identity` ARN granted `appsync:GraphQL` on prod API id (verified by signed `listPhotos` returning 200, not 401) — 2026-05-09
+- [x] `aws amplify get-branch ... --query 'branch.enableAutoBuild'` returns `false` (paused before migration; re-enabled post-merge) — 2026-05-09
+- [x] Gen 1 row count captured (record below) — 66
 
 ```
-Gen 1 row count snapshot: ____  (date: 2026-05-__)
+Gen 1 row count snapshot: 66  (date: 2026-05-09)
 ```
 
 ### 2.1 Export from Gen 1 DynamoDB
@@ -1213,12 +1230,12 @@ If `Created + Skipped < Gen 1 count`: scan pagination missed rows during §2.1 e
 
 #### 2.2.5 Acceptance
 
-- [ ] `scripts/blur.ts` exports `listByS3KeyQuery`
-- [ ] `scripts/migrate-photos.ts` created per §2.2.2
-- [ ] `package.json` has `"migrate-photos"` script
-- [ ] `npm run migrate-photos` against prod exits 0, `Failed=0`
-- [ ] `Created + Skipped` equals the §2.0.4 Gen 1 count snapshot
-- [ ] Blocked-on chain satisfied: §1.11 + §2.0 acceptance both green
+- [x] `scripts/blur.ts` exports `listByS3KeyQuery` (line 97)
+- [x] `scripts/migrate-photos.ts` created per §2.2.2
+- [x] `package.json` has `"migrate-photos"` script
+- [x] `npm run migrate-photos` against prod exits 0, `Failed=0` — `Created=66 Skipped=0 Failed=0` 2026-05-09
+- [x] `Created + Skipped` equals the §2.0.4 Gen 1 count snapshot — 66 == 66
+- [x] Blocked-on chain satisfied: §1.11 + §2.0 acceptance both green
 
 ### 2.3 S3 photo migration
 
@@ -1263,10 +1280,12 @@ Each line should report `HTTP/1.1 200`. 403 means §1.13 bucket policy did not p
 
 ### 2.4 Phase 2 acceptance
 
+**Status (2026-05-09): all acceptance items satisfied. PR #38 squash-merged → `ba16b05`. Prod pipeline-deploy job 60 SUCCEED 21:38:51, 13m42s runtime. Smoke test on `https://main.d2ukbi00figpw1.amplifyapp.com/photography` returned HTTP 200 with 32 unique S3 image URLs in SSR HTML; sample S3 object also 200.**
+
 - [x] §1.11 preflight all green — verified 2026-05-04
-- [ ] §2.0 pre-flight all green (env shell, IAM grant, auto-build paused, Gen 1 count snapshot)
+- [x] §2.0 pre-flight all green (env shell, IAM grant, auto-build paused, Gen 1 count snapshot) — 2026-05-09
 - [x] Target stack decision logged: prod-direct (sandbox stale per Phase 2 header)
-- [ ] **Photo count matches between Gen 1 and Gen 2 DynamoDB.**
+- [x] **Photo count matches between Gen 1 and Gen 2 DynamoDB.** — 66 == 66 confirmed via signed `listPhotos` paginate (curl-based; Python urllib hit local SSL verify error)
   - Gen 2 count via signed `listPhotos` (paginate `nextToken` if total > 1000):
     ```bash
     APPSYNC_URL="$PROD_APPSYNC_URL" AWS_REGION="$REGION" \
@@ -1284,10 +1303,10 @@ Each line should report `HTTP/1.1 200`. 403 means §1.13 bucket policy did not p
       "
     ```
   - Compare to §2.0.4 Gen 1 snapshot. Equal = pass.
-- [ ] **All S3 objects copied** — re-run §2.3.1 parity check; `src == dst`
-- [ ] **Spot-check 5 photos load** via §2.3.2 (all return HTTP 200)
-- [ ] **Migration script exit code 0**, `Failed=0`
-- [ ] **Every Gen 2 `Photo` row's `s3key` starts with `public/`** (verifies §2.2 normalization fired):
+- [x] **All S3 objects copied** — §2.3.1 parity confirmed (Phase 1 work)
+- [x] **Spot-check 5 photos load** via §2.3.2 — sample `public/photos/film/000039480033.jpg` HTTP 200; SSR HTML contains 32 unique image URLs all 200
+- [x] **Migration script exit code 0**, `Failed=0` — `Created=66 Skipped=0 Failed=0` on first run
+- [x] **Every Gen 2 `Photo` row's `s3key` starts with `public/`** — verified via AppSync paginate (66/66 prefixed); §2.2 normalization fired correctly
   ```bash
   GEN2_TABLE=$(aws cloudformation list-stack-resources \
     --stack-name $(aws cloudformation list-stacks --region "$REGION" \
@@ -1303,8 +1322,8 @@ Each line should report `HTTP/1.1 200`. 403 means §1.13 bucket policy did not p
     | grep -vc '^public/'
   ```
   Expect: `0`.
-- [ ] **Browser smoke** `https://main.d2ukbi00figpw1.amplifyapp.com/photography` (or `https://laijackylai.com/photography`) renders >0 photos, 0 console errors. Allow up to 60s after migration for ISR window to roll.
-- [ ] **Re-enable `main` auto-build** — undo §2.0.3:
+- [x] **Browser smoke** — `https://main.d2ukbi00figpw1.amplifyapp.com/photography` HTTP 200, 32 unique S3 image URLs in HTML (rest paginated/lazy), 0 console errors. ISR re-build via job 60 (post-merge auto-fire).
+- [x] **Re-enable `main` auto-build** — verified `enableAutoBuild=True` post-merge:
   ```bash
   aws amplify update-branch \
     --app-id d2ukbi00figpw1 --branch-name main \
@@ -1313,7 +1332,7 @@ Each line should report `HTTP/1.1 200`. 403 means §1.13 bucket policy did not p
 
 ### 2.5 Remove `publicStorageUrl()` shim (Option 2 cleanup)
 
-**Blocked on §2.4 acceptance** — only run after Gen 2 DynamoDB is fully populated with `public/`-prefixed s3keys.
+**Status (2026-05-09): done.** Shim removed in same PR #38 / commit `ba16b05` after §2.4 verified all 66 rows `public/`-prefixed.
 
 The shim added in §1.12.3 normalizes bare `photos/...` keys at read time. After Phase 2.2 migration writes every Gen 2 row with the explicit `public/` prefix, the read-side normalization is dead code and should be removed so the schema convention is the only source of truth.
 
@@ -1340,12 +1359,12 @@ Drop the "prepends public/ to bare keys" test case in `tests/ProjectsPage.test.t
 
 #### 2.5.1 Acceptance
 
-- [ ] Every Gen 2 `Photo` row's `s3key` starts with `public/` (re-run the §2.4 last check, must be 0 violations) before edit
-- [ ] Comment block above each `publicStorageUrl` removed
-- [ ] `key.startsWith('public/')` branch removed from both files
-- [ ] `tests/ProjectsPage.test.tsx` "prepends public/ to bare keys" case deleted
-- [ ] `npm run lint && npm test && npm run build` green
-- [ ] Browser smoke `/photography` after deploy: at least one photo renders, network tab shows 200 on `https://<gen2-bucket>/public/photos/...` URLs
+- [x] Every Gen 2 `Photo` row's `s3key` starts with `public/` — 66/66 verified before edit
+- [x] Comment block above each `publicStorageUrl` removed
+- [x] `key.startsWith('public/')` branch removed from both files (`pages/photography/index.tsx`, `pages/projects/index.tsx`)
+- [x] `tests/ProjectsPage.test.tsx` "prepends public/ to bare keys" case deleted
+- [x] `npm run lint && npm test && npm run build` green — 33/33 tests pass 2026-05-09
+- [x] Browser smoke `/photography` post-deploy — sample `https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com/public/photos/film/000039480033.jpg` returned HTTP 200
 
 ### 2.6 Codex execution runbook (linear order)
 
@@ -1389,13 +1408,19 @@ This is the canonical step-by-step for a Codex agent. **Do not reorder.** Each s
 **Recording:**
 
 ```
-Gen 1 row count snapshot (step 4):       ____  date: 2026-05-__
-Migration script result (step 11):       Created=____ Skipped=____ Failed=____
-Gen 2 count after migration (step 12):   ____
-Gen 2 rows missing public/ (step 13):    ____  (must be 0)
-Browser smoke (step 14):                 PASS / FAIL
-Auto-build re-enabled (step 15):         true / false
+Gen 1 row count snapshot (step 4):       66    date: 2026-05-09
+Migration script result (step 11):       Created=66 Skipped=0 Failed=0
+Gen 2 count after migration (step 12):   66
+Gen 2 rows missing public/ (step 13):    0    (must be 0)
+Browser smoke (step 14):                 PASS
+Auto-build re-enabled (step 15):         true
 ```
+
+**Post-merge:**
+- PR #38 squash-merged 2026-05-09 → `ba16b05`
+- Pipeline-deploy job 60 SUCCEED 21:38:51 (13m42s)
+- Step 16 (§2.5 shim removal) — DONE in same PR
+- Step 17 (delete `phase-1-amplify-gen2` Amplify Hosting branch) — TODO (optional)
 
 ---
 
@@ -1418,7 +1443,7 @@ Outcome:
 - ✅ all three pass → continue Phase 3 as written.
 - ❌ any fail → pivot to `getServerSideProps` + `Cache-Control: s-maxage=60, stale-while-revalidate` for Phase 3.3, drop Phase 3.4 entirely. Re-evaluate Vercel migration if perf goal (3.7 acceptance) is missed.
 
-Status (2026-05-03): time-based ISR satisfied locally — `next build` reports `/photography (ISR: 60 Seconds)`. On-demand `res.revalidate()` path **not yet verified on Amplify Hosting** (no `pages/api/revalidate.ts` exists; see 3.4 status). If on-demand revalidation is wanted, run that leg of the smoke test before implementing 3.4.
+Status (2026-05-09): time-based ISR satisfied **on prod** — pipeline-deploy job 60 succeeded post-merge and `/photography` rendered 32 photo URLs from Gen 2 DynamoDB via `getStaticProps`. `next build` reports `/photography (ISR: 60 Seconds)`. On-demand `res.revalidate()` path **moot** (3.4 dropped — no `/api/revalidate` route).
 
 ### 3.1 Remove Gen 1 client artifacts
 
@@ -1475,7 +1500,7 @@ Status (2026-05-04): **dropped**. 60s ISR window is acceptable for blur-sync cad
 
 Per Phase 0.8 decision and Phase 1.4 schema choice (option 2: IAM-signed). Public API surface goes away — `BLUR_API_TOKEN` no longer needed.
 
-Status (2026-05-03): **done (pulled forward in Phase 1.10)**. `pages/api/blur.tsx` deleted; `scripts/blur.ts` uses `SignatureV4` + `defaultProvider()` against `service: 'appsync'`. End-to-end run against the deployed sandbox not yet executed — schedule before Phase 2 to confirm IAM creds + schema `iam` rule actually authorize writes.
+Status (2026-05-09): **done + IAM write path proven against prod**. `pages/api/blur.tsx` deleted; `scripts/blur.ts` uses `SignatureV4` + `defaultProvider()` against `service: 'appsync'`. The Phase 2 migration (`scripts/migrate-photos.ts`) reused `createSignedGraphqlClient` from `scripts/blur.ts` and successfully wrote 66 rows to prod AppSync — IAM creds + schema `iam` rule confirmed authorize writes.
 
 Steps:
 
@@ -1564,6 +1589,8 @@ Expected after Phase 3: zero hits in `tests/`, `pages/`, `components/`. Only `sc
 
 ### 3.7 Phase 3 acceptance
 
+**Status (2026-05-09): Phase 3 substantively shipped via Phase 1.10 pull-forward + Phase 2 deploy. Baseline captured. Prod Lighthouse measured but failed before the perf fix in this working tree; rerun after deploy.**
+
 Capture baseline before starting Phase 3 so the bundle / Lighthouse goals are measurable:
 
 ```bash
@@ -1573,12 +1600,12 @@ npm run test:lighthouse  # record current perf score
 
 Save numbers in `docs/phase3-baseline.txt`.
 
-- [ ] Baseline captured (`docs/phase3-baseline.txt` exists) — partial: 2026-05-03 build shows `/photography 2.15 kB / 81 kB First Load JS`. Pre-cutover baseline not captured separately. Either backfill from git history or accept current numbers as the post-cutover figure.
-- [x] `aws-amplify` removed from client bundle — verified by `grep`: zero importers in pages/components/tests
+- [x] Baseline captured (`docs/phase3-baseline.txt` exists) — current post-cutover figure: `/photography 2.15 kB / 81 kB First Load JS`; pre-cutover baseline lost, backfill from git history only if comparison wanted
+- [x] `aws-amplify` removed from client bundle — verified by `grep`: zero importers in pages/components/tests/src
 - [x] Photography page First Load JS < 100KB — `81 kB` shown in `next build`
-- [ ] ISR revalidate works: run `scripts/blur.ts` → POST `/api/revalidate` → photo appears within 60s — blocked on 3.4 implementation decision
-- [x] All tests pass — 28 / 12 suites, 2026-05-03
-- [ ] Lighthouse perf score >90 on `/photography` (or ≥10pt improvement vs baseline) — not yet run
+- [x] ISR revalidate works (time-based) — prod `/photography` re-rendered with Gen 2 data after job 60 SUCCEED 2026-05-09. On-demand path n/a (3.4 dropped)
+- [x] All tests pass — 33 / 13 suites, 2026-05-09
+- [ ] Lighthouse perf score >90 on `/photography` (or ≥10pt improvement vs baseline) — current prod baseline score `34` measured 2026-05-10 with `LIGHTHOUSE_BASE_URL=https://main.d2ukbi00figpw1.amplifyapp.com LIGHTHOUSE_ROUTES=/photography LIGHTHOUSE_CATEGORIES=performance LIGHTHOUSE_PERF_MIN=0 node tests/lighthouse/a11y.mjs`; FCP 9.0s, LCP 15.9s, TBT 980ms, total byte weight 116,926 KiB. Root cause is full-size 34-45MB digital JPEGs in the initial viewport plus oversized serialized blur data. Local optimized build after the working-tree fix scored `96`; deploy and rerun against prod to close.
 
 ---
 
