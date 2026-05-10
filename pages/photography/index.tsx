@@ -85,30 +85,35 @@ const Photography: NextPage<Props> = ({
             photosData && photosData.length > 0 && photosData.map((p, i) => {
               const isOdd = i % 2
               const wh = imageHeightsById[p.id] ?? 400
-              return (
-                <RevealOnScroll key={p.id}>
-                  <div className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-                    <Image
-                      quality={75}
-                      src={p.url}
-                      alt={p.s3key}
-                      width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
-                      height={wh}
-                      placeholder='blur'
-                      blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
-                      priority={i === 0}
-                      sizes='(min-width: 1024px) 50vw, 100vw'
-                      className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
-                    />
-                    <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
-                      <div className='font-bold text-lg'>{p.type}</div>
-                      <div>{p.id}</div>
-                      <div>{p.s3key}</div>
-                      <div>{p.createdAt}</div>
-                    </div>
+              const isInitialViewport = i < 2;
+              const photoContent = (
+                <div className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+                  <Image
+                    quality={65}
+                    src={p.url}
+                    alt={p.s3key}
+                    width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                    height={wh}
+                    placeholder='blur'
+                    blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
+                    priority={isInitialViewport}
+                    sizes='(min-width: 1024px) 50vw, 100vw'
+                    className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
+                  />
+                  <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
+                    <div className='font-bold text-lg'>{p.type}</div>
+                    <div>{p.id}</div>
+                    <div>{p.s3key}</div>
+                    <div>{p.createdAt}</div>
                   </div>
-                </RevealOnScroll>
-              )
+                </div>
+              );
+
+              return isInitialViewport ? (
+                <div key={p.id}>{photoContent}</div>
+              ) : (
+                <RevealOnScroll key={p.id}>{photoContent}</RevealOnScroll>
+              );
             })
           }
         </div>

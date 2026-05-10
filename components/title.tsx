@@ -5,7 +5,7 @@ const Title: NextPage = () => {
   return (
     <Head data-testid="title-component">
       <title>HKLai</title>
-      <link rel="icon" href="logos/logo_black.ico" />
+      <link rel="icon" href="/logos/logo_black.svg" type="image/svg+xml" />
     </Head>
   )
 }
