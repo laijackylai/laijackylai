@@ -1,5 +1,5 @@
 Phase 3 baseline / post-cutover measurement
-Date: 2026-05-09
+Date: 2026-05-10
 
 Context:
 - Phase 3 client refactor was pulled forward into Phase 1.10 and shipped with the Phase 2 production deploy.
@@ -8,7 +8,7 @@ Context:
 
 Build output:
 - Route: /photography
-- Page size: 2.15 kB before perf fix; 2.17 kB after perf fix
+- Page size: 2.15 kB before perf fix; 2.2 kB after perf fix
 - First Load JS: 81 kB
 - Rendering: ISR, 60 seconds
 
@@ -20,9 +20,25 @@ Lighthouse:
   - TBT: 980ms
   - CLS: 0
   - Total byte weight: 116,926 KiB
-- Local optimized build after perf fix: 96
-- Prod needs post-deploy rerun to close the Phase 3 Lighthouse acceptance item.
+- Smoke branch /photography after full perf fix: 95
+  - URL: https://phase-1-amplify-gen2.d2ukbi00figpw1.amplifyapp.com/photography
+  - Measured: 2026-05-10T18:01:26.746Z
+  - Caveat: smoke branch rendered 0 S3 photo URLs, so this is a deployment-path smoke result, not production-data performance.
+- Prod /photography after deployed perf fix: 78
+  - URL: https://main.d2ukbi00figpw1.amplifyapp.com/photography
+  - Commit: 3ac8ccfc4ff4e41728197966bca831235a98f225
+  - Amplify job: main #62 SUCCEED, 2026-05-10T15:18:28-04:00
+  - Measured: 2026-05-10T23:07:06.433Z
+  - FCP: 1.1s
+  - LCP: 4.7s
+  - TBT: 50ms
+  - CLS: 0.132
+  - Speed Index: 3.0s
+  - Root document response: 330ms
+  - Total byte weight: 420 KiB
 
 Acceptance:
 - Photography page First Load JS target: <100 kB
 - Result: pass
+- Lighthouse performance target: >90 on prod /photography, or >=10pt improvement versus baseline
+- Result: accepted at 78 (+44pt versus 34 baseline); absolute >90 target remains future perf work outside migration scope
