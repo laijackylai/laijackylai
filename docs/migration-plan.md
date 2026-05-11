@@ -5,22 +5,21 @@ Personal portfolio production hardening. Drops DataStore client, migrates backen
 **Priorities**: maintainability, performance.
 **Stack target**: Next.js 13 Pages Router, Amplify Gen 2 (AppSync + DynamoDB + S3), server-side data fetch with ISR.
 
-## Status snapshot (2026-05-09)
+## Status snapshot (2026-05-10)
 
 | Phase | Status |
 |-------|--------|
 | 0 — Security + Cleanup | ✅ done |
 | 1 — Amplify Gen 2 Backend | ✅ done (incl. 1.10 Phase 3 pull-forward) |
 | 2 — Data Migration | ✅ done — PR #38 → `ba16b05`, job 60 SUCCEED, 66/66 rows migrated |
-| 3 — Client Refactor | ✅ shipped via 1.10 + Phase 2 deploy. Open: post-deploy Lighthouse rerun after perf fix |
-| 4 — Decommission Gen 1 | ⏳ blocked: requires 1 week prod soak (earliest 2026-05-16) |
+| 3 — Client Refactor | ✅ done — perf fix `3ac8ccf` deployed (main job 62 SUCCEED). Lighthouse 34 → 78 on prod; accepted below >90 target (see §3.7 note) |
+| 4 — Decommission Gen 1 | ⏳ blocked: requires 1 week prod soak from `3ac8ccf` deploy (earliest 2026-05-17) |
 
 ### Outstanding TODOs (non-blocking)
 
-- [ ] §2.6 step 17 — delete Phase 1 Amplify Hosting branch `phase-1-amplify-gen2` (optional)
-- [x] §3.7 — write `docs/phase3-baseline.txt` with current `81 kB` First Load JS as post-cutover figure
-- [ ] §3.7 — deploy `/photography` perf fix, rerun Lighthouse against prod `/photography`, target >90
-- [ ] §4.1–4.4 — Gen 1 stack teardown after 1-week prod soak
+- [x] §2.6 step 17 — delete Phase 1 Amplify Hosting branch `phase-1-amplify-gen2` — done 2026-05-10
+- [x] §3.7 — `docs/phase3-baseline.txt` written; prod Lighthouse 78 recorded, accepted with note
+- [ ] §4.1–4.4 — Gen 1 stack teardown after 1-week prod soak (earliest 2026-05-17)
 
 ---
 
@@ -189,11 +188,13 @@ Drop `react-microsoft-clarity` dep.
 
 ### 0.9 Phase 0 acceptance
 
-- [ ] `npm run lint && npm test && npm run build` green locally
-- [ ] CI passes on PR
-- [ ] Amplify Hosting deploy green with new `amplify.yml`
-- [ ] `BLUR_API_TOKEN` set, `/api/blur` returns 401 without header
-- [ ] Clarity firing in browser devtools network tab
+**Status (2026-05-10): superseded.** `/api/blur` deleted in Phase 3.5 (moved to `scripts/blur.ts`); `BLUR_API_TOKEN` retired. Remaining gates verified throughout Phases 1–3:
+
+- [x] `npm run lint && npm test && npm run build` green locally — last green 2026-05-09 (33/33 tests)
+- [x] CI passes on PR — PR #36 + #38 merged green
+- [x] Amplify Hosting deploy green with new `amplify.yml` — main job 60 + 62 SUCCEED
+- [x] ~~`BLUR_API_TOKEN` set, `/api/blur` returns 401 without header~~ — N/A, endpoint removed in §3.5
+- [x] Clarity firing in browser devtools network tab — verified prod smoke 2026-05-09
 
 ---
 
@@ -892,7 +893,7 @@ After 1.12 + 1.13 land:
 - [x] Latest job on test branch = SUCCEED — job 15, 2026-05-07 (after env-var-runtime fix)
 - [x] `/projects` returns 200 with all 3 images visible — verified via Playwright 2026-05-07; `/_next/image` returned 200 on all 3 `public/takcarly/...` URLs after `next.config.js` remotePatterns picked up the test-branch Gen 2 hostname
 - [x] `/photography` builds without throwing; empty list rendered — verified via Playwright 2026-05-07 after `amplify.yml` preBuild bakes branch env vars into `.env.production` for SSR Lambda runtime; AppSync `listPhotos` returns `{ items: [] }` (DynamoDB empty pre-Phase 2.2)
-- [ ] Test branch deleted from Amplify Hosting — defer until PR merged (keeps a green reference build until cutover)
+- [x] Test branch deleted from Amplify Hosting — `phase-1-amplify-gen2` deleted 2026-05-10 after Phase 3 closeout
 
 ---
 
@@ -1420,7 +1421,7 @@ Auto-build re-enabled (step 15):         true
 - PR #38 squash-merged 2026-05-09 → `ba16b05`
 - Pipeline-deploy job 60 SUCCEED 21:38:51 (13m42s)
 - Step 16 (§2.5 shim removal) — DONE in same PR
-- Step 17 (delete `phase-1-amplify-gen2` Amplify Hosting branch) — TODO (optional)
+- Step 17 (delete `phase-1-amplify-gen2` Amplify Hosting branch) — DONE 2026-05-10
 
 ---
 
@@ -1589,7 +1590,7 @@ Expected after Phase 3: zero hits in `tests/`, `pages/`, `components/`. Only `sc
 
 ### 3.7 Phase 3 acceptance
 
-**Status (2026-05-09): Phase 3 substantively shipped via Phase 1.10 pull-forward + Phase 2 deploy. Baseline captured. Prod Lighthouse measured but failed before the perf fix in this working tree; rerun after deploy.**
+**Status (2026-05-10): Phase 3 closed. Perf fix `3ac8ccf` deployed (main job 62 SUCCEED). Prod Lighthouse 34 → 78 (+44pt), well over the ≥10pt-improvement fallback. Absolute >90 target not hit; accepted with note — see acceptance below.**
 
 Capture baseline before starting Phase 3 so the bundle / Lighthouse goals are measurable:
 
@@ -1605,7 +1606,7 @@ Save numbers in `docs/phase3-baseline.txt`.
 - [x] Photography page First Load JS < 100KB — `81 kB` shown in `next build`
 - [x] ISR revalidate works (time-based) — prod `/photography` re-rendered with Gen 2 data after job 60 SUCCEED 2026-05-09. On-demand path n/a (3.4 dropped)
 - [x] All tests pass — 33 / 13 suites, 2026-05-09
-- [ ] Lighthouse perf score >90 on `/photography` (or ≥10pt improvement vs baseline) — current prod baseline score `34` measured 2026-05-10 with `LIGHTHOUSE_BASE_URL=https://main.d2ukbi00figpw1.amplifyapp.com LIGHTHOUSE_ROUTES=/photography LIGHTHOUSE_CATEGORIES=performance LIGHTHOUSE_PERF_MIN=0 node tests/lighthouse/a11y.mjs`; FCP 9.0s, LCP 15.9s, TBT 980ms, total byte weight 116,926 KiB. Root cause is full-size 34-45MB digital JPEGs in the initial viewport plus oversized serialized blur data. Local optimized build after the working-tree fix scored `96`; deploy and rerun against prod to close.
+- [x] Lighthouse perf score >90 on `/photography` (or ≥10pt improvement vs baseline) — **accepted at 78 with note**. Prod baseline 2026-05-10: `34` (FCP 9.0s, LCP 15.9s, TBT 980ms, byte weight 116,926 KiB). Post-fix prod (`3ac8ccf`, main job 62 SUCCEED, measured 2026-05-10T23:07Z): `78` (FCP 1.1s, LCP 4.7s, TBT 50ms, CLS 0.132, SI 3.0s, byte weight 420 KiB). Improvement +44pt — exceeds ≥10pt fallback criterion. Absolute >90 target missed; remaining headroom is LCP (hero image dimensions/format) + CLS 0.132 (image aspect-ratio reservation). Tracked as future perf work outside migration scope. Full numbers in `docs/phase3-baseline.txt`.
 
 ---
 
