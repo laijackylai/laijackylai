@@ -23,7 +23,6 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
   const hktidesURL = "https://github.com/laijackylai/hktides"
   const hkradarURL = "https://github.com/laijackylai/hkradar"
 
-  const [windowWidth, setWindowWidth] = useState(28)
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 
   useEffect(() => {
@@ -31,9 +30,6 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
       setIsScrolledToTop(window.scrollY === 0);
     };
     window.addEventListener('scroll', handleScroll);
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth)
-    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -56,11 +52,9 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
   return (
     <div className={`global-font ${ocra.variable} font-sans`}>
       <Title />
-      <div className='flex pt-10 lg:pt-0 lg:py-20 flex-col'>
+      <HorizontalDrawer />
+      <div className='flex flex-col pt-24 lg:pt-0'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
-        <div className='lg:px-20'>
-          <HorizontalDrawer logoSize={25} width={windowWidth} />
-        </div>
         <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />

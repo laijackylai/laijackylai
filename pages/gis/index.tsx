@@ -1,7 +1,6 @@
 import { GetServerSideProps, NextPage } from 'next';
 import ocra from '../../components/font';
 import Title from '../../components/title';
-import ResponsiveDrawer from '../../components/drawer';
 import HorizontalDrawer from '../../components/horizontalDrawer';
 import Image from 'next/image';
 
@@ -13,7 +12,7 @@ const GIS: NextPage<Props> = () => {
   return (
     <div className={`global-font ${ocra.variable} font-sans lg:px-10`}>
       <Title />
-      <HorizontalDrawer logoSize={50} width={40} />
+      <HorizontalDrawer />
       <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>GIS</div>
       <div className='flex flex-col w-screen snap-y snap-mandatory overflow-scroll'>
         <div className='h-screen w-screen p-5 lg:px-12 lg:py-8 flex flex-col justify-around snap-start'>
