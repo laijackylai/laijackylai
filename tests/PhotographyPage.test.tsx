@@ -1,5 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import Photography from '../pages/photography';
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/photography',
+  }),
+}));
 
 const photosData = [
   {
@@ -43,6 +49,18 @@ describe('Photography page', () => {
     expect(screen.getByAltText('photos/film/photo-2.jpg')).toBeInTheDocument();
     expect(screen.getByText('photo-1')).toBeInTheDocument();
     expect(screen.getByText('photo-2')).toBeInTheDocument();
+  });
+
+  it('opens a full resolution photo modal from a photo click', () => {
+    render(<Photography photosData={photosData as any} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /open full resolution photo photos\/digital\/photo-1\.jpg/i }));
+
+    expect(screen.getByRole('dialog', { name: /full resolution photo photos\/digital\/photo-1\.jpg/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /close full resolution photo/i }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
 });
