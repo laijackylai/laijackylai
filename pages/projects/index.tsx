@@ -3,7 +3,6 @@ import Image from 'next/image'
 import githubLogo from '../../public/logos/github.png'
 import pythonLogo from '../../public/logos/python.png'
 import reactLogo from '../../public/logos/react.png'
-import ocra from '../../components/font'
 import Title from '../../components/title'
 // @ts-ignore
 import { getPlaiceholder } from 'plaiceholder';
@@ -50,23 +49,23 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
   }
 
   return (
-    <div className={`global-font ${ocra.variable} font-sans`}>
+    <div>
       <Title />
       <HorizontalDrawer />
       <div className='flex flex-col pt-24 lg:pt-0'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
-        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
-          <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-3 bg-black text-white' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
         <RevealOnScroll>
           <div className='pt-10 lg:pt-7 pb-8 lg:py-14 px-5 lg:px-32'>
-            <div className='font-extrabold text-2xl'>Open Source Contribution</div>
+            <div className='font-display text-heading-2 uppercase tracking-display'>Open Source Contribution</div>
             <div>
               <div className='flex flex-row gap-2'>
                 Contributed to
-                <a className='underline' href="https://loaders.gl" target='_blank' rel="noopener noreferrer">
+                <a className='underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200' href="https://loaders.gl" target='_blank' rel="noopener noreferrer">
                   <div>@loaders.gl</div>
                 </a>
                 <div>
@@ -77,19 +76,19 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
               </div>
             </div>
             <div className='text-sm pb-2'>• Added support for an alternative triangular mesh generation technique (
-              <a className='underline' href="https://github.com/mapbox/delatin" target='_blank' rel="noopener noreferrer">
+              <a className='underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200' href="https://github.com/mapbox/delatin" target='_blank' rel="noopener noreferrer">
                 Delatin
               </a>
               ) as an option for the terrain loader
             </div>
             <a href='https://mapbox.github.io/delatin/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
-              <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
+              <Image className='bg-gray-100 w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
             </a>
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-amber-700 text-white'>
-            <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-gray-900 text-white'>
+            <div className='font-display text-heading-2 uppercase tracking-display flex flex-row gap-2 items-center'>
               Canadian Fires
               <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer" aria-label="View Canadian Fires on GitHub">
                 <FaGithub size={25} />
@@ -101,13 +100,13 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div className='text-sm'>• Predicting future Ontario fires with XBGoost Regression</div>
             <div className='text-sm pb-2'>• Flask and SQLite for backend</div>
             <a href='https://canadian-fires.vercel.app/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
-              <Image className='bg-white rounded-md w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
+              <Image className='bg-gray-100 w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
             </a>
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
           <div className='py-7 lg:py-20 px-5 lg:px-32'>
-            <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+            <div className='font-display text-heading-2 uppercase tracking-display flex flex-row gap-2 items-center'>
               NUXT Google Maps
               <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer" aria-label="View NUXT Google Maps on GitHub">
                 <FaGithub size={25} />
@@ -116,13 +115,13 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div className=''>A Vue Google Maps demo showcasing google maps & map search</div>
             <div className='text-sm pb-2'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
             <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
-              <Image className='bg-white rounded-md w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
+              <Image className='bg-gray-100 w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
             </a>
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-sky-950 text-white'>
-            <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-gray-900 text-white'>
+            <div className='font-display text-heading-2 uppercase tracking-display flex flex-row gap-2 items-center'>
               Takcarly
               <div className='flex flex-row gap-2 items-end'>
                 <div className='text-sm'>(Available on the App Store)</div>
@@ -139,9 +138,9 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div className='flex overflow-x-auto pt-3 gap-5'>
               {imageUrls && imageUrls.map((url, i) => {
                 return (
-                  <div className='rounded-lg' key={url}>
+                  <div key={url}>
                     <Image
-                      className='bg-white rounded-md w-full'
+                      className='bg-gray-100 w-full'
                       quality={75}
                       src={url}
                       alt={url}
@@ -159,11 +158,11 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
         <RevealOnScroll>
           <div className='py-7 lg:py-20 px-5 lg:px-32'>
             <div className='flex flex-row items-center'>
-              <div className='font-extrabold text-2xl'>Senior Design Project</div>
+              <div className='font-display text-heading-2 uppercase tracking-display'>Senior Design Project</div>
             </div>
             <div>3D Tidal and Cloud Visualization System</div>
             <div className='p-2' />
-            <div className='font-bold text-xl'>The Tech Stack</div>
+            <div className='font-display text-heading-3 uppercase tracking-display'>The Tech Stack</div>
             <div className='flex flex-row justify-between'>
               <div>
                 <div>Data Processing:</div>
@@ -212,7 +211,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
             <div>
               <div className='pt-2 flex flex-row gap-2 items-center'>
                 <div>Technical Report:</div>
-                <button onClick={openFYPPDF} className='text-sm underline'>download</button>
+                <button onClick={openFYPPDF} className='text-sm underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200'>download</button>
               </div>
             </div>
             {/* <MyPdfViewer /> */}

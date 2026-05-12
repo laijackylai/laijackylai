@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import logo from '../assets/logo/logo_black.svg';
 import { useEffect, useState } from 'react';
 
@@ -10,6 +11,7 @@ type Props = {
 
 const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
 
+  const router = useRouter();
   const [isDesktop, setIsDesktop] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -29,6 +31,12 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
     setDrawerOpen(!drawerOpen);
   };
 
+  const navLinkClass = (href: string) => (
+    `cover-underline ${router.pathname === href ? 'text-sapphire-500' : ''}`
+  );
+
+  const navTextClass = 'font-mono text-label uppercase tracking-nav';
+
   return isDesktop ?
     (
       <div
@@ -42,23 +50,23 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
             <Image alt={"logo"} src={logo} height={logoSize * 2} width={logoSize * 2} />
           </Link>
           <Link href='/projects'>
-            <div className='cover-underline'>
-              <div className='global-font'>Projects</div>
+            <div className={navLinkClass('/projects')}>
+              <div className={navTextClass}>Projects</div>
             </div>
           </Link>
           <Link href='/photography'>
-            <div className='cover-underline'>
-              <div className='global-font'>Photography</div>
+            <div className={navLinkClass('/photography')}>
+              <div className={navTextClass}>Photography</div>
             </div>
           </Link>
           <Link href='/music'>
-            <div className='cover-underline'>
-              <div className='global-font'>Music</div>
+            <div className={navLinkClass('/music')}>
+              <div className={navTextClass}>Music</div>
             </div>
           </Link>
           <Link href='/gis'>
-            <div className='cover-underline'>
-              <div className='global-font'>GIS</div>
+            <div className={navLinkClass('/gis')}>
+              <div className={navTextClass}>GIS</div>
             </div>
           </Link>
         </div>
@@ -91,30 +99,30 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
                 <Image alt={"logo"} src={logo} height={logoSize * 2} width={logoSize * 2} />
               </Link>
               <Link href='/projects'>
-                <div className='cover-underline'>
-                  <div className='global-font'>Projects</div>
+                <div className={navLinkClass('/projects')}>
+                  <div className={navTextClass}>Projects</div>
                 </div>
               </Link>
               <Link href='/photography'>
-                <div className='cover-underline'>
-                  <div className='global-font'>Photography</div>
+                <div className={navLinkClass('/photography')}>
+                  <div className={navTextClass}>Photography</div>
                 </div>
               </Link>
               <Link href='/music'>
-                <div className='cover-underline'>
-                  <div className='global-font'>Music</div>
+                <div className={navLinkClass('/music')}>
+                  <div className={navTextClass}>Music</div>
                 </div>
               </Link>
               <Link href='/gis'>
-                <div className='cover-underline'>
-                  <div className='global-font'>GIS</div>
+                <div className={navLinkClass('/gis')}>
+                  <div className={navTextClass}>GIS</div>
                 </div>
               </Link>
             </div>
             <button
               type="button"
               aria-label="Close navigation menu"
-              className='w-52 bg-gray-400 opacity-30'
+              className='w-52 bg-black opacity-20'
               onClick={toggleDrawer}
             />
           </div>
