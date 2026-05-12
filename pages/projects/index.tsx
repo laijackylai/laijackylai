@@ -87,7 +87,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-gray-900 text-white'>
+          <div className='py-12 lg:py-28 px-5 lg:px-20 bg-gray-900 text-white'>
             <div className='font-display text-heading-2 uppercase tracking-display flex flex-row gap-2 items-center'>
               Canadian Fires
               <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer" aria-label="View Canadian Fires on GitHub">
@@ -105,7 +105,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-32'>
+          <div className='py-12 lg:py-28 px-5 lg:px-32'>
             <div className='font-display text-heading-2 uppercase tracking-display flex flex-row gap-2 items-center'>
               NUXT Google Maps
               <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer" aria-label="View NUXT Google Maps on GitHub">
@@ -120,7 +120,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-gray-900 text-white'>
+          <div className='py-12 lg:py-28 px-5 lg:px-20 bg-gray-900 text-white'>
             <div className='font-display text-heading-2 uppercase tracking-display flex flex-row gap-2 items-center'>
               Takcarly
               <div className='flex flex-row gap-2 items-end'>
@@ -156,7 +156,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-32'>
+          <div className='py-12 lg:py-28 px-5 lg:px-32'>
             <div className='flex flex-row items-center'>
               <div className='font-display text-heading-2 uppercase tracking-display'>Senior Design Project</div>
             </div>

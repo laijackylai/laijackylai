@@ -82,7 +82,7 @@ const Photography: NextPage<Props> = ({
               const wh = imageHeightsById[p.id] ?? 400
               const isInitialViewport = i < 2;
               const photoContent = (
-                <div className={`gap-5 py-20 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+                <div className={`gap-5 py-24 lg:py-32 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
                   <Image
                     quality={65}
                     src={p.url}

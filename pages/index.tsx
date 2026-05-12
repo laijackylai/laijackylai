@@ -173,7 +173,7 @@ const App: NextPage = () => {
                     </div>
                 </div>
             </div>
-            <div className="py-20 flex flex-col gap-3 lg:gap-14 w-full bg-gray-900 text-white">
+            <div className="py-24 lg:py-32 flex flex-col gap-3 lg:gap-14 w-full bg-gray-900 text-white">
                 <div className='flex flex-row gap-3 justify-center items-center'>
                     <div className="font-display text-heading-1 uppercase tracking-display pb-5">Skills</div>
                 </div>
@@ -246,7 +246,7 @@ const App: NextPage = () => {
                     </div>
                 </div>
             </div>
-            <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
+            <div className='flex flex-col items-center gap-24 lg:py-24 lg:px-16 p-6'>
                 <div className="font-display text-heading-1 uppercase tracking-display">My Journey</div>
                 {journeyItems.map((item, index) => (
                     <RevealOnScroll key={item.href}>
@@ -259,7 +259,7 @@ const App: NextPage = () => {
                                 <div className="font-body text-body text-gray-600">{item.description}</div>
                             </div>
                             <div className="flex flex-col items-end font-body">
-                                <div className="font-display text-heading-1 lg:text-display-xl">{item.startYear}</div>
+                                <div className="font-display text-heading-1 lg:text-display-lg">{item.startYear}</div>
                                 <div className={item.endYear === 'Current' ? 'font-bold' : ''}>- {item.endYear}</div>
                             </div>
                         </div>
