@@ -80,7 +80,7 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
         `cover-underline ${router.pathname === href ? 'border-l-4 border-sapphire-500 pl-2' : ''}`
     )
 
-    const navTextClass = 'font-mono text-label uppercase tracking-nav'
+    const navTextClass = 'font-mono text-body-sm uppercase tracking-nav'
 
     return (
         <div className='top-0 relative' data-testid="drawer-component">
@@ -88,7 +88,7 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
                 <Link href="/" className={`py-5 lg:py-16 min-h-min`}>
                     <Image alt={"logo"} src={logo} height={imgWidth} width={imgWidth} />
                 </Link>
-                <ul className={`flex flex-row lg:flex-col font-mono font-normal text-label items-center lg:items-start`} style={{ gap: `${gap}rem` }}>
+                <ul className={`flex flex-row lg:flex-col font-mono font-normal text-body-sm items-center lg:items-start`} style={{ gap: `${gap}rem` }}>
                     <li>
                         <Link href="/projects">
                             <div className={navLinkClass('/projects')}>

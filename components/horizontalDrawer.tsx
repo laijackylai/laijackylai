@@ -35,7 +35,7 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
     `cover-underline ${router.pathname === href ? 'text-sapphire-500' : ''}`
   );
 
-  const navTextClass = 'font-mono text-label uppercase tracking-nav';
+  const navTextClass = 'font-mono text-body-sm uppercase tracking-nav';
 
   return isDesktop ?
     (
