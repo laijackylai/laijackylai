@@ -81,7 +81,6 @@ const journeyItems: JourneyItem[] = [
 
 const App: NextPage = () => {
     const [scroll, setScroll] = useState(0)
-    const [windowWidth, setWindowWidth] = useState(0)
     const scrollFrameRef = useRef<number | null>(null)
 
     useEffect(() => {
@@ -96,17 +95,10 @@ const App: NextPage = () => {
             })
         }
 
-        function handleResize() {
-            setWindowWidth(window.innerWidth)
-        }
-
         window.addEventListener("scroll", handleScroll);
-        window.addEventListener("resize", handleResize);
-        setWindowWidth(window.innerWidth)
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
-            window.removeEventListener("resize", handleResize);
             if (scrollFrameRef.current !== null) {
                 cancelAnimationFrame(scrollFrameRef.current)
             }
@@ -147,7 +139,7 @@ const App: NextPage = () => {
                     </a>
                 </div>
                 <Title />
-                <HorizontalDrawer logoSize={25} width={windowWidth} />
+                <HorizontalDrawer />
                 <div>
                     <div className="flex flex-col gap-10 items-center font-['Sabon']">
                         <div className='col-span-6 flex flex-col items-end justify-end gap-10 lg:gap-40 w-full'>

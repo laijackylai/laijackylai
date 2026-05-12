@@ -4,11 +4,11 @@ import logo from '../assets/logo/logo_black.svg';
 import { useEffect, useState } from 'react';
 
 type Props = {
-  logoSize: number
-  width: number
+  logoSize?: number
+  width?: number
 }
 
-const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
+const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
 
   const [isDesktop, setIsDesktop] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -32,32 +32,36 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 28 }) => {
   return isDesktop ?
     (
       <div
-        className="flex flex-row justify-between items-center self-start gap-5 w-fit overflow-auto py-10"
-        style={{ width: `${width}rem` }}
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] flex w-screen px-5 py-10 lg:px-16"
       >
-        <Link href="/" className='lg:mr-10'>
-          <Image alt={"logo"} src={logo} height={logoSize * 2} width={logoSize * 2} />
-        </Link>
-        <Link href='/projects'>
-          <div className='cover-underline'>
-            <div className='global-font'>Projects</div>
-          </div>
-        </Link>
-        <Link href='/photography'>
-          <div className='cover-underline'>
-            <div className='global-font'>Photography</div>
-          </div>
-        </Link>
-        <Link href='/music'>
-          <div className='cover-underline'>
-            <div className='global-font'>Music</div>
-          </div>
-        </Link>
-        <Link href='/gis'>
-          <div className='cover-underline'>
-            <div className='global-font'>GIS</div>
-          </div>
-        </Link>
+        <div
+          className="flex flex-row justify-between items-center gap-5 overflow-auto"
+          style={{ width: `${width}rem` }}
+        >
+          <Link href="/" className='lg:mr-10'>
+            <Image alt={"logo"} src={logo} height={logoSize * 2} width={logoSize * 2} />
+          </Link>
+          <Link href='/projects'>
+            <div className='cover-underline'>
+              <div className='global-font'>Projects</div>
+            </div>
+          </Link>
+          <Link href='/photography'>
+            <div className='cover-underline'>
+              <div className='global-font'>Photography</div>
+            </div>
+          </Link>
+          <Link href='/music'>
+            <div className='cover-underline'>
+              <div className='global-font'>Music</div>
+            </div>
+          </Link>
+          <Link href='/gis'>
+            <div className='cover-underline'>
+              <div className='global-font'>GIS</div>
+            </div>
+          </Link>
+        </div>
       </div>
     )
     :

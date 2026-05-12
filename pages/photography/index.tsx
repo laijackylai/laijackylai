@@ -24,7 +24,6 @@ type Props = {
 const Photography: NextPage<Props> = ({
   photosData,
 }) => {
-  const [windowWidth, setWindowWidth] = useState(28)
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
   const imageHeightsById = useMemo(() => {
     return photosData.reduce<Record<string, number>>((acc, photo) => {
@@ -39,9 +38,6 @@ const Photography: NextPage<Props> = ({
       setIsScrolledToTop(window.scrollY === 0);
     };
     window.addEventListener('scroll', handleScroll);
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth)
-    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -70,10 +66,10 @@ const Photography: NextPage<Props> = ({
   // }
 
   return (
-    <div className={`global-font ${ocra.variable} font-sans p-5 lg:p-14`}>
+    <div className={`global-font ${ocra.variable} font-sans`}>
       <Title />
-      <div className='flex flex-col'>
-        <HorizontalDrawer logoSize={25} width={windowWidth} />
+      <HorizontalDrawer />
+      <div className='flex flex-col p-5 pt-24 lg:p-14'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
         <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -94,7 +90,7 @@ const Photography: NextPage<Props> = ({
                     alt={p.s3key}
                     width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
                     height={wh}
-                    placeholder='blur'
+                    placeholder={p.blurredBase64 ? 'blur' : 'empty'}
                     blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
                     priority={isInitialViewport}
                     sizes='(min-width: 1024px) 50vw, 100vw'
