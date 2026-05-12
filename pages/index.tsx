@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import React, { useEffect, useRef, useState } from 'react'
 import Title from '../components/title'
-import ocra from '../components/font'
 import Image from 'next/image';
 import VotanicLogo from '../public/logos/votanic_logo.png'
 import VivableeLogo from '../public/logos/vivablee_logo.png'
@@ -121,7 +120,7 @@ const App: NextPage = () => {
     }
 
     return (
-        <div className={`global-font ${ocra.variable} font-sans w-full`}>
+        <div className="w-full">
             <div className={`relative h-screen p-5 lg:p-16 pt-0 lg:pt-0 flex flex-col justify-between bg-white z-20`}>
                 <div className='absolute right-5 top-20 z-10 flex flex-row gap-7 items-center lg:right-8 lg:top-6'>
                     <a href="https://linkedin.com/in/laijackylai" target='_blank' rel="noopener noreferrer">
@@ -133,23 +132,23 @@ const App: NextPage = () => {
                     <a href="https://www.instagram.com/laijackylai/" target='_blank' rel="noopener noreferrer">
                         <Image className="grayscale mr-5 lg:mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
                     </a>
-                    <a href="mailto:laijackylai@gmail.com" className="border border-black p-2 rounded-full relative overflow-hidden group w-fit">
-                        <span className="text-black relative group-hover:text-white">contact</span>
-                        <span className="absolute inset-0 bg-gradient-to-t from-black to-black opacity-0 group-hover:opacity-100"></span>
+                    <a href="mailto:laijackylai@gmail.com" className="border border-black px-6 py-3 relative overflow-hidden group w-fit font-mono uppercase text-label tracking-nav">
+                        <span className="text-black relative group-hover:text-white transition-colors duration-200">contact</span>
+                        <span className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
                     </a>
                 </div>
                 <Title />
                 <HorizontalDrawer />
                 <div>
-                    <div className="flex flex-col gap-10 items-center font-['Sabon']">
+                    <div className="flex flex-col gap-10 items-center">
                         <div className='col-span-6 flex flex-col items-end justify-end gap-10 lg:gap-40 w-full'>
-                            <div className="flex flex-col lg:text-8xl text-5xl p-2 text-end font-bold animate-fade-in-left">
+                            <div className="flex flex-col font-display text-display-lg lg:text-display-xl uppercase tracking-display p-2 text-end font-bold animate-fade-in-left">
                                 <div>Data Engineer</div>
-                                <div className='text-2xl lg:text-4xl font-normal'>&</div>
+                                <div className='font-body text-heading-2 lg:text-heading-1 font-normal normal-case tracking-normal'>&</div>
                                 <div>Software Engineer</div>
 
                             </div>
-                            <div className='text-lg text-right lg:w-1/3 w-full motion-safe:animate-fade-in-right'>
+                            <div className='font-body text-body-lg text-gray-600 text-right lg:w-1/3 w-full motion-safe:animate-fade-in-right'>
                                 Hi, I am Jacky. I&apos;m a Data Engineer experienced in building and maintaining containerized data pipelines.
                                 <br />
                                 Skilled in Python, Bash, Kubernetes, and automation. Strong problem-solving and cross-team collaboration in high-scale, data-driven environments.
@@ -174,14 +173,14 @@ const App: NextPage = () => {
                     </div>
                 </div>
             </div>
-            <div className="py-20 flex flex-col gap-3 lg:gap-14 w-full bg-slate-800 text-white font-['Sabon']">
+            <div className="py-20 flex flex-col gap-3 lg:gap-14 w-full bg-gray-900 text-white">
                 <div className='flex flex-row gap-3 justify-center items-center'>
-                    <div className="text-4xl font-extrabold pb-5">Skills</div>
+                    <div className="font-display text-heading-1 uppercase tracking-display pb-5">Skills</div>
                 </div>
                 <div className='flex flex-col gap-3 lg:gap-6 items-start w-fit self-center'>
-                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
                         <div className="w-fit font-bold">Data Engineering:</div>
-                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center font-['Gluten']">
+                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center font-body">
                             <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
                                 Docker & Kubernetes
                             </span>
@@ -197,7 +196,7 @@ const App: NextPage = () => {
 
                         </span>
                     </div>
-                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
                         <div className="w-fit font-bold">Data Science:</div>
                         <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
                             <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
@@ -214,7 +213,7 @@ const App: NextPage = () => {
                             </span>
                         </span>
                     </div>
-                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
                         <div className="w-fit font-bold">Full Stack:</div>
                         <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
                             <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
@@ -231,7 +230,7 @@ const App: NextPage = () => {
                             </span>
                         </span>
                     </div>
-                    <div className="flex items-center text-lg lg:text-2xl font-medium">
+                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
                         <div className="w-fit font-bold">Cloud:</div>
                         <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
                             <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none my-2" >
@@ -248,19 +247,19 @@ const App: NextPage = () => {
                 </div>
             </div>
             <div className='flex flex-col items-center gap-20 lg:p-16 p-5'>
-                <div className="text-2xl font-bold font-['Sabon']">My Journey</div>
+                <div className="font-display text-heading-1 uppercase tracking-display">My Journey</div>
                 {journeyItems.map((item, index) => (
                     <RevealOnScroll key={item.href}>
-                        <div className={`w-full lg:px-32 px-5 pb-10 ${index < journeyItems.length - 1 ? 'border-b' : ''} flex flex-row justify-between items-center`}>
+                        <div className={`w-full lg:px-32 px-5 pb-10 ${index < journeyItems.length - 1 ? 'border-b border-gray-200' : ''} flex flex-row justify-between items-center`}>
                             <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
                                 <a href={item.href} target='_blank' rel="noopener noreferrer">
                                     <Image className={item.logoClassName} alt={item.logoAlt} src={item.logoSrc} height={400} width={index === 0 ? 300 : 200} />
                                 </a>
-                                <div className="font-['Sabon'] text-2xl">{item.title}</div>
-                                <div className="font-['Sabon']">{item.description}</div>
+                                <div className="font-display text-heading-3 uppercase tracking-display">{item.title}</div>
+                                <div className="font-body text-body text-gray-600">{item.description}</div>
                             </div>
-                            <div className="flex flex-col items-end font-['Sabon']">
-                                <div className="text-4xl lg:text-8xl">{item.startYear}</div>
+                            <div className="flex flex-col items-end font-body">
+                                <div className="font-display text-heading-1 lg:text-display-xl">{item.startYear}</div>
                                 <div className={item.endYear === 'Current' ? 'font-bold' : ''}>- {item.endYear}</div>
                             </div>
                         </div>

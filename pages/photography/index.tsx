@@ -1,5 +1,4 @@
 import { GetStaticProps, NextPage } from 'next';
-import ocra from '../../components/font';
 import Title from '../../components/title';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
@@ -66,13 +65,13 @@ const Photography: NextPage<Props> = ({
   // }
 
   return (
-    <div className={`global-font ${ocra.variable} font-sans`}>
+    <div>
       <Title />
       <HorizontalDrawer />
       <div className='flex flex-col p-5 pt-24 lg:p-14'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
-        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
-          <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-3 bg-black text-white z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
@@ -94,13 +93,13 @@ const Photography: NextPage<Props> = ({
                     blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
                     priority={isInitialViewport}
                     sizes='(min-width: 1024px) 50vw, 100vw'
-                    className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-500'
+                    className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-100'
                   />
-                  <div className={`flex flex-col text-xs text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
-                    <div className='font-bold text-lg'>{p.type}</div>
-                    <div>{p.id}</div>
-                    <div>{p.s3key}</div>
-                    <div>{p.createdAt}</div>
+                  <div className={`flex flex-col text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
+                    <div className='font-display text-heading-3 uppercase tracking-display'>{p.type}</div>
+                    <div className='font-mono text-body-sm text-gray-400'>{p.id}</div>
+                    <div className='font-mono text-body-sm text-gray-400'>{p.s3key}</div>
+                    <div className='font-body text-body-sm text-gray-400'>{p.createdAt}</div>
                   </div>
                 </div>
               );

@@ -1,5 +1,4 @@
 import { GetServerSideProps, NextPage } from 'next';
-import ocra from '../../components/font';
 import Title from '../../components/title';
 import HorizontalDrawer from '../../components/horizontalDrawer';
 import Image from 'next/image';
@@ -10,14 +9,14 @@ type Props = {
 
 const GIS: NextPage<Props> = () => {
   return (
-    <div className={`global-font ${ocra.variable} font-sans lg:px-10`}>
+    <div className="lg:px-10">
       <Title />
       <HorizontalDrawer />
-      <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>GIS</div>
+      <div className='font-display text-heading-1 uppercase tracking-display fixed top-5 right-5 opacity-10 -z-50'>GIS</div>
       <div className='flex flex-col w-screen snap-y snap-mandatory overflow-scroll'>
         <div className='h-screen w-screen p-5 lg:px-12 lg:py-8 flex flex-col justify-around snap-start'>
           <Image
-            className='bg-white rounded-md self-center'
+            className='bg-gray-100 border border-gray-200 self-center'
             src="/gis/Toronto_Shooting_Rates_2022.png"
             alt="torontoShootingRates2022"
             width={800}
@@ -28,7 +27,7 @@ const GIS: NextPage<Props> = () => {
         </div>
         <div className='h-screen w-screen p-5 lg:px-12 lg:py-8 flex items-center justify-center snap-start'>
           <Image
-            className='bg-white border border-black'
+            className='bg-gray-100 border border-gray-200'
             src="/gis/Cycle_Routes.png"
             alt="CycleRoutes"
             width={500}
@@ -42,7 +41,7 @@ const GIS: NextPage<Props> = () => {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
 

@@ -28,7 +28,7 @@ const RevealOnScroll: React.FC<Props> = ({ children }) => {
     };
   }, []);
 
-  const classes = `transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"}`;
+  const classes = `transition-all duration-[600ms] ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`;
 
   return (
     <div ref={ref} className={classes}>
