@@ -24,6 +24,7 @@ const Photography: NextPage<Props> = ({
   photosData,
 }) => {
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+  const [selectedPhoto, setSelectedPhoto] = useState<PhotoData | null>(null);
   const imageHeightsById = useMemo(() => {
     return photosData.reduce<Record<string, number>>((acc, photo) => {
       const hash = Array.from(photo.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
@@ -43,6 +44,25 @@ const Photography: NextPage<Props> = ({
     };
 
   }, []);
+
+  useEffect(() => {
+    if (!selectedPhoto) return undefined;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedPhoto(null);
+      }
+    };
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPhoto]);
 
   const scrollUp = () => {
     window.scrollTo({
@@ -68,7 +88,7 @@ const Photography: NextPage<Props> = ({
     <div>
       <Title />
       <HorizontalDrawer />
-      <div className='flex flex-col p-5 pt-24 lg:p-14'>
+      <div className='flex flex-col px-8 py-5 pt-12 sm:px-10 lg:px-24 lg:py-14 lg:pt-8 xl:px-32'>
         {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
         <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-3 bg-black text-white z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -81,25 +101,33 @@ const Photography: NextPage<Props> = ({
               const isOdd = i % 2
               const wh = imageHeightsById[p.id] ?? 400
               const isInitialViewport = i < 2;
+              const photoPaddingClass = i === 0 ? 'pt-8 pb-24 lg:pt-10 lg:pb-32' : 'py-24 lg:py-32';
               const photoContent = (
-                <div className={`gap-5 py-24 lg:py-32 flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-                  <Image
-                    quality={65}
-                    src={p.url}
-                    alt={p.s3key}
-                    width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
-                    height={wh}
-                    placeholder={p.blurredBase64 ? 'blur' : 'empty'}
-                    blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
-                    priority={isInitialViewport}
-                    sizes='(min-width: 1024px) 50vw, 100vw'
-                    className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-100'
-                  />
+                <div className={`gap-5 ${photoPaddingClass} flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+                  <button
+                    type="button"
+                    aria-label={`Open full resolution photo ${p.s3key}`}
+                    onClick={() => setSelectedPhoto(p)}
+                    className='cursor-zoom-in bg-transparent p-0 text-left'
+                  >
+                    <Image
+                      quality={65}
+                      src={p.url}
+                      alt={p.s3key}
+                      width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
+                      height={wh}
+                      placeholder={p.blurredBase64 ? 'blur' : 'empty'}
+                      blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
+                      priority={isInitialViewport}
+                      sizes='(min-width: 1024px) 50vw, 100vw'
+                      className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-100'
+                    />
+                  </button>
                   <div className={`flex flex-col text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
-                    <div className='font-display text-heading-3 uppercase tracking-display'>{p.type}</div>
-                    <div className='font-mono text-body-sm text-gray-400'>{p.id}</div>
-                    <div className='font-mono text-body-sm text-gray-400'>{p.s3key}</div>
-                    <div className='font-body text-body-sm text-gray-400'>{p.createdAt}</div>
+                    <div className='pb-2 font-display text-heading-3 uppercase tracking-display'>{p.type}</div>
+                    <div className='font-mono text-label text-gray-400'>{p.id}</div>
+                    <div className='font-mono text-label text-gray-400'>{p.s3key}</div>
+                    <div className='font-body text-label text-gray-400'>{p.createdAt}</div>
                   </div>
                 </div>
               );
@@ -113,11 +141,40 @@ const Photography: NextPage<Props> = ({
           }
         </div>
       </div>
+      {selectedPhoto && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Full resolution photo ${selectedPhoto.s3key}`}
+          className='fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 lg:p-8'
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div
+            className='relative'
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Close full resolution photo"
+              className='absolute bottom-0 left-full z-[101] bg-white px-3 py-2 font-mono text-label uppercase tracking-nav text-black'
+              onClick={() => setSelectedPhoto(null)}
+            >
+              X
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={selectedPhoto.url}
+              alt={selectedPhoto.s3key}
+              className='block max-h-[90vh] max-w-[90vw]'
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
+const defaultStorageBaseUrl = 'https://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2.s3.ap-southeast-1.amazonaws.com';
 
 const shouldFailStaticBuild = () => (
   process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
