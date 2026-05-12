@@ -7,9 +7,10 @@ import { useEffect, useState } from 'react';
 type Props = {
   logoSize?: number
   width?: number
+  fixedMobile?: boolean
 }
 
-const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
+const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMobile = true }) => {
 
   const router = useRouter();
   const [isDesktop, setIsDesktop] = useState(false);
@@ -36,6 +37,7 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
   );
 
   const navTextClass = 'font-mono text-body-sm uppercase tracking-nav';
+  const mobileHeaderPosition = fixedMobile ? 'fixed top-0 left-0' : 'relative';
 
   return isDesktop ?
     (
@@ -75,7 +77,7 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40 }) => {
     :
     (
       <div className='flex items-center z-0'>
-        <div className='fixed top-0 left-0 w-screen z-0'>
+        <div className={`${mobileHeaderPosition} w-screen z-0`}>
           <div className='flex flex-row justify-between items-center bg-white p-5'>
             <button type="button" aria-label="Open navigation menu" onClick={toggleDrawer} >
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

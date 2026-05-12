@@ -2,15 +2,17 @@
 
 Visual design system for personal portfolio. Desktop-first, light-mode-first, minimal and professional.
 
+This document reflects the **current live implementation**.
+
 ---
 
 ## 1. Design Principles
 
-1. **Typographic hierarchy drives the layout** — let font weight, size, and spacing do the work, not decoration
+1. **Typographic hierarchy drives the layout** — font weight, size, and spacing do the work, not decoration
 2. **Black and white foundation** — sapphire blue used sparingly for emphasis, never as background fill
-3. **Consistent rhythm** — use the spacing scale religiously; no magic numbers
-4. **Photography-grade whitespace** — content breathes; dense layouts reserved for data-heavy sections only
-5. **Motion with purpose** — animate to guide attention, never to decorate
+3. **Photography-grade whitespace** — content breathes; dense layouts reserved for data-heavy sections only
+4. **Motion with purpose** — animate to guide attention, never to decorate
+5. **Sharp geometry** — 0px border-radius everywhere; no rounded corners
 
 ---
 
@@ -18,37 +20,48 @@ Visual design system for personal portfolio. Desktop-first, light-mode-first, mi
 
 ### Font Stack
 
-| Role | Font | Fallback | Usage |
-|------|------|----------|-------|
-| **Display** | Eurostile Extended | `'Arial Black', sans-serif` | Page titles, hero text, section headers |
-| **Body** | IBM Plex Sans | `'Helvetica Neue', Arial, sans-serif` | Paragraphs, descriptions, UI labels |
-| **Mono** | OCR-A | `'Courier New', monospace` | Code snippets, technical labels, nav links |
+| Role | Font | CSS Variable | Fallback | Usage |
+|------|------|-------------|----------|-------|
+| **Display** | Michroma (Google Fonts) | `--font-display` | `'Arial Black', sans-serif` | Page titles, hero text, section headers |
+| **Body** | IBM Plex Sans (Google Fonts) | `--font-ibm-plex` | `'Helvetica Neue', Arial, sans-serif` | Paragraphs, descriptions, default text |
+| **Mono** | OCR-A (local) | `--font-ocra` | `'Courier New', monospace` | Nav links, technical labels |
+
+Font loading via `@next/font` in `components/font.tsx`. CSS variables applied at root in `_app.tsx`.
 
 ### Type Scale
 
-Based on a **1.333 (perfect fourth)** ratio, root `16px`.
-
-| Token | Size | Weight | Line Height | Use |
-|-------|------|--------|-------------|-----|
-| `display-xl` | 72px / 4.5rem | 700 | 1.0 | Hero headline (desktop) |
-| `display-lg` | 54px / 3.375rem | 700 | 1.05 | Hero headline (mobile) |
-| `heading-1` | 40px / 2.5rem | 700 | 1.1 | Section titles |
-| `heading-2` | 30px / 1.875rem | 600 | 1.2 | Subsection titles |
-| `heading-3` | 22px / 1.375rem | 600 | 1.3 | Card titles, job titles |
-| `body-lg` | 18px / 1.125rem | 400 | 1.6 | Lead paragraphs, intro text |
-| `body` | 16px / 1rem | 400 | 1.6 | Default body copy |
-| `body-sm` | 14px / 0.875rem | 400 | 1.5 | Captions, metadata |
-| `label` | 12px / 0.75rem | 500 | 1.4 | Tags, overlines, nav items |
-| `mono` | 14px / 0.875rem | 400 | 1.5 | Code, technical labels |
+| Token | Size | Line Height | Use |
+|-------|------|-------------|-----|
+| `display-xl` | 3.75rem (60px) | 1.0 | Hero headline (desktop) |
+| `display-lg` | 2.75rem (44px) | 1.05 | Hero headline (mobile), journey year numbers |
+| `heading-1` | 2rem (32px) | 1.1 | Section titles (Skills, My Journey) |
+| `heading-2` | 1.5rem (24px) | 1.2 | Subsection titles, project headings |
+| `heading-3` | 1.125rem (18px) | 1.3 | Card titles, job titles, photo type labels |
+| `body-lg` | 1rem (16px) | 1.6 | Lead paragraphs, intro text |
+| `body` | 1rem (16px) | 1.6 | Default body copy |
+| `body-sm` | 0.875rem (14px) | 1.5 | Captions, metadata, nav links |
+| `label` | 0.75rem (12px) | 1.4 | Tags, overlines |
 
 ### Typography Rules
 
-- **Headings**: Eurostile Extended, uppercase, letter-spacing `0.05em`
-- **Body**: IBM Plex Sans, sentence case, letter-spacing `0`
-- **Nav links**: OCR-A, uppercase, letter-spacing `0.08em`, `label` size
+- **Headings**: `font-display uppercase tracking-display` — applied globally via `@layer base` on `h1`, `h2`, `h3`
+- **Body**: `font-body` — set as default on `body` element via `@layer base`
+- **Nav links**: `font-mono text-body-sm uppercase tracking-nav`
 - **No italic** in headings — use weight contrast instead
-- **Max body line length**: 65ch (approximately 600px at 16px)
-- **Paragraph spacing**: `1.5em` between paragraphs
+- **Letter spacing**: `tracking-display` = `0.05em`, `tracking-nav` = `0.08em`
+
+### Global Base Styles (globals.css)
+
+```css
+@layer base {
+    body {
+        @apply font-body text-body text-black bg-white antialiased;
+    }
+    h1, h2, h3 {
+        @apply font-display uppercase tracking-display;
+    }
+}
+```
 
 ---
 
@@ -78,299 +91,289 @@ Based on a **1.333 (perfect fourth)** ratio, root `16px`.
 │  Sapphire 700  #0A3A82   — Hover/active on accent  │
 │  Sapphire 900  #061F4A   — Dark accent text         │
 │                                                   │
-├─────────────────────────────────────────────────┤
-│  SEMANTIC                                         │
-│                                                   │
-│  Success       #16A34A                             │
-│  Error         #DC2626                             │
-│  Warning       #D97706                             │
 └─────────────────────────────────────────────────┘
 ```
 
 ### Color Usage Rules
 
-- **Text on white bg**: `#000000` for headings, `#525252` for body
+- **Text on white bg**: `#000000` for headings, `text-gray-600` for body paragraphs
 - **Sapphire blue used only for**:
-  - Interactive elements (links, buttons, hover states)
-  - Accent borders or underlines
-  - Small highlight moments (tags, active nav indicator, focus rings)
-- **Never** use sapphire as full section background — keep sections white or `Gray 900` for contrast blocks
-- **Dark sections** (like current Skills section): `Gray 900` background, white text, sapphire for interactive elements
-- **Ratio**: ~85% black/white/gray, ~15% sapphire blue across any given page
+  - Active nav indicator: `border-sapphire-500` (sidebar), `text-sapphire-500` (horizontal)
+  - Link underlines on projects page: `decoration-sapphire-500`
+  - Focus/hover accent moments
+- **Never** use sapphire as full section background
+- **Dark sections** (Skills): `bg-gray-900` background, white text
+- **Ratio**: ~90% black/white/gray, ~10% sapphire across any given page
 
 ---
 
-## 4. Spacing System
+## 4. Layout
 
-8px base unit. Use only these values:
+### Landing Page (`/`)
 
-| Token | Value | Common Use |
-|-------|-------|------------|
-| `space-1` | 4px | Inline icon gaps |
-| `space-2` | 8px | Tight element padding |
-| `space-3` | 12px | Button padding, small gaps |
-| `space-4` | 16px | Default gap between related items |
-| `space-6` | 24px | Card padding, group spacing |
-| `space-8` | 32px | Section inner padding |
-| `space-12` | 48px | Between content groups |
-| `space-16` | 64px | Section padding (mobile) |
-| `space-20` | 80px | Section padding (desktop) |
-| `space-24` | 96px | Major section breaks |
-| `space-32` | 128px | Hero section padding |
+- Full viewport height hero section, content right-aligned
+- Social icons top-right with grayscale treatment
+- Contact button: ghost style (border, no fill), hover fills black with white text
+- Skills section: full-width `bg-gray-900` contrast block
+- Journey section: 2-column on desktop (content left, years right), border-b dividers between items
 
-### Spacing Rules
+### Subpages
 
-- Vertical rhythm between sections: `space-20` minimum on desktop, `space-16` on mobile
-- Content within a section uses `space-8` to `space-12` between groups
-- Related elements (label + value, icon + text) use `space-2` to `space-4`
-- Page horizontal padding: `space-16` desktop, `space-6` mobile
+- **Desktop**: Fixed left sidebar nav (`drawer.tsx`), scroll-reactive logo sizing
+- **Mobile**: Top bar with hamburger, full-screen slide-out drawer
+- **Landing page**: Horizontal nav bar (`horizontalDrawer.tsx`)
+
+### Breakpoints
+
+| Breakpoint | Nav Style | Padding |
+|------------|-----------|---------|
+| Desktop (≥1024px) | Sidebar (subpages) / Horizontal (landing) | `p-16` / `px-32` |
+| Tablet (768–1023px) | Horizontal top bar | `px-5` |
+| Mobile (<768px) | Hamburger + slide-out drawer | `p-5` / `p-6` |
 
 ---
 
-## 5. Layout & Grid
+## 5. Navigation
 
-### Desktop (≥1024px)
+### Sidebar (`drawer.tsx`)
 
-- **Max content width**: 1200px, centered
-- **Grid**: 12-column, 24px gutter
-- **Sidebar nav (drawer)**: fixed, 200px wide on subpages
-- **Hero section**: full viewport height, content right-aligned
+- Fixed position, logo at top with scroll-reactive sizing (100px → 50px)
+- Vertical link list with dynamic gap based on scroll
+- Active state: `border-l-4 border-sapphire-500 pl-2`
+- Link style: `.cover-underline` (animated underline on hover)
+- Nav text: `font-mono text-body-sm uppercase tracking-nav`
 
-### Tablet (768–1023px)
+### Horizontal Bar (`horizontalDrawer.tsx`)
 
-- **Max content width**: 100%, padded 32px sides
-- **Grid**: 8-column
-- **Nav**: horizontal top bar
+- Logo left, links right, `40rem` max width
+- Active state: `text-sapphire-500`
+- Same link and text styles as sidebar
 
-### Mobile (<768px)
+### Mobile Drawer
 
-- **Max content width**: 100%, padded 20px sides
-- **Grid**: 4-column
-- **Nav**: hamburger → slide-out drawer
-
-### Layout Rules
-
-- Sections alternate between full-width (edge-to-edge for dark bg sections) and contained (max-width for content)
-- Journey timeline: 2-column on desktop (content left, years right), stacked on mobile
-- Photography grid: maintain current masonry/gallery layout — no changes needed
-- Project cards: 2-column grid on desktop, single column mobile
+- Full-screen overlay, slide from left (`-translate-x-full` → `translate-x-0`)
+- Semi-transparent black backdrop on right side for close
+- Transition: `transform` with CSS transition
 
 ---
 
 ## 6. Components
 
-### Buttons
+### Contact Button (Ghost Style)
 
-**Primary (CTA)**
-```
-Background:  #000000
-Text:        #FFFFFF (IBM Plex Sans, 500 weight, uppercase, tracking 0.05em)
-Padding:     12px 24px
-Border:      none
-Radius:      0px (sharp corners)
-Hover:       Background → Sapphire 500 (#0F52BA)
-Transition:  background-color 200ms ease
-```
-
-**Secondary (Ghost)**
 ```
 Background:  transparent
-Text:        #000000
-Padding:     12px 24px
+Text:        #000000 (font-mono uppercase text-label tracking-nav)
+Padding:     px-6 py-3
 Border:      1px solid #000000
 Radius:      0px
-Hover:       Background → #000000, Text → #FFFFFF
-Transition:  all 200ms ease
+Hover:       Background fills black via opacity overlay, text → white
+Transition:  colors/opacity 200ms
 ```
 
-**Tertiary (Link-style)**
-```
-Background:  none
-Text:        #000000
-Decoration:  animated underline (current link-underline style — keep)
-Hover:       Underline expands, color stays black
-```
-
-### Navigation
-
-- **Desktop subpages**: Fixed left sidebar, logo top, vertical link list
-- **Landing page**: Horizontal bar, logo left, links right
-- **Active page indicator**: Sapphire 500 left border (4px) on sidebar, sapphire underline on horizontal
-- **Font**: OCR-A, uppercase, `label` size, `0.08em` tracking
-- **Link hover**: Animated underline (keep current behavior)
-
-### Cards (Journey Items, Projects)
+### Scroll-to-Top Button
 
 ```
-Background:  #FFFFFF
-Border:      1px solid Gray 200 (#E5E5E5)
-Padding:     space-8 (32px)
-Shadow:      none (flat design, border-defined)
-Hover:       Border → #000000
-Transition:  border-color 200ms ease
+Background:  #000000
+Text:        #FFFFFF (chevron icon)
+Padding:     p-3
+Radius:      0px
+Position:    fixed bottom-5 right-5 (mobile), bottom-10 right-10 (desktop)
+Visibility:  hidden when scrolled to top
 ```
+
+### Animated Underline Links (`.link-underline`)
+
+```css
+background-image: linear-gradient(transparent, transparent), linear-gradient(#000, #000);
+background-size: 0 1.5px;            /* collapsed */
+background-position: 0 100%;
+transition: background-size 0.2s ease-in-out;
+/* on hover: background-size: 100% 1.5px */
+```
+
+`.cover-underline` wraps `.link-underline` with flex column layout and gap-1.
 
 ### Section Headers
 
 ```
-Font:        Eurostile Extended
-Weight:      700
-Size:        heading-1 (40px)
+Font:        font-display (Michroma)
 Case:        Uppercase
-Tracking:    0.05em
-Decoration:  None (no underlines, no icons)
-Alignment:   Left on desktop, center on mobile
+Tracking:    tracking-display (0.05em)
+Size:        text-heading-1 (2rem) for main sections
+             text-heading-2 (1.5rem) for subsections
+             text-heading-3 (1.125rem) for card/item titles
 ```
 
-### Dividers
+### Journey Items
 
-```
-Color:       Gray 200 (#E5E5E5)
-Thickness:   1px
-Style:       Solid
-Margin:      space-12 top and bottom
-```
+- 2-column layout: content (2/3 width) left, year numbers right
+- Divider: `border-b border-gray-200` between items (except last)
+- Company logo links to external site
+- Job title: `font-display text-heading-3 uppercase tracking-display`
+- Description: `font-body text-body text-gray-600`
+- Year: `font-display text-heading-1 lg:text-display-lg`
 
 ---
 
-## 7. Iconography
+## 7. Animation & Motion
 
-- **Style**: Outline/stroke only, 1.5px stroke weight (matches current heroicons usage)
-- **Size**: 24px default, 20px for inline, 16px for compact
-- **Color**: Inherit from parent text color
-- **Source**: Heroicons (already in use) — keep consistent, don't mix icon sets
+### Entrance Animations (keyframes in tailwind.config.js)
 
----
+| Animation | Duration | Easing | Use |
+|-----------|----------|--------|-----|
+| `fade-in-left` | 1.5s | ease-out | Hero headline |
+| `fade-in-right` | 2s (guarded by `motion-safe:`) | ease-out | Hero description |
+| `fade-in-down` | 2s | ease-out | Available but unused |
+| `fade-in-up` | 2s | ease-out | Available but unused |
+| `text-reveal` | 1.5s | cubic-bezier(0.77, 0, 0.175, 1) | Text clip animation |
 
-## 8. Animation & Motion
+### Scroll Reveal (`RevealOnScroll`)
 
-### Principles
+- Intersection Observer, fires once
+- Transition: `opacity-0 translate-y-4` → `opacity-100 translate-y-0`
+- Duration: 600ms, ease-out
 
-- All animations respect `prefers-reduced-motion` (already implemented via `motion-safe:`)
-- Entrance animations: fade + translate, 400–600ms, `ease-out`
-- Hover transitions: 200ms, `ease`
-- No looping animations except the skills ticker (keep current slide animation)
+### Skills Ticker
 
-### Standard Transitions
+- Looping vertical slide animation
+- `slide-3`: 6s linear infinite (3 items)
+- `slide-4`: 8s linear infinite (4 items)
+- Staggered via `[animation-delay]`
 
-| Element | Property | Duration | Easing |
-|---------|----------|----------|--------|
-| Links/buttons hover | `background-color`, `color`, `border-color` | 200ms | ease |
-| Reveal on scroll | `opacity`, `transform` | 600ms | ease-out |
-| Nav drawer (mobile) | `transform` | 300ms | ease-in-out |
-| Page transitions | `opacity` | 300ms | ease |
+### Hover Transitions
+
+- Link underlines: 200ms ease-in-out
+- Contact button: 200ms for color/opacity
+- Image scale on photography page: `hover:scale-105 ease-in duration-100`
 
 ### Rules
 
-- Max 2 animated elements visible simultaneously
-- Stagger delay between sequential reveals: 100ms
-- No animation longer than 800ms
-- Skills ticker: keep current behavior, it works
+- Use `motion-safe:` prefix for entrance animations
+- Skills ticker runs continuously (intentional)
+- No animation longer than 2s
 
 ---
 
-## 9. Image Treatment
+## 8. Image Treatment
 
-### Photography Pages
+### Photography Page
 
-- No filters, no borders — let photos speak
-- Aspect ratio preserved always
-- Blurred placeholder on load (already implemented)
-- Gallery: consistent gutter spacing using `space-4`
+- No filters, no borders — photos stand alone
+- Aspect ratio preserved, height derived from deterministic hash per photo ID
+- Blurred base64 placeholder on load (`placeholder='blur'`)
+- Alternating layout: odd items `flex-row-reverse` on desktop
+- First 2 photos get `priority` loading, rest lazy-loaded
+- Hover: `scale-105` with 100ms ease-in transition
+- Background: `bg-gray-100` as loading fallback
 
-### Logos & Icons
+### Social Icons
 
-- Grayscale by default (already implemented for social icons)
-- Hover: transition to full color, 200ms
-- Company logos in journey: contained within consistent height (80px max)
+- Grayscale by default via `className="grayscale"`
+- Fixed size: 25x25px
+
+### Project Images
+
+- Full-width within container, `bg-gray-100` loading background
+- quality={75} for Takcarly screenshots
 
 ### General
 
 - All images use `next/image` for optimization
-- Lazy loading for below-fold content
-- No rounded corners on photos; `0px` radius
+- No rounded corners; 0px radius
+- `sizes` attribute set appropriately (e.g., `(min-width: 1024px) 50vw, 100vw` on photography)
 
 ---
 
-## 10. Dark Sections
+## 9. Dark Sections
 
-For contrast blocks (Skills section, potential future sections):
+Currently used for Skills section on landing page.
 
 ```
-Background:     Gray 900 (#171717)
-Text primary:   #FFFFFF
-Text secondary: Gray 400 (#A3A3A3)
-Accent:         Sapphire 300 (#7B9AFF) — lighter shade for dark bg readability
-Borders:        Gray 600 (#525252)
+Background:     bg-gray-900 (#171717)
+Text primary:   text-white
+Text labels:    font-body font-bold (skill category names)
+Padding:        py-24 lg:py-32
+Layout:         Centered content, self-center
 ```
 
----
-
-## 11. Anti-Patterns (Do Not)
-
-- ❌ Use more than 3 font families on a single page
-- ❌ Use sapphire blue as background fill for sections
-- ❌ Use rounded corners on containers (keep 0px, sharp)
-- ❌ Add drop shadows to cards or sections
-- ❌ Use colored text for body copy (black/white/gray only)
-- ❌ Mix icon sets
-- ❌ Use decorative elements (borders, ornaments, gradients) that don't serve function
-- ❌ Animate without `motion-safe` guard
-- ❌ Use font sizes outside the type scale
-- ❌ Use spacing values outside the spacing system
+Projects page also uses `bg-gray-900 text-white` for alternating sections (Canadian Fires, Takcarly).
 
 ---
 
-## 12. Tailwind Config Mapping
+## 10. Anti-Patterns (Do Not)
 
-Reference for implementing these guidelines in tailwind.config.js:
+- Do not use more than 3 font families
+- Do not use sapphire blue as background fill for sections
+- Do not use rounded corners on containers (keep 0px, sharp)
+- Do not add drop shadows to cards or sections
+- Do not use colored text for body copy (black/white/gray only)
+- Do not mix icon sets (stick with Heroicons + react-icons where already used)
+- Do not animate without `motion-safe` guard on entrance animations
+- Do not use font sizes outside the type scale
+- Do not add inline font-family overrides (e.g., `font-['SomeFont']`)
+
+---
+
+## 11. Tailwind Config Reference
+
+Actual values from `tailwind.config.js`:
 
 ```js
-// Colors
-sapphire: {
-  50:  '#EEF2FF',
-  100: '#D4DEFF',
-  300: '#7B9AFF',
-  500: '#0F52BA',
-  700: '#0A3A82',
-  900: '#061F4A',
+colors: {
+  sapphire: {
+    50:  '#EEF2FF',
+    100: '#D4DEFF',
+    300: '#7B9AFF',
+    500: '#0F52BA',
+    700: '#0A3A82',
+    900: '#061F4A',
+  },
+  gray: {
+    100: '#F5F5F5',
+    200: '#E5E5E5',
+    400: '#A3A3A3',
+    600: '#525252',
+    900: '#171717',
+  },
 }
 
-// Font families
 fontFamily: {
-  display: ['Eurostile Extended', 'Arial Black', 'sans-serif'],
-  body:    ['IBM Plex Sans', 'Helvetica Neue', 'Arial', 'sans-serif'],
-  mono:    ['OCR-A', 'Courier New', 'monospace'],
+  display: ['var(--font-display)', 'Arial Black', 'sans-serif'],
+  body:    ['var(--font-ibm-plex)', 'Helvetica Neue', 'Arial', 'sans-serif'],
+  mono:    ['var(--font-ocra)', 'Courier New', 'monospace'],
+  sans:    ['var(--font-ibm-plex)', 'Helvetica Neue', 'Arial', 'sans-serif'],
 }
 
-// Font sizes (with line-height)
 fontSize: {
-  'display-xl': ['4.5rem',   { lineHeight: '1.0' }],
-  'display-lg': ['3.375rem', { lineHeight: '1.05' }],
-  'heading-1':  ['2.5rem',   { lineHeight: '1.1' }],
-  'heading-2':  ['1.875rem', { lineHeight: '1.2' }],
-  'heading-3':  ['1.375rem', { lineHeight: '1.3' }],
-  'body-lg':    ['1.125rem', { lineHeight: '1.6' }],
+  'display-xl': ['3.75rem',  { lineHeight: '1.0' }],
+  'display-lg': ['2.75rem',  { lineHeight: '1.05' }],
+  'heading-1':  ['2rem',     { lineHeight: '1.1' }],
+  'heading-2':  ['1.5rem',   { lineHeight: '1.2' }],
+  'heading-3':  ['1.125rem', { lineHeight: '1.3' }],
+  'body-lg':    ['1rem',     { lineHeight: '1.6' }],
   'body':       ['1rem',     { lineHeight: '1.6' }],
   'body-sm':    ['0.875rem', { lineHeight: '1.5' }],
   'label':      ['0.75rem',  { lineHeight: '1.4' }],
 }
+
+letterSpacing: {
+  display: '0.05em',
+  nav:     '0.08em',
+}
 ```
 
 ---
 
-## 13. Summary: Current → Target Changes
+## 12. File Reference
 
-| Aspect | Current | Target |
-|--------|---------|--------|
-| Display font | None (using OCR-A for everything) | Eurostile Extended for headings |
-| Body font | Sabon (serif) + global-font class | IBM Plex Sans |
-| Mono font | OCR-A (overloaded as primary) | OCR-A (scoped to nav + code only) |
-| Accent color | None | Sapphire blue, used sparingly |
-| Button style | Mixed (rounded-full, varied) | Sharp corners, consistent states |
-| Section headers | Inconsistent (`text-4xl font-extrabold`) | Standardized `heading-1` + Eurostile |
-| Spacing | Ad-hoc (`gap-3`, `gap-10`, `gap-14`, `gap-20`) | 8px-based scale |
-| Dark section bg | `slate-800` | `Gray 900 (#171717)` |
-| Card borders | None / `border-b` only | Consistent `1px solid Gray 200` |
-| Font mixing | 3 fonts used inconsistently inline | 3 fonts with clear roles |
-| Active nav state | None visible | Sapphire accent indicator |
+| File | Role |
+|------|------|
+| `components/font.tsx` | Font definitions (OCR-A local, IBM Plex Sans + Michroma via Google) |
+| `pages/_app.tsx` | Applies font CSS variables at root |
+| `styles/globals.css` | Base typography layer, link underline animation |
+| `tailwind.config.js` | Design tokens (colors, fonts, sizes, animations) |
+| `components/drawer.tsx` | Sidebar nav (subpages) |
+| `components/horizontalDrawer.tsx` | Horizontal nav (landing) + mobile drawer |
+| `components/reviewOnScroll.tsx` | Intersection Observer reveal wrapper |
+| `components/animatedText.tsx` | Character-by-character text animation |
