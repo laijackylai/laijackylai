@@ -12,7 +12,6 @@ const GIS: NextPage<Props> = () => {
     <div className="lg:px-10">
       <Title />
       <HorizontalDrawer />
-      <div className='font-display text-heading-1 uppercase tracking-display fixed top-5 right-5 opacity-10 -z-50'>GIS</div>
       <div className='flex flex-col w-screen snap-y snap-mandatory overflow-scroll'>
         <div className='h-screen w-screen p-6 lg:px-16 lg:py-16 flex flex-col justify-around snap-start'>
           <Image
