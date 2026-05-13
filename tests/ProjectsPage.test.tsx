@@ -5,6 +5,12 @@ jest.mock('plaiceholder', () => ({
   getPlaiceholder: jest.fn().mockResolvedValue({ base64: 'data:image/png;base64,placeholder' }),
 }));
 
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/projects',
+  }),
+}));
+
 describe('Projects page', () => {
   const originalStorageBaseUrl = process.env.STORAGE_BASE_URL;
 
@@ -20,7 +26,11 @@ describe('Projects page', () => {
   });
 
   afterEach(() => {
-    process.env.STORAGE_BASE_URL = originalStorageBaseUrl;
+    if (originalStorageBaseUrl === undefined) {
+      delete process.env.STORAGE_BASE_URL;
+    } else {
+      process.env.STORAGE_BASE_URL = originalStorageBaseUrl;
+    }
   });
 
   it('renders the five project sections and opens the senior design PDF', () => {
@@ -49,13 +59,17 @@ describe('Projects page', () => {
     }
   });
 
-  it('returns empty image data when static project data loading fails', async () => {
+  it('keeps image URLs when blur placeholder loading fails', async () => {
     (global.fetch as jest.Mock).mockRejectedValue(new Error('fetch failed'));
 
     await expect(getStaticProps({} as any)).resolves.toEqual({
       props: {
-        imageUrls: [],
-        base64: [],
+        imageUrls: [
+          'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_1.png',
+          'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_2.png',
+          'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_3.png',
+        ],
+        base64: [null, null, null],
       },
     });
   });

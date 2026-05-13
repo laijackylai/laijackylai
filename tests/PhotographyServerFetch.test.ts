@@ -30,6 +30,7 @@ describe('Photography getStaticProps', () => {
   });
 
   afterEach(() => {
+    jest.restoreAllMocks();
     process.env = originalEnv;
   });
 

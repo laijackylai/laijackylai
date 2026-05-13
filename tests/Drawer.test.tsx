@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import mockRouter from 'next-router-mock';
 import ResponsiveDrawer from '../components/drawer';
 
 jest.mock('next/link', () => {
@@ -7,15 +8,17 @@ jest.mock('next/link', () => {
   };
 });
 
+jest.mock('next/router', () => require('next-router-mock'));
+
 describe('ResponsiveDrawer', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/');
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
     Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 0 });
     window.requestAnimationFrame = (callback: FrameRequestCallback) => {
       callback(0);
       return 0;
     };
-    jest.spyOn(console, 'info').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -40,6 +43,15 @@ describe('ResponsiveDrawer', () => {
     expect(navigationLinks[3]).toHaveAttribute('href', '/music');
     expect(navigationLinks[4]).toHaveTextContent('GIS');
     expect(navigationLinks[4]).toHaveAttribute('href', '/gis');
+  });
+
+  it('highlights the active route', () => {
+    mockRouter.setCurrentUrl('/photography');
+
+    render(<ResponsiveDrawer />);
+
+    const photographyLink = screen.getByRole('link', { name: /photography/i });
+    expect(photographyLink.firstElementChild).toHaveClass('border-l-4', 'border-sapphire-500', 'pl-2');
   });
 
   it('removes resize and scroll listeners on unmount', () => {

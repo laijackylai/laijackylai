@@ -26,7 +26,8 @@
       "Bash(npm ls *)",
       "Bash(rtk proxy *)",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_playwright_playwright__browser_network_requests"
+      "mcp__plugin_playwright_playwright__browser_network_requests",
+      "Bash(node *)"
     ]
   }
 }

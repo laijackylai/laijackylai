@@ -3,18 +3,17 @@ import Image from 'next/image'
 import githubLogo from '../../public/logos/github.png'
 import pythonLogo from '../../public/logos/python.png'
 import reactLogo from '../../public/logos/react.png'
-import ocra from '../../components/font'
 import Title from '../../components/title'
 // @ts-ignore
 import { getPlaiceholder } from 'plaiceholder';
 import { FaGithub, FaAppStoreIos } from 'react-icons/fa';
 import HorizontalDrawer from '../../components/horizontalDrawer'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import RevealOnScroll from '../../components/reviewOnScroll'
 
 type Props = {
   imageUrls: string[];
-  base64: string[];
+  base64: Array<string | null>;
 };
 
 const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
@@ -23,20 +22,26 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
   const hktidesURL = "https://github.com/laijackylai/hktides"
   const hkradarURL = "https://github.com/laijackylai/hkradar"
 
-  const [windowWidth, setWindowWidth] = useState(28)
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+  const [isDarkSection, setIsDarkSection] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolledToTop(window.scrollY === 0);
+      const scrollContainer = scrollContainerRef.current;
+      const scrollTop = scrollContainer?.scrollTop || 0;
+      const sectionHeight = scrollContainer?.clientHeight || window.innerHeight;
+      const activeSectionIndex = Math.round(scrollTop / sectionHeight);
+
+      setIsScrolledToTop(scrollTop < 2);
+      setIsDarkSection(activeSectionIndex % 2 === 1);
     };
-    window.addEventListener('scroll', handleScroll);
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth)
-    }
+    const scrollContainer = scrollContainerRef.current;
+    scrollContainer?.addEventListener('scroll', handleScroll);
+    handleScroll();
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      scrollContainer?.removeEventListener('scroll', handleScroll);
     };
 
   }, []);
@@ -47,32 +52,38 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
   }
 
   const scrollUp = () => {
-    window.scrollTo({
+    scrollContainerRef.current?.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
 
+  const sectionClass = 'relative h-screen snap-start snap-always flex flex-col items-center justify-center px-6 lg:px-20';
+  const lightSectionClass = `${sectionClass} gap-y-5`;
+  const darkSectionClass = `${sectionClass} bg-gray-900 text-white gap-y-5`;
+  const projectTitleClass = 'font-display text-heading-2 uppercase tracking-display mb-3 lg:mb-5';
+  const projectImageClass = 'bg-gray-100 w-full max-h-[46vh] lg:max-h-[52vh] object-contain';
+  const scrollTopButtonClass = isDarkSection ? 'bg-white text-black' : 'bg-black text-white';
+
   return (
-    <div className={`global-font ${ocra.variable} font-sans`}>
+    <div className='h-screen overflow-hidden'>
       <Title />
-      <div className='flex pt-10 lg:pt-0 lg:py-20 flex-col'>
-        {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
-        <div className='lg:px-20'>
-          <HorizontalDrawer logoSize={25} width={windowWidth} />
-        </div>
-        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-2 bg-gray-200 rounded-full' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
-          <svg className="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+      <div ref={scrollContainerRef} className='h-screen overflow-y-auto snap-y snap-mandatory overscroll-contain'>
+        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className={`fixed bottom-5 right-5 z-50 lg:bottom-10 lg:right-10 p-3 transition-colors duration-200 ${scrollTopButtonClass}`} style={{ display: isScrolledToTop ? 'none' : 'block' }}>
+          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
         <RevealOnScroll>
-          <div className='pt-10 lg:pt-7 pb-8 lg:py-14 px-5 lg:px-32'>
-            <div className='font-extrabold text-2xl'>Open Source Contribution</div>
-            <div>
+          <div className={lightSectionClass}>
+            <div className='absolute top-0 left-0 w-full'>
+              <HorizontalDrawer fixedMobile={false} />
+            </div>
+            <div className={projectTitleClass}>Open Source Contribution</div>
+            <div className='space-y-3'>
               <div className='flex flex-row gap-2'>
                 Contributed to
-                <a className='underline' href="https://loaders.gl" target='_blank' rel="noopener noreferrer">
+                <a className='underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200' href="https://loaders.gl" target='_blank' rel="noopener noreferrer">
                   <div>@loaders.gl</div>
                 </a>
                 <div>
@@ -82,56 +93,57 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                 </div>
               </div>
             </div>
-            <div className='text-sm pb-2'>• Added support for an alternative triangular mesh generation technique (
-              <a className='underline' href="https://github.com/mapbox/delatin" target='_blank' rel="noopener noreferrer">
+            <div className='text-sm'>• Added support for an alternative triangular mesh generation technique (
+              <a className='underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200' href="https://github.com/mapbox/delatin" target='_blank' rel="noopener noreferrer">
                 Delatin
               </a>
               ) as an option for the terrain loader
             </div>
-            <a href='https://mapbox.github.io/delatin/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
-              <Image className='bg-white rounded-md w-full' src="/images/delatin.png" alt="delatin" width={800} height={100} />
+            <a href='https://mapbox.github.io/delatin/' target="_blank" rel="noopener noreferrer" className='block justify-center items-center self-center pt-3'>
+              <Image className={projectImageClass} src="/images/delatin.png" alt="delatin" width={800} height={100} />
             </a>
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-amber-700 text-white'>
-            <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+          <div className={darkSectionClass}>
+            <div className={`${projectTitleClass} flex flex-row gap-2 items-center`}>
               Canadian Fires
               <a href="https://github.com/laijackylai/canadianFires" target="_blank" rel="noopener noreferrer" aria-label="View Canadian Fires on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
-            <div className=''>Visualizing historical Canadian fires from 1930-2021 and predicting future fires in Ontario</div>
-            <div className='text-sm'>• Visualizing historical Canadian fires with Deck.gl</div>
-            <div className='text-sm'>• Natural language search with NLTK</div>
-            <div className='text-sm'>• Predicting future Ontario fires with XBGoost Regression</div>
-            <div className='text-sm pb-2'>• Flask and SQLite for backend</div>
-            <a href='https://canadian-fires.vercel.app/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
-              <Image className='bg-white rounded-md w-full' src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
+            <div>Visualizing historical Canadian fires from 1930-2021 and predicting future fires in Ontario</div>
+            <div className='space-y-2'>
+              <div className='text-sm'>• Visualizing historical Canadian fires with Deck.gl</div>
+              <div className='text-sm'>• Natural language search with NLTK</div>
+              <div className='text-sm'>• Predicting future Ontario fires with XBGoost Regression</div>
+              <div className='text-sm'>• Flask and SQLite for backend</div>
+            </div>
+            <a href='https://canadian-fires.vercel.app/' target="_blank" rel="noopener noreferrer" className='block justify-center items-center self-center pt-4'>
+              <Image className={projectImageClass} src="/images/canadian-fires.png" alt="canadian-fires" width={800} height={200} />
             </a>
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-32'>
-            <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+          <div className={lightSectionClass}>
+            <div className={`${projectTitleClass} flex flex-row gap-2 items-center`}>
               NUXT Google Maps
               <a href="https://github.com/laijackylai/vue-google-maps" target="_blank" rel="noopener noreferrer" aria-label="View NUXT Google Maps on GitHub">
                 <FaGithub size={25} />
               </a>
             </div>
-            <div className=''>A Vue Google Maps demo showcasing google maps & map search</div>
-            <div className='text-sm pb-2'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
-            <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" rel="noopener noreferrer" className='justify-center items-center self-center'>
-              <Image className='bg-white rounded-md w-full' src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
+            <div>A Vue Google Maps demo showcasing google maps & map search</div>
+            <div className='text-sm'>• Tech Stack: Nuxt.js, Google Cloud Platform</div>
+            <a href='https://laijackylai.github.io/vue-google-maps/' target="_blank" rel="noopener noreferrer" className='block justify-center items-center self-center pt-4'>
+              <Image className={projectImageClass} src="/images/vue-google-maps.png" alt="vue-google-maps" width={800} height={200} />
             </a>
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-20 bg-sky-950 text-white'>
-            <div className='font-extrabold text-2xl flex flex-row gap-2 items-center'>
+          <div className={darkSectionClass}>
+            <div className={`${projectTitleClass} flex flex-row gap-2 items-center`}>
               Takcarly
               <div className='flex flex-row gap-2 items-end'>
-                <div className='text-sm'>(Available on the App Store)</div>
                 <a className='flex items-center' href="https://apps.apple.com/ca/app/takcarly/id1664211405" target="_blank" rel="noopener noreferrer" aria-label="View Takcarly on the App Store">
                   <FaAppStoreIos size={30} />
                 </a>
@@ -140,21 +152,21 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                 <FaGithub size={25} />
               </a>
             </div>
-            <div className=''>A two in one app for taking care of elderly</div>
+            <div>A two in one app for taking care of elderly</div>
             <div className='text-sm'>• Caretakers can set events, schedule, remind & push custom notification events to the elderly that they are taking care of</div>
-            <div className='flex overflow-x-auto pt-3 gap-5'>
+            <div className='flex w-full justify-center overflow-x-auto pt-5 gap-6'>
               {imageUrls && imageUrls.map((url, i) => {
                 return (
-                  <div className='rounded-lg' key={url}>
+                  <div key={url} className='shrink-0'>
                     <Image
-                      className='bg-white rounded-md w-full'
+                      className='bg-gray-100 h-[50vh] w-auto max-w-none object-contain'
                       quality={75}
                       src={url}
                       alt={url}
                       width={500}
                       height={500}
-                      placeholder='blur'
-                      blurDataURL={base64[i]}
+                      placeholder={base64[i] ? 'blur' : 'empty'}
+                      blurDataURL={base64[i] || undefined}
                     />
                   </div>
                 )
@@ -163,15 +175,14 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
           </div>
         </RevealOnScroll>
         <RevealOnScroll>
-          <div className='py-7 lg:py-20 px-5 lg:px-32'>
+          <div className={lightSectionClass}>
             <div className='flex flex-row items-center'>
-              <div className='font-extrabold text-2xl'>Senior Design Project</div>
+              <div className={projectTitleClass}>Senior Design Project</div>
             </div>
             <div>3D Tidal and Cloud Visualization System</div>
-            <div className='p-2' />
-            <div className='font-bold text-xl'>The Tech Stack</div>
-            <div className='flex flex-row justify-between'>
-              <div>
+            <div className='font-display text-heading-3 uppercase tracking-display'>The Tech Stack</div>
+            <div className='flex flex-row justify-between gap-8'>
+              <div className='space-y-2'>
                 <div>Data Processing:</div>
                 <div className='flex flex-row items-center gap-3'>
                   <div className=' text-sm'>• 3D Terrain (hkdsm)</div>
@@ -201,8 +212,8 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                   </a>
                 </div>
               </div>
-              <div>
-                <div className='pt-1'>Frontend:</div>
+              <div className='space-y-2'>
+                <div>Frontend:</div>
                 <div className='flex flex-row items-center gap-3'>
                   <div className=' text-sm'>• React.js (hkterrain)</div>
                   <a>
@@ -216,12 +227,11 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
               <div />
             </div>
             <div>
-              <div className='pt-2 flex flex-row gap-2 items-center'>
+              <div className='pt-3 flex flex-row gap-2 items-center'>
                 <div>Technical Report:</div>
-                <button onClick={openFYPPDF} className='text-sm underline'>download</button>
+                <button onClick={openFYPPDF} className='text-sm underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200'>download</button>
               </div>
             </div>
-            {/* <MyPdfViewer /> */}
           </div>
         </RevealOnScroll>
       </div>
@@ -251,22 +261,29 @@ export const publicStorageUrl = (key: string) => {
 };
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  try {
-    const imageKeys = [
-      'public/takcarly/takcarly_1.png',
-      'public/takcarly/takcarly_2.png',
-      'public/takcarly/takcarly_3.png',
-    ];
-    const urls = imageKeys.map(publicStorageUrl);
+  const imageKeys = [
+    'public/takcarly/takcarly_1.png',
+    'public/takcarly/takcarly_2.png',
+    'public/takcarly/takcarly_3.png',
+  ];
+  const urls = imageKeys.map(publicStorageUrl);
 
+  try {
     // get blurred photos
     const photoBase64 = await Promise.all(
       urls.map(async (url: string) => {
-        const buffer = await fetch(url).then(async (res) =>
-          Buffer.from(await res.arrayBuffer())
-        );
-        const { base64 } = await getPlaiceholder(buffer);
-        return base64
+        try {
+          const buffer = await fetch(url).then(async (res) =>
+            Buffer.from(await res.arrayBuffer())
+          );
+          const { base64 } = await getPlaiceholder(buffer);
+          return base64
+        } catch (error) {
+          if (shouldFailStaticBuild()) {
+            throw error;
+          }
+          return null;
+        }
       })
     );
 
@@ -282,8 +299,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     }
     return {
       props: {
-        imageUrls: [],
-        base64: []
+        imageUrls: urls,
+        base64: urls.map(() => null)
       },
     };
   }
