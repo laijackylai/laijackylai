@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import HorizontalDrawer from '../../components/horizontalDrawer'
 import RevealOnScroll from '../../components/reviewOnScroll';
-// import { getPlaiceholder } from 'plaiceholder';
 
 export type PhotoData = {
   id: string,
@@ -71,25 +70,11 @@ const Photography: NextPage<Props> = ({
     });
   }
 
-  // // get blurred photos
-  // const getBlurredPhotos = async () => {
-  //   const photoBase64 = await Promise.all(
-  //     photosData.map(async (p: PhotoData) => {
-  //       const buffer = await fetch(p.url).then(async (res) =>
-  //         Buffer.from(await res.arrayBuffer())
-  //       );
-  //       const { base64 } = await getPlaiceholder(buffer);
-  //       return base64
-  //     })
-  //   );
-  // }
-
   return (
     <div>
       <Title />
       <HorizontalDrawer />
       <div className='flex flex-col px-8 py-5 pt-12 sm:px-10 lg:px-24 lg:py-14 lg:pt-8 xl:px-32'>
-        {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>PHOTOGRAPHY</div> */}
         <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-3 bg-black text-white z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
@@ -174,7 +159,7 @@ const Photography: NextPage<Props> = ({
   );
 }
 
-const defaultStorageBaseUrl = 'https://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2.s3.ap-southeast-1.amazonaws.com';
+const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
 const shouldFailStaticBuild = () => (
   process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
