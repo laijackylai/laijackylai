@@ -187,15 +187,15 @@ const normalizeBlurDataUrl = (blurredBase64: string | null) => {
   return blurredBase64;
 };
 
-const sortPhotosForInitialLoad = (photos: PhotoData[]) => {
-  return [...photos].sort((a, b) => {
-    const aIsDigital = a.s3key.includes('/digital/');
-    const bIsDigital = b.s3key.includes('/digital/');
-    if (aIsDigital !== bIsDigital) {
-      return aIsDigital ? 1 : -1;
-    }
-    return a.s3key.localeCompare(b.s3key);
-  });
+const randomizePhotosForInitialLoad = (photos: PhotoData[]) => {
+  const randomizedPhotos = [...photos];
+
+  for (let i = randomizedPhotos.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [randomizedPhotos[i], randomizedPhotos[j]] = [randomizedPhotos[j], randomizedPhotos[i]];
+  }
+
+  return randomizedPhotos;
 };
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
@@ -241,7 +241,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       url: publicStorageUrl(photo.s3key),
     }));
 
-    return { props: { photosData: sortPhotosForInitialLoad(photosData) }, revalidate: 60 };
+    return { props: { photosData: randomizePhotosForInitialLoad(photosData) }, revalidate: 60 };
   } catch (error) {
     if (shouldFailStaticBuild()) {
       throw error;

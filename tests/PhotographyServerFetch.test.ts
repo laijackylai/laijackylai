@@ -30,6 +30,7 @@ describe('Photography getStaticProps', () => {
   });
 
   afterEach(() => {
+    jest.restoreAllMocks();
     process.env = originalEnv;
   });
 
@@ -61,5 +62,54 @@ describe('Photography getStaticProps', () => {
       },
       revalidate: 60,
     });
+  });
+
+  it('randomizes the server-fetched photo order', async () => {
+    const randomSpy = jest.spyOn(Math, 'random')
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0);
+
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      json: jest.fn().mockResolvedValue({
+        data: {
+          listPhotos: {
+            items: [
+              {
+                id: 'photo-1',
+                s3key: 'public/photos/digital/photo-1.jpg',
+                type: 'digital',
+                aspectRatio: '1.500',
+                blurredBase64: null,
+                createdAt: '2026-04-29',
+              },
+              {
+                id: 'photo-2',
+                s3key: 'public/photos/film/photo-2.jpg',
+                type: 'film',
+                aspectRatio: '1.000',
+                blurredBase64: null,
+                createdAt: '2026-04-30',
+              },
+              {
+                id: 'photo-3',
+                s3key: 'public/photos/film/photo-3.jpg',
+                type: 'film',
+                aspectRatio: '0.750',
+                blurredBase64: null,
+                createdAt: '2026-05-01',
+              },
+            ],
+          },
+        },
+      }),
+    });
+
+    const result = await getStaticProps({} as any);
+
+    expect((result as any).props.photosData.map((photo: any) => photo.id)).toEqual([
+      'photo-2',
+      'photo-3',
+      'photo-1',
+    ]);
   });
 });
