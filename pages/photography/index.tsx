@@ -19,11 +19,23 @@ type Props = {
   photosData: PhotoData[],
 }
 
+const randomizePhotosForPageLoad = (photos: PhotoData[]) => {
+  const randomizedPhotos = [...photos];
+
+  for (let i = randomizedPhotos.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [randomizedPhotos[i], randomizedPhotos[j]] = [randomizedPhotos[j], randomizedPhotos[i]];
+  }
+
+  return randomizedPhotos;
+};
+
 const Photography: NextPage<Props> = ({
   photosData,
 }) => {
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoData | null>(null);
+  const [visiblePhotosData, setVisiblePhotosData] = useState(photosData);
   const imageHeightsById = useMemo(() => {
     return photosData.reduce<Record<string, number>>((acc, photo) => {
       const hash = Array.from(photo.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
@@ -43,6 +55,10 @@ const Photography: NextPage<Props> = ({
     };
 
   }, []);
+
+  useEffect(() => {
+    setVisiblePhotosData(randomizePhotosForPageLoad(photosData));
+  }, [photosData]);
 
   useEffect(() => {
     if (!selectedPhoto) return undefined;
@@ -82,7 +98,7 @@ const Photography: NextPage<Props> = ({
         </button>
         <div>
           {
-            photosData && photosData.length > 0 && photosData.map((p, i) => {
+            visiblePhotosData && visiblePhotosData.length > 0 && visiblePhotosData.map((p, i) => {
               const isOdd = i % 2
               const wh = imageHeightsById[p.id] ?? 400
               const isInitialViewport = i < 2;
@@ -187,17 +203,6 @@ const normalizeBlurDataUrl = (blurredBase64: string | null) => {
   return blurredBase64;
 };
 
-const randomizePhotosForInitialLoad = (photos: PhotoData[]) => {
-  const randomizedPhotos = [...photos];
-
-  for (let i = randomizedPhotos.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [randomizedPhotos[i], randomizedPhotos[j]] = [randomizedPhotos[j], randomizedPhotos[i]];
-  }
-
-  return randomizedPhotos;
-};
-
 export const getStaticProps: GetStaticProps<Props> = async () => {
   if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
     if (shouldFailStaticBuild()) {
@@ -241,7 +246,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       url: publicStorageUrl(photo.s3key),
     }));
 
-    return { props: { photosData: randomizePhotosForInitialLoad(photosData) }, revalidate: 60 };
+    return { props: { photosData }, revalidate: 60 };
   } catch (error) {
     if (shouldFailStaticBuild()) {
       throw error;
