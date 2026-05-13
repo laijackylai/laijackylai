@@ -1,7 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import mockRouter from 'next-router-mock';
 import HorizontalDrawer from '../components/horizontalDrawer';
 
+jest.mock('next/router', () => require('next-router-mock'));
+
 describe('HorizontalDrawer', () => {
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/');
+  });
+
   it('renders desktop links at desktop width', () => {
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
 
@@ -14,6 +21,15 @@ describe('HorizontalDrawer', () => {
     expect(screen.getByRole('link', { name: /music/i })).toHaveAttribute('href', '/music');
     expect(screen.getByRole('link', { name: /gis/i })).toHaveAttribute('href', '/gis');
     expect(links[0].parentElement).toHaveStyle({ width: '32rem' });
+  });
+
+  it('highlights the active desktop route', () => {
+    mockRouter.setCurrentUrl('/projects');
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
+
+    render(<HorizontalDrawer logoSize={25} width={32} />);
+
+    expect(screen.getByRole('link', { name: /projects/i }).firstElementChild).toHaveClass('text-sapphire-500');
   });
 
   it('opens and closes the mobile drawer', () => {

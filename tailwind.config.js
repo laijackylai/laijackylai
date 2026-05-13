@@ -6,8 +6,46 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        sapphire: {
+          50: '#EEF2FF',
+          100: '#D4DEFF',
+          300: '#7B9AFF',
+          500: '#0F52BA',
+          700: '#0A3A82',
+          900: '#061F4A',
+        },
+        gray: {
+          100: '#F5F5F5',
+          200: '#E5E5E5',
+          400: '#A3A3A3',
+          600: '#525252',
+          900: '#171717',
+        },
+      },
       fontFamily: {
-        sans: ['var(--font-ocra)']
+        display: ['var(--font-display)', 'Arial Black', 'sans-serif'],
+        body: ['var(--font-ibm-plex)', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        mono: ['var(--font-ocra)', 'Courier New', 'monospace'],
+        sans: ['var(--font-ibm-plex)', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
+      fontSize: {
+        'display-xl': ['3.75rem', { lineHeight: '1.0' }],
+        'display-lg': ['2.75rem', { lineHeight: '1.05' }],
+        'heading-1': ['2rem', { lineHeight: '1.1' }],
+        'heading-2': ['1.5rem', { lineHeight: '1.2' }],
+        'heading-3': ['1.125rem', { lineHeight: '1.3' }],
+        'body-lg': ['1rem', { lineHeight: '1.6' }],
+        'body': ['1rem', { lineHeight: '1.6' }],
+        'body-sm': ['0.875rem', { lineHeight: '1.5' }],
+        'label': ['0.75rem', { lineHeight: '1.4' }],
+      },
+      letterSpacing: {
+        display: '0.05em',
+        nav: '0.08em',
+      },
+      maxWidth: {
+        content: '1200px',
       },
       keyframes: {
         "text-reveal": {

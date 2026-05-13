@@ -1,7 +1,5 @@
 import { GetServerSideProps, NextPage } from 'next';
-import ocra from '../../components/font';
 import Title from '../../components/title';
-import ResponsiveDrawer from '../../components/drawer';
 import HorizontalDrawer from '../../components/horizontalDrawer';
 import Image from 'next/image';
 
@@ -11,14 +9,13 @@ type Props = {
 
 const GIS: NextPage<Props> = () => {
   return (
-    <div className={`global-font ${ocra.variable} font-sans lg:px-10`}>
+    <div className="lg:px-10">
       <Title />
-      <HorizontalDrawer logoSize={50} width={40} />
-      <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>GIS</div>
+      <HorizontalDrawer />
       <div className='flex flex-col w-screen snap-y snap-mandatory overflow-scroll'>
-        <div className='h-screen w-screen p-5 lg:px-12 lg:py-8 flex flex-col justify-around snap-start'>
+        <div className='h-screen w-screen p-6 lg:px-16 lg:py-16 flex flex-col justify-around snap-start'>
           <Image
-            className='bg-white rounded-md self-center'
+            className='bg-gray-100 border border-gray-200 self-center'
             src="/gis/Toronto_Shooting_Rates_2022.png"
             alt="torontoShootingRates2022"
             width={800}
@@ -27,9 +24,9 @@ const GIS: NextPage<Props> = () => {
             blurDataURL='data:image/jpeg;base64,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'
           />
         </div>
-        <div className='h-screen w-screen p-5 lg:px-12 lg:py-8 flex items-center justify-center snap-start'>
+        <div className='h-screen w-screen p-6 lg:px-16 lg:py-16 flex items-center justify-center snap-start'>
           <Image
-            className='bg-white border border-black'
+            className='bg-gray-100 border border-gray-200'
             src="/gis/Cycle_Routes.png"
             alt="CycleRoutes"
             width={500}
@@ -43,7 +40,7 @@ const GIS: NextPage<Props> = () => {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
 
