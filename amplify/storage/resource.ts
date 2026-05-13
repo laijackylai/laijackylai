@@ -1,11 +1,52 @@
 import { defineStorage } from '@aws-amplify/backend';
+import { CfnResource } from 'aws-cdk-lib';
+import type { Backend } from '../backend';
+
+const branchName = process.env.AWS_BRANCH ?? 'sandbox';
 
 export const storage = defineStorage({
-  name: 'laijackylai-storage',
+  name: `laijackylai-storage-4ba35e5623621-${branchName}`,
   access: (allow) => ({
     'public/*': [
       allow.guest.to(['read']),
       allow.authenticated.to(['read', 'write', 'delete']),
     ],
+    'protected/{entity_id}/*': [
+      allow.authenticated.to(['read', 'write', 'delete']),
+    ],
+    'private/{entity_id}/*': [
+      allow.authenticated.to(['read', 'write', 'delete']),
+    ],
   }),
 });
+
+export function postRefactor(backend: Backend) {
+  const s3Bucket = backend.storage.resources.cfnResources.cfnBucket;
+  s3Bucket.bucketName = 'laijackylai-storage-4ba35e5623621-main';
+}
+
+export function applyEscapeHatches(backend: Backend) {
+  const s3Bucket = backend.storage.resources.cfnResources.cfnBucket;
+  s3Bucket.bucketEncryption = {
+    serverSideEncryptionConfiguration: [
+      {
+        serverSideEncryptionByDefault: {
+          sseAlgorithm: 'AES256',
+        },
+        bucketKeyEnabled: false,
+      },
+    ],
+  };
+  for (const cfnResource of backend.storage.stack.node
+    .findAll()
+    .filter(
+      (c) =>
+        CfnResource.isCfnResource(c) &&
+        ['AWS::S3::Bucket', 'Custom::S3AutoDeleteObjects'].includes(
+          c.cfnResourceType
+        )
+    )) {
+    (cfnResource as CfnResource).addOverride('UpdateReplacePolicy', 'Retain');
+    (cfnResource as CfnResource).addOverride('DeletionPolicy', 'Retain');
+  }
+}
