@@ -69,7 +69,6 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
     <div className='h-screen overflow-hidden'>
       <Title />
       <div ref={scrollContainerRef} className='h-screen overflow-y-auto snap-y snap-mandatory overscroll-contain'>
-        {/* <div className='font-extrabold text-4xl fixed top-5 right-5 opacity-25 -z-50'>TECH</div> */}
         <button type="button" aria-label="Scroll to top" onClick={scrollUp} className={`fixed bottom-5 right-5 z-50 lg:bottom-10 lg:right-10 p-3 transition-colors duration-200 ${scrollTopButtonClass}`} style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
@@ -233,7 +232,6 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                 <button onClick={openFYPPDF} className='text-sm underline decoration-sapphire-500 underline-offset-2 hover:text-sapphire-500 transition-colors duration-200'>download</button>
               </div>
             </div>
-            {/* <MyPdfViewer /> */}
           </div>
         </RevealOnScroll>
       </div>
@@ -243,7 +241,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
 
 export default Projects
 
-const defaultStorageBaseUrl = 'https://amplify-laijackylai-laija-laijackylaistoragebucket-ntfkq0sgwpt2.s3.ap-southeast-1.amazonaws.com';
+const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
 
 const shouldFailStaticBuild = () => (
   process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'

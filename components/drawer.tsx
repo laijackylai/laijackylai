@@ -35,7 +35,6 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
         }
 
         if (windowWidth < 720) {
-            console.info('mobile')
             setImgSize(50)
             setMinImgSize(30)
             setImgWidth(50)

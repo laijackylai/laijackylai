@@ -1,11 +1,10 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
-import ocra, { eurostile, ibmPlexSans } from '../components/font'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
     return (
-        <div className={`${ocra.variable} ${ibmPlexSans.variable} ${eurostile.variable}`}>
+        <>
             <Script id="ms-clarity" strategy="afterInteractive">
                 {`(function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -14,6 +13,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           })(window, document, "clarity", "script", "hkl116cujk");`}
             </Script>
             <Component {...pageProps} />
-        </div>
+        </>
     )
 }
