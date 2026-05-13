@@ -1,5 +1,4 @@
 import { Html, Head, Main, NextScript } from 'next/document'
-import ocra, { eurostile, ibmPlexSans } from '../components/font'
 
 export default function Document() {
   return (
@@ -17,7 +16,7 @@ export default function Document() {
         <meta name="twitter:description" content="Data Engineer experienced in building and maintaining containerized data pipelines. Skilled in Python, Bash, Kubernetes, and automation." />
         <link rel="canonical" href="https://laijackylai.com" />
       </Head>
-      <body className={`${ocra.variable} ${ibmPlexSans.variable} ${eurostile.variable}`}>
+      <body>
         <Main />
         <NextScript />
       </body>
