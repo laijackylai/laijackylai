@@ -13,7 +13,7 @@ export const auth = defineAuth({
 
 export function applyEscapeHatches(backend: Backend) {
   const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;
-  cfnUserPool.addPropertyDeletionOverride('UsernameAttributes');
+  // UsernameAttributes cannot be changed after UserPool creation — leave as-is
   cfnUserPool.policies = {
     passwordPolicy: {
       minimumLength: 8,
