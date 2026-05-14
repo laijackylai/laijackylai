@@ -1,52 +1,5 @@
 import { defineAuth } from '@aws-amplify/backend';
-import { CfnResource, Duration } from 'aws-cdk-lib';
-import type { Backend } from '../backend';
 
 export const auth = defineAuth({
-  loginWith: {
-    email: true,
-  },
-  multifactor: {
-    mode: 'OFF',
-  },
+  loginWith: { email: true },
 });
-
-export function applyEscapeHatches(backend: Backend) {
-  const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;
-  // UsernameAttributes cannot be changed after UserPool creation — leave as-is
-  cfnUserPool.policies = {
-    passwordPolicy: {
-      minimumLength: 8,
-      requireLowercase: false,
-      requireNumbers: false,
-      requireSymbols: false,
-      requireUppercase: false,
-      temporaryPasswordValidityDays: 7,
-    },
-  };
-  const userPool = backend.auth.resources.userPool;
-  userPool.addClient('NativeAppClient', {
-    refreshTokenValidity: Duration.days(30),
-    enableTokenRevocation: true,
-    enablePropagateAdditionalUserContextData: false,
-    authSessionValidity: Duration.minutes(3),
-    disableOAuth: true,
-    generateSecret: false,
-  });
-  for (const cfnResource of backend.auth.stack.node
-    .findAll()
-    .filter(
-      (c) =>
-        CfnResource.isCfnResource(c) &&
-        [
-          'AWS::Cognito::UserPool',
-          'AWS::Cognito::IdentityPool',
-          'AWS::Cognito::UserPoolClient',
-          'AWS::Cognito::IdentityPoolRoleAttachment',
-          'AWS::Cognito::UserPoolGroup',
-        ].includes(c.cfnResourceType)
-    )) {
-    (cfnResource as CfnResource).addOverride('UpdateReplacePolicy', 'Retain');
-    (cfnResource as CfnResource).addOverride('DeletionPolicy', 'Retain');
-  }
-}
