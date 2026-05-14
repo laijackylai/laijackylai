@@ -71,6 +71,7 @@
     "start-server-and-test": "^3.0.2",
     "tailwindcss": "^3.1.8",
     "ts-node": "^10.9.1",
+    "tsx": "^4.21.0",
     "typescript": "~5.4.0"
   }
 }
