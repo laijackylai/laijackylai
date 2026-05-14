@@ -4,16 +4,7 @@ import type { Backend } from '../backend';
 
 export const auth = defineAuth({
   loginWith: {
-    email: {
-      verificationEmailSubject: 'Your verification code',
-      verificationEmailBody: () => 'Your verification code is {####}',
-    },
-  },
-  userAttributes: {
-    email: {
-      required: true,
-      mutable: true,
-    },
+    email: true,
   },
   multifactor: {
     mode: 'OFF',
@@ -22,7 +13,7 @@ export const auth = defineAuth({
 
 export function applyEscapeHatches(backend: Backend) {
   const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;
-  cfnUserPool.usernameAttributes = undefined;
+  cfnUserPool.addPropertyDeletionOverride('UsernameAttributes');
   cfnUserPool.policies = {
     passwordPolicy: {
       minimumLength: 8,
