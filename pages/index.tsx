@@ -133,8 +133,8 @@ const App: NextPage = () => {
                         <Image className="grayscale mr-5 lg:mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
                     </a>
                     <a href="mailto:laijackylai@gmail.com" className="border border-black px-6 py-3 relative overflow-hidden group w-fit font-mono uppercase text-label tracking-nav">
-                        <span className="text-black relative group-hover:text-white transition-colors duration-200">contact</span>
-                        <span className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                        <span className="absolute inset-0 z-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                        <span className="relative z-10 text-black group-hover:text-white transition-colors duration-200">contact</span>
                     </a>
                 </div>
                 <Title />

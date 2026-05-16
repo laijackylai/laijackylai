@@ -29,7 +29,9 @@ describe('HorizontalDrawer', () => {
 
     render(<HorizontalDrawer logoSize={25} width={32} />);
 
-    expect(screen.getByRole('link', { name: /projects/i }).firstElementChild).toHaveClass('text-sapphire-500');
+    expect(screen.getByRole('link', { name: /projects/i })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: /projects/i })).not.toHaveClass('bg-sapphire-500');
+    expect(screen.getByRole('link', { name: /projects/i }).lastElementChild).toHaveClass('text-black');
   });
 
   it('opens and closes the mobile drawer', () => {

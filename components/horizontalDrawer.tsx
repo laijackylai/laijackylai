@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import logo from '../assets/logo/logo_black.svg';
 import { useEffect, useState } from 'react';
+import NavLinkBlob from './navLinkBlob';
 
 type Props = {
   logoSize?: number
@@ -51,26 +52,10 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMob
           <Link href="/" className='lg:mr-10'>
             <Image alt={"logo"} src={logo} height={logoSize * 2} width={logoSize * 2} />
           </Link>
-          <Link href='/projects'>
-            <div className={navLinkClass('/projects')}>
-              <div className={navTextClass}>Projects</div>
-            </div>
-          </Link>
-          <Link href='/photography'>
-            <div className={navLinkClass('/photography')}>
-              <div className={navTextClass}>Photography</div>
-            </div>
-          </Link>
-          <Link href='/music'>
-            <div className={navLinkClass('/music')}>
-              <div className={navTextClass}>Music</div>
-            </div>
-          </Link>
-          <Link href='/gis'>
-            <div className={navLinkClass('/gis')}>
-              <div className={navTextClass}>GIS</div>
-            </div>
-          </Link>
+          <NavLinkBlob href="/projects" label="Projects" />
+          <NavLinkBlob href="/photography" label="Photography" />
+          <NavLinkBlob href="/music" label="Music" />
+          <NavLinkBlob href="/gis" label="GIS" />
         </div>
       </div>
     )

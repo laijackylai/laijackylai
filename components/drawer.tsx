@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import logo from '../assets/logo/logo_black.svg';
+import NavLinkBlob from './navLinkBlob';
 
 interface DrawerProps {
 }
 
 const ResponsiveDrawer: NextPage<DrawerProps> = () => {
-    const router = useRouter();
     const [imgSize, setImgSize] = useState(100)
     const [minImgSize, setMinImgSize] = useState(50)
     const [imgWidth, setImgWidth] = useState(imgSize)
@@ -75,12 +74,6 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
         };
     }, [imgSize, minImgSize, ratio])
 
-    const navLinkClass = (href: string) => (
-        `cover-underline ${router.pathname === href ? 'border-l-4 border-sapphire-500 pl-2' : ''}`
-    )
-
-    const navTextClass = 'font-mono text-body-sm uppercase tracking-nav'
-
     return (
         <div className='top-0 relative' data-testid="drawer-component">
             <div className='fixed flex flex-row lg:flex-col justify-around lg:justify-normal col-span-1 lg:col-span-2 lg:h-full lg:px-5 lg:gap-2 z-10 w-screen lg:w-fit bg-gradient-to-t from-transparent to-white via-white'>
@@ -89,32 +82,16 @@ const ResponsiveDrawer: NextPage<DrawerProps> = () => {
                 </Link>
                 <ul className={`flex flex-row lg:flex-col font-mono font-normal text-body-sm items-center lg:items-start`} style={{ gap: `${gap}rem` }}>
                     <li>
-                        <Link href="/projects">
-                            <div className={navLinkClass('/projects')}>
-                                <div className={navTextClass}>Projects</div>
-                            </div>
-                        </Link>
+                        <NavLinkBlob href="/projects" label="Projects" className="lg:w-full" />
                     </li>
                     <li>
-                        <Link href="/photography" >
-                            <div className={navLinkClass('/photography')}>
-                                <div className={navTextClass}>Photography</div>
-                            </div>
-                        </Link>
+                        <NavLinkBlob href="/photography" label="Photography" className="lg:w-full" />
                     </li>
                     <li>
-                        <Link href="/music" >
-                            <div className={navLinkClass('/music')}>
-                                <div className={navTextClass}>Music</div>
-                            </div>
-                        </Link>
+                        <NavLinkBlob href="/music" label="Music" className="lg:w-full" />
                     </li>
                     <li>
-                        <Link href="/gis" >
-                            <div className={navLinkClass('/gis')}>
-                                <div className={navTextClass}>GIS</div>
-                            </div>
-                        </Link>
+                        <NavLinkBlob href="/gis" label="GIS" className="lg:w-full" />
                     </li>
                 </ul>
             </div >

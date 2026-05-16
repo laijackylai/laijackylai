@@ -3,8 +3,8 @@ import mockRouter from 'next-router-mock';
 import ResponsiveDrawer from '../components/drawer';
 
 jest.mock('next/link', () => {
-  return ({ children, href }: { children: any, href: string }) => {
-    return <a href={href}>{children}</a>;
+  return ({ children, href, ...props }: { children: any, href: string }) => {
+    return <a href={href} {...props}>{children}</a>;
   };
 });
 
@@ -51,7 +51,9 @@ describe('ResponsiveDrawer', () => {
     render(<ResponsiveDrawer />);
 
     const photographyLink = screen.getByRole('link', { name: /photography/i });
-    expect(photographyLink.firstElementChild).toHaveClass('border-l-4', 'border-sapphire-500', 'pl-2');
+    expect(photographyLink).toHaveAttribute('aria-current', 'page');
+    expect(photographyLink).not.toHaveClass('bg-sapphire-500');
+    expect(photographyLink.lastElementChild).toHaveClass('text-black');
   });
 
   it('removes resize and scroll listeners on unmount', () => {
