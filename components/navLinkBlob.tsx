@@ -74,7 +74,7 @@ const NavLinkBlob: React.FC<Props> = ({ href, label, className = '' }) => {
           transform: 'translate(-50%, -50%)',
           borderRadius: '50%',
           backgroundColor: '#000000',
-          opacity: isClicked ? 1 : isHovered ? 0.18 : 0,
+          opacity: isClicked ? 1 : isHovered ? 0.28 : 0,
           filter: isClicked ? 'none' : 'blur(18px)',
         }}
       />
