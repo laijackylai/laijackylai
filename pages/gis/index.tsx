@@ -1,43 +1,52 @@
-import { NextPage } from 'next';
-import Title from '../../components/title';
-import HorizontalDrawer from '../../components/horizontalDrawer';
-import Image from 'next/image';
+import type { NextPage } from 'next'
+import Head from 'next/head'
+import Image from 'next/image'
 
-type Props = {
+const MAPS = [
+  {
+    id: 'g1', n: 'M.01', title: 'Toronto shooting rates', note: 'Per 100,000, by neighbourhood', year: '2022', type: 'Choropleth', area: 'City of Toronto',
+    src: '/gis/Toronto_Shooting_Rates_2022.png', alt: 'Choropleth map of shooting rates by Toronto neighbourhood, 2022', width: 1600, height: 1236,
+  },
+  {
+    id: 'g2', n: 'M.02', title: 'Cycling routes', type: 'Network map on imagery', area: 'Scarborough, Toronto',
+    src: '/gis/Cycle_Routes.png', alt: 'Map of cycling routes, intersections and major parks in Scarborough, Toronto', width: 1236, height: 1600,
+  },
+]
 
-}
-
-const GIS: NextPage<Props> = () => {
-  return (
-    <div className="lg:px-10">
-      <Title />
-      <HorizontalDrawer />
-      <div className='flex flex-col w-screen snap-y snap-mandatory overflow-scroll'>
-        <div className='noise-bg h-screen w-screen p-6 lg:px-16 lg:py-16 flex flex-col justify-around snap-start'>
-          <Image
-            className='bg-gray-100 border border-gray-200 self-center'
-            src="/gis/Toronto_Shooting_Rates_2022.png"
-            alt="torontoShootingRates2022"
-            width={800}
-            height={100}
-            placeholder='blur'
-            blurDataURL='data:image/jpeg;base64,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'
-          />
+const GIS: NextPage = () => (
+  <main id="main" className="noise-bg">
+    <Head><title>GIS — HKLai</title></Head>
+    <header className="page-head">
+      <div className="inner">
+        <div>
+          <p className="label" style={{ marginBottom: 16 }}>Cartography / {String(MAPS.length).padStart(2, '0')} maps</p>
+          <h1>GIS</h1>
+          <p style={{ marginTop: 16 }}>Thematic maps of Toronto.</p>
         </div>
-        <div className='noise-bg h-screen w-screen p-6 lg:px-16 lg:py-16 flex items-center justify-center snap-start'>
-          <Image
-            className='bg-gray-100 border border-gray-200'
-            src="/gis/Cycle_Routes.png"
-            alt="CycleRoutes"
-            width={500}
-            height={100}
-            placeholder='blur'
-            blurDataURL='data:image/jpeg;base64,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'
-          />
-        </div>
+        <span className="idx dot-num" aria-hidden="true">05</span>
       </div>
+      <ol className="toc" aria-label="Maps on this page">
+        {MAPS.map(m => <li key={m.id}><a href={`#${m.id}`}><span className="dot-num">{m.n}</span><span>{m.title}</span></a></li>)}
+      </ol>
+    </header>
+    <div className="maps">
+      {MAPS.map((m, i) => (
+        <section className="snap" id={m.id} key={m.id}>
+          <article className="map hw reveal" aria-labelledby={`${m.id}-title`}>
+            <i className="screw tl"></i><i className="screw tr"></i><i className="screw bl"></i><i className="screw br"></i>
+            <figure><Image src={m.src} alt={m.alt} width={m.width} height={m.height} sizes="(min-width: 1024px) 70vw, 100vw" priority={i === 0} /></figure>
+            <dl>
+              <div><dt className="sr-only">Map</dt><dd className="dot-num" style={{ fontSize: '2.5rem', color: 'var(--accent)' }}>{m.n}</dd></div>
+              <div><dt className="part">Title</dt><dd><h2 id={`${m.id}-title`}>{m.title}</h2>{m.note && <p className="label" style={{ marginTop: 4 }}>{m.note}</p>}</dd></div>
+              {m.year && <div><dt className="part">Year</dt><dd className="dot-num" style={{ fontSize: '1.5rem' }}>{m.year}</dd></div>}
+              <div><dt className="part">Type</dt><dd>{m.type}</dd></div>
+              <div><dt className="part">Area</dt><dd>{m.area}</dd></div>
+            </dl>
+          </article>
+        </section>
+      ))}
     </div>
-  );
-}
+  </main>
+)
 
 export default GIS

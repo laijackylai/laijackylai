@@ -44,3 +44,6 @@ export function watchRuntimeIssues(page: Page) {
     },
   };
 }
+
+// wait until lib/site.js has wired the page (hydrated, listeners attached)
+export const ready = (page: Page) => page.locator('html[data-site-ready]').waitFor({ state: 'attached' });

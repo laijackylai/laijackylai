@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import Projects, { getStaticProps, publicStorageUrl } from '../pages/projects';
+import { render, screen } from '@testing-library/react';
+import Projects, { getStaticProps } from '../pages/projects';
+import { publicStorageUrl } from '../lib/storage';
 
 jest.mock('plaiceholder', () => ({
   getPlaiceholder: jest.fn().mockResolvedValue({ base64: 'data:image/png;base64,placeholder' }),
@@ -19,7 +20,6 @@ describe('Projects page', () => {
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
     Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 0 });
     window.scrollTo = jest.fn();
-    window.open = jest.fn();
     global.fetch = jest.fn().mockResolvedValue({
       arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(8)),
     }) as any;
@@ -33,17 +33,17 @@ describe('Projects page', () => {
     }
   });
 
-  it('renders the five project sections and opens the senior design PDF', () => {
+  it('renders the projects in order, without the Nuxt demo, and links the senior design PDF', () => {
     render(<Projects imageUrls={['https://example.com/takcarly.png']} base64={['data:image/png;base64,abc']} />);
 
-    expect(screen.getByText('Open Source Contribution')).toBeInTheDocument();
-    expect(screen.getByText('Canadian Fires')).toBeInTheDocument();
-    expect(screen.getByText('NUXT Google Maps')).toBeInTheDocument();
-    expect(screen.getByText('Takcarly')).toBeInTheDocument();
-    expect(screen.getByText('Senior Design Project')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: /download/i }));
-    expect(window.open).toHaveBeenCalledWith('/docs/FYP-Final-Report.pdf', '_blank');
+    const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(titles).toEqual([
+      'rbrmesh', 'PitchPose', 'Flight Replay', 'Iceland Road Trip Planner',
+      '3D Tidal and Cloud Visualization System', 'loaders.gl terrain', 'Canadian Fires', 'Takcarly',
+    ]);
+    expect(screen.queryByText(/NUXT/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /technical report/i })).toHaveAttribute('href', '/docs/FYP-Final-Report.pdf');
+    expect(screen.getByAltText('Takcarly app screenshot 1')).toBeInTheDocument();
   });
 
   it('keeps external links isolated from the opener', () => {

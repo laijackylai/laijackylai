@@ -15,3 +15,11 @@ class MockIntersectionObserver {
 MockIntersectionObserver.instances = [];
 
 global.IntersectionObserver = MockIntersectionObserver;
+
+// jsdom has no matchMedia: report reduced motion so lib/site.js skips canvas and animation work
+window.matchMedia = window.matchMedia || ((query) => ({
+  matches: query.includes('reduce'),
+  media: query,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+}));

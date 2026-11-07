@@ -1,272 +1,220 @@
-import type { NextPage } from 'next'
-import React, { useEffect, useRef, useState } from 'react'
-import Title from '../components/title'
-import Image from 'next/image';
+import type { GetStaticProps, NextPage } from 'next'
+import Head from 'next/head'
+import Image, { StaticImageData } from 'next/image'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+import { Icon } from '../components/layout'
+import { fetchPhotos } from '../lib/storage'
+import EbayLogo from '../public/logos/ebay_logo.svg'
+import EbayLogo1999 from '../public/logos/ebay_logo_1999.svg'
+import GDLogo from '../public/logos/g+d_logo.png'
 import VotanicLogo from '../public/logos/votanic_logo.png'
 import VivableeLogo from '../public/logos/vivablee_logo.png'
 import HKOLogo from '../public/logos/hko_logo.png'
 import CentalineLogo from '../public/logos/centaline_logo.png'
-import LinkedinLogo from '../public/logos/linkedin.png'
-import GDLogo from "../public/logos/g+d_logo.png"
-import GithubLogo from '../public/logos/github.png'
-import InstagramLogo from '../public/logos/instagram.png'
-import HorizontalDrawer from '../components/horizontalDrawer';
-import RevealOnScroll from '../components/reviewOnScroll';
 
-interface JourneyItem {
-    href: string
-    logoSrc: Parameters<typeof Image>[0]['src']
-    logoAlt: string
-    logoClassName: string
-    title: string
-    description: string
-    startYear: string
-    endYear: string
+type Job = {
+  href: string,
+  logo: StaticImageData,
+  logoAlt: string,
+  logoHistory?: StaticImageData[],
+  wrapClass?: string,
+  title: string,
+  at: string,
+  description: string,
+  tags: string[],
+  start: string,
+  end: string | null,
 }
 
-const journeyItems: JourneyItem[] = [
-    {
-        href: 'https://www.gi-de.com/en/',
-        logoSrc: GDLogo,
-        logoAlt: 'g+d_logo',
-        logoClassName: 'mb-8',
-        title: 'DATA GEN ENGINEER @ GIESECKE+DEVRIENT',
-        description: 'Operate and optimize high-scale, containerized data generation systems for SIM and eUICC products, focusing on automation, reliability, and cross-functional collaboration. Mainly Utilizing Docker, k8s, Python & Bash.',
-        startYear: '2023',
-        endYear: 'Current',
-    },
-    {
-        href: 'https://www.votanic.com',
-        logoSrc: VotanicLogo,
-        logoAlt: 'votanic_logo',
-        logoClassName: 'bg-[#5c4c87] p-4 mb-8',
-        title: 'SOFTWARE ENGINEER @ VOTANIC LIMITED',
-        description: 'I redesigned software, enhanced performance, and expanded platform compatibility. I utilized Next.js, Electron, and WPF .NET for frontend development, implemented real-time communication, deployed full-stack solutions, conducted compatibility testing, and managed software installation and licensing.',
-        startYear: '2022',
-        endYear: '2023',
-    },
-    {
-        href: 'https://www.vivablee.com',
-        logoSrc: VivableeLogo,
-        logoAlt: 'vivablee_logo',
-        logoClassName: 'py-4',
-        title: 'CO-FOUNDER @ VIVABLEE LIMITED',
-        description: 'I oversaw strategic development to secure funding for continuous growth. I successfully developed the Vivablee Android and iOS app using React Native and AWS cloud services.',
-        startYear: '2020',
-        endYear: '2024',
-    },
-    {
-        href: 'https://www.hko.gov.hk/en/index.html',
-        logoSrc: HKOLogo,
-        logoAlt: 'hko_logo',
-        logoClassName: 'py-4',
-        title: 'CO-OP @ HONG KONG OBSERVATORY',
-        description: 'I developed a backend data processing pipeline using Python and Cron for multiple meteorological products, utilizing distributed MongoDB instances. Additionally, I created a frontend visualization system for high-dimensional meteorological data using Deck.gl and the MERN stack. I successfully deployed the MVP on internal servers using Docker and Docker-compose.',
-        startYear: '2020',
-        endYear: '2021',
-    },
-    {
-        href: 'https://hk.centanet.com/info/en/index',
-        logoSrc: CentalineLogo,
-        logoAlt: 'centaline_logo',
-        logoClassName: 'py-4',
-        title: 'PART-TIME RESEARCH ANALYST @ CENTALINE PROPERTY AGENCY',
-        description: 'I developed scripts for data-mining latest property information on various platforms and websites using Python and automated data processing and Centa-City Leading Index report generation using Excel VBA and Python',
-        startYear: '2019',
-        endYear: '2020',
-    },
+const JOBS: Job[] = [
+  {
+    href: 'https://www.ebay.com', logo: EbayLogo, logoAlt: 'eBay', logoHistory: [EbayLogo1999],
+    title: 'Full Stack Engineer, Data & AI', at: 'eBay',
+    description: "Build AI agents and tools that make it easy for research and product teams to get answers from eBay's large collection of survey and customer feedback data. Answer user analytics questions with charts and live dashboards.",
+    tags: ['Python', 'TypeScript', 'MCP', 'AI agents', 'SQL'], start: '2026', end: null,
+  },
+  {
+    href: 'https://www.gi-de.com/en/', logo: GDLogo, logoAlt: 'Giesecke+Devrient',
+    title: 'Data Gen Engineer', at: 'Giesecke+Devrient',
+    description: 'Ran and improved large-scale, containerized data generation systems for SIM and eUICC products, with a focus on automation, reliability and working across teams.',
+    tags: ['Docker', 'k8s', 'Python', 'Bash'], start: '2023', end: '2026',
+  },
+  {
+    href: 'https://www.votanic.com', logo: VotanicLogo, logoAlt: 'Votanic', wrapClass: 'votanic',
+    title: 'Software Engineer', at: 'Votanic Limited',
+    description: 'Redesigned software, enhanced performance and expanded platform compatibility. Real-time communication, full-stack deployment, compatibility testing, installation and licensing.',
+    tags: ['Next.js', 'Electron', 'WPF .NET'], start: '2022', end: '2023',
+  },
+  {
+    href: 'https://www.vivablee.com', logo: VivableeLogo, logoAlt: 'Vivablee',
+    title: 'Co-Founder', at: 'Vivablee Limited',
+    description: 'Oversaw strategic development to secure funding for continuous growth. Developed the Vivablee Android and iOS app.',
+    tags: ['React Native', 'AWS'], start: '2020', end: '2024',
+  },
+  {
+    href: 'https://www.hko.gov.hk/en/index.html', logo: HKOLogo, logoAlt: 'Hong Kong Observatory',
+    title: 'Co-op', at: 'Hong Kong Observatory',
+    description: 'Backend data processing pipeline for meteorological products on distributed MongoDB. Frontend visualization of high-dimensional meteorological data. MVP deployed on internal servers.',
+    tags: ['Python', 'Cron', 'Deck.gl', 'MERN', 'Docker Compose'], start: '2020', end: '2021',
+  },
+  {
+    href: 'https://hk.centanet.com/info/en/index', logo: CentalineLogo, logoAlt: 'Centaline Property Agency',
+    title: 'Part-time Research Analyst', at: 'Centaline Property',
+    description: 'Data-mining scripts for the latest property information across platforms. Automated processing and Centa-City Leading Index report generation.',
+    tags: ['Python', 'Excel VBA'], start: '2019', end: '2020',
+  },
 ]
 
-const App: NextPage = () => {
-    const [scroll, setScroll] = useState(0)
-    const scrollFrameRef = useRef<number | null>(null)
+const SKILLS: [string, string, string[]][] = [
+  ['01', 'Data engineering', ['Docker & Kubernetes', 'Extract Load Transform', 'Data pipelines', 'Data modelling']],
+  ['02', 'Data science', ['NumPy', 'Pandas', 'XGBoost', 'NLTK']],
+  ['03', 'Full stack', ['ReactJS', 'NextJS', 'NodeJS', 'Django / Flask']],
+  ['04', 'Cloud', ['Amazon Web Services', 'AWS Amplify', 'Vercel']],
+]
 
-    useEffect(() => {
-        function handleScroll() {
-            if (scrollFrameRef.current !== null) {
-                return
-            }
+const PROJECT_SHOTS = ['/images/rbrmesh.jpg', '/images/pitch-pose.jpg', '/images/flight-replay.jpg', '/images/iceland-planner.jpg', '/images/canadian-fires.png', '/images/delatin.png']
+const MAPS = ['/gis/Toronto_Shooting_Rates_2022.png', '/gis/Cycle_Routes.png']
 
-            scrollFrameRef.current = requestAnimationFrame(() => {
-                setScroll(window.scrollY)
-                scrollFrameRef.current = null
-            })
-        }
+const FLASH_MS = 180
 
-        window.addEventListener("scroll", handleScroll);
+/** Company logo that flashes through its past logos (oldest first) on hover, then settles on the current one. */
+const JobLogo = ({ job }: { job: Job }) => {
+  const [frame, setFrame] = useState<number | null>(null)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const history = job.logoHistory ?? []
 
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            if (scrollFrameRef.current !== null) {
-                cancelAnimationFrame(scrollFrameRef.current)
-            }
-        };
-    }, []);
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
 
-    const scrollDown = () => {
-        const scrollHeight = window.innerHeight / 3;
-        window.scrollTo({
-            top: window.pageYOffset + scrollHeight,
-            behavior: "smooth",
-        });
-    };
-
-    const scrollUp = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
+  const flash = () => {
+    if (!history.length || frame !== null || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const step = (i: number) => {
+      setFrame(i < history.length ? i : null)
+      if (i < history.length) timer.current = setTimeout(() => step(i + 1), FLASH_MS)
     }
+    step(0)
+  }
 
-    return (
-        <div className="w-full">
-            <div className={`noise-bg relative h-screen p-5 lg:p-16 pt-0 lg:pt-0 flex flex-col justify-between bg-white z-20`}>
-                <div className='absolute right-5 top-20 z-10 flex flex-row gap-7 items-center lg:right-8 lg:top-6'>
-                    <a href="https://linkedin.com/in/laijackylai" target='_blank' rel="noopener noreferrer">
-                        <Image className="grayscale" alt={"linkedin_logo"} src={LinkedinLogo} height={25} width={25} />
-                    </a>
-                    <a href="https://github.com/laijackylai" target='_blank' rel="noopener noreferrer">
-                        <Image className="grayscale" alt={"github_logo"} src={GithubLogo} height={25} width={25} />
-                    </a>
-                    <a href="https://www.instagram.com/laijackylai/" target='_blank' rel="noopener noreferrer">
-                        <Image className="grayscale mr-5 lg:mr-10" alt={"instagram_logo"} src={InstagramLogo} height={25} width={25} />
-                    </a>
-                    <a href="mailto:laijackylai@gmail.com" className="border border-black px-6 py-3 relative overflow-hidden group w-fit font-mono uppercase text-label tracking-nav">
-                        <span className="absolute inset-0 z-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
-                        <span className="relative z-10 text-black group-hover:text-white transition-colors duration-200">contact</span>
-                    </a>
-                </div>
-                <Title />
-                <HorizontalDrawer />
-                <div>
-                    <div className="flex flex-col gap-10 items-center">
-                        <div className='col-span-6 flex flex-col items-end justify-end gap-10 lg:gap-40 w-full'>
-                            <div className="flex flex-col font-display text-display-lg lg:text-display-xl uppercase tracking-display p-2 text-end font-bold animate-fade-in-left">
-                                <div>Data Engineer</div>
-                                <div className='font-body text-heading-2 lg:text-heading-1 font-normal normal-case tracking-normal'>&</div>
-                                <div>Software Engineer</div>
-
-                            </div>
-                            <div className='font-body text-body-lg text-gray-600 text-right lg:w-1/3 w-full motion-safe:animate-fade-in-right'>
-                                Hi, I am Jacky. I&apos;m a Data Engineer experienced in building and maintaining containerized data pipelines.
-                                <br />
-                                Skilled in Python, Bash, Kubernetes, and automation. Strong problem-solving and cross-team collaboration in high-scale, data-driven environments.
-                            </div>
-                        </div>
-                        {/* moving down or up arrow */}
-                        {
-                            scroll === 0
-                                ?
-                                <button type="button" aria-label="Scroll down" onClick={scrollDown}>
-                                    <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                    </svg>
-                                </button>
-                                :
-                                <button type="button" aria-label="Scroll to top" onClick={scrollUp}>
-                                    <svg className="w-6 h-6 motion-safe:animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                    </svg>
-                                </button>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div className="py-24 lg:py-32 flex flex-col gap-3 lg:gap-14 w-full bg-gray-900 text-white">
-                <div className='flex flex-row gap-3 justify-center items-center'>
-                    <div className="font-display text-heading-1 uppercase tracking-display pb-5">Skills</div>
-                </div>
-                <div className='flex flex-col gap-3 lg:gap-6 items-start w-fit self-center'>
-                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
-                        <div className="w-fit font-bold">Data Engineering:</div>
-                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center font-body">
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
-                                Docker & Kubernetes
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:2s] my-2" >
-                                Extract Load Transform
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:4s] my-2" >
-                                Data Pipelines
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:6s] my-2" >
-                                Data Modelling
-                            </span>
-
-                        </span>
-                    </div>
-                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
-                        <div className="w-fit font-bold">Data Science:</div>
-                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
-                                NumPy
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:2s] my-2" >
-                                Pandas
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:4s] my-2" >
-                                XGBoost
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:6s] my-2" >
-                                NLTK
-                            </span>
-                        </span>
-                    </div>
-                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
-                        <div className="w-fit font-bold">Full Stack:</div>
-                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none my-2" >
-                                ReactJS
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:2s] my-2" >
-                                NextJS
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:4s] my-2" >
-                                NodeJS
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-4 leading-none [animation-delay:6s] my-2" >
-                                Django / Flask
-                            </span>
-                        </span>
-                    </div>
-                    <div className="flex items-center font-body text-body lg:text-heading-3 font-semibold">
-                        <div className="w-fit font-bold">Cloud:</div>
-                        <span className="relative ml-3 lg:ml-5 h-8 lg:h-9 w-60 lg:w-80 overflow-hidden justify-center">
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none my-2" >
-                                Amazon Web Services
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:2s] my-2" >
-                                Firebase
-                            </span>
-                            <span className="absolute h-full w-full -translate-y-full animate-slide-3 leading-none [animation-delay:4s] my-2" >
-                                Vercel
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div className='noise-bg flex flex-col items-center gap-24 lg:py-24 lg:px-16 p-6'>
-                <div className="font-display text-heading-1 uppercase tracking-display">My Journey</div>
-                {journeyItems.map((item, index) => (
-                    <RevealOnScroll key={item.href}>
-                        <div className={`w-full lg:px-32 px-5 pb-10 ${index < journeyItems.length - 1 ? 'border-b border-gray-200' : ''} flex flex-row justify-between items-center`}>
-                            <div className='flex flex-col gap-2 w-2/3 lg:w-1/2'>
-                                <a href={item.href} target='_blank' rel="noopener noreferrer">
-                                    <Image className={item.logoClassName} alt={item.logoAlt} src={item.logoSrc} height={400} width={index === 0 ? 300 : 200} />
-                                </a>
-                                <div className="font-display text-heading-3 uppercase tracking-display">{item.title}</div>
-                                <div className="font-body text-body text-gray-600">{item.description}</div>
-                            </div>
-                            <div className="flex flex-col items-end font-body">
-                                <div className="font-display text-heading-1 lg:text-display-lg">{item.startYear}</div>
-                                <div className={item.endYear === 'Current' ? 'font-bold' : ''}>- {item.endYear}</div>
-                            </div>
-                        </div>
-                    </RevealOnScroll>
-                ))}
-            </div>
-        </div>
-    )
+  return (
+    <a className={`logo-wrap ${job.wrapClass ?? ''}`} href={job.href} target="_blank" rel="noopener noreferrer" onPointerEnter={flash}>
+      <span style={{ position: 'relative', display: 'block' }}>
+        <Image src={job.logo} alt={job.logoAlt} style={frame !== null ? { visibility: 'hidden' } : undefined} />
+        {history.map((src, i) => (
+          <Image key={i} src={src} alt="" aria-hidden style={{ position: 'absolute', inset: 0, margin: 'auto', display: frame === i ? 'block' : 'none' }} />
+        ))}
+      </span>
+    </a>
+  )
 }
 
-export default App
+/** Page tile; on hover a faint greyscale picture from the page's own pool shows behind it, a different one each time. */
+const Tile = ({ n, href, name, label, pool }: { n: string, href: string, name: string, label: string, pool: string[] }) => {
+  const [pick, setPick] = useState(0)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const next = () => setPick(p => (pool.length < 2 ? 0 : (p + 1 + Math.floor(Math.random() * (pool.length - 1))) % pool.length))
+
+  useEffect(() => {
+    next()
+    return () => { if (timer.current) clearTimeout(timer.current) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- once on mount: random first picture
+
+  return (
+    // swap only after the fade-out finishes, so the next picture has loaded before the next hover
+    <Link className="hw" href={href} onPointerLeave={() => { timer.current = setTimeout(next, 350) }} onBlur={() => { timer.current = setTimeout(next, 350) }}>
+      {pool.length > 0 && <Image className="preview" src={pool[pick]} alt="" fill sizes="(min-width: 768px) 25vw, 100vw" quality={40} />}
+      <i className="screw tl"></i><i className="screw tr"></i>
+      <span className="top"><span className="dot-num">{n}</span><span className="part">JL-{n}</span></span>
+      <span className="name">{name}<Icon name="arrow-ur" /></span>
+      <span className="label">{label}</span>
+    </Link>
+  )
+}
+
+type Props = { photoPool: string[] }
+
+const Home: NextPage<Props> = ({ photoPool }) => (
+  <main id="main">
+    <Head><title>HKLai</title></Head>
+    <section className="hero noise-bg" aria-labelledby="hero-title">
+      <div className="topline">
+        <span className="label coords"><span>HK — 22.3193° N, 114.1694° E</span><span>TO — 43.6532° N, 79.3832° W</span></span>
+        <div className="socials label">
+          <a className="link-underline" href="https://linkedin.com/in/laijackylai" target="_blank" rel="noopener noreferrer">LinkedIn<Icon name="arrow-ur" className="icon-sm" /></a>
+          <a className="link-underline" href="https://github.com/laijackylai" target="_blank" rel="noopener noreferrer">GitHub<Icon name="arrow-ur" className="icon-sm" /></a>
+          <a className="link-underline" href="https://www.instagram.com/laijackylai/" target="_blank" rel="noopener noreferrer">Instagram<Icon name="arrow-ur" className="icon-sm" /></a>
+        </div>
+      </div>
+      <div className="hero-main">
+        <h1 className="hero-title" id="hero-title">Full Stack Engineer<br />Data &amp; AI</h1>
+        <p className="hero-lede">Hi, I am Jacky. I&apos;m a full stack engineer focused on data and AI, building AI agents, data pipelines and dashboards. Skilled in Python, TypeScript, Kubernetes and LLM tooling.</p>
+      </div>
+      <div className="hero-meta">
+        <span className="status label"><i aria-hidden="true"></i>Live · currently at eBay</span>
+        <a className="scroll-btn" href="#skills" aria-label="Scroll to skills"><Icon name="down" /></a>
+        <div className="hw readout" role="group" aria-label="Local time in Hong Kong and Toronto">
+          <i className="screw tl" aria-hidden="true"></i><i className="screw tr" aria-hidden="true"></i>
+          <div className="stack"><span className="part">Local time</span><span className="glyph" id="glyph" aria-hidden="true"></span></div>
+          <div className="city"><span className="part">Hong Kong · HKT</span><span className="time dot-num" data-tz="Asia/Hong_Kong">--:--</span></div>
+          <div className="city"><span className="part">Toronto · <span data-tz-abbr="America/Toronto">ET</span></span><span className="time dot-num" data-tz="America/Toronto">--:--</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section className="skills seq-alt" id="skills" aria-labelledby="skills-title">
+      <div className="inner">
+        <div className="sec-head"><h2 id="skills-title">Skills</h2><span className="label" style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}><i className="pip"></i>04 disciplines</span></div>
+        <dl>
+          {SKILLS.map(([idx, name, items]) => (
+            <div className="skill-row reveal" key={idx}><dt><span className="idx">{idx}</span><span>{name}</span></dt>
+              <dd>
+                <span className="rotator" style={{ ['--dur' as string]: `${items.length * 2}s` }} aria-hidden="true">{items.map(t => <span key={t}>{t}</span>)}</span>
+                <span className="static-list">{items.join(' · ')}</span><span className="sr-only">{items.join(', ')}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section className="journey noise-bg" aria-labelledby="journey-title">
+      <div className="inner">
+        <div className="sec-head"><h2 id="journey-title">My Journey</h2><span className="label tabular">2019 — Present</span></div>
+        <ol className="jobs">
+          {JOBS.map(job => (
+            <li className="job reveal" key={job.at}>
+              <div>
+                <JobLogo job={job} />
+                <h3>{job.title} <span className="at">@ {job.at}</span></h3>
+                <p>{job.description}</p>
+                <ul className="tags">{job.tags.map(t => <li key={t}>{t}</li>)}</ul>
+              </div>
+              <div className="years">
+                <div className="start">{job.start}</div>
+                {job.end ? <div className="end label">— {job.end}</div> : <div className="end label now">Current</div>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <nav className="tiles" aria-label="Explore pages">
+      <Tile n="02" href="/projects" name="Projects" label="3D, vision, maps, apps" pool={PROJECT_SHOTS} />
+      <Tile n="03" href="/photography" name="Photography" label="Film + digital" pool={photoPool} />
+      <Tile n="04" href="/music" name="Music" label="Recordings" pool={[]} />
+      <Tile n="05" href="/gis" name="GIS" label="Spatial work" pool={MAPS} />
+    </nav>
+  </main>
+)
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  // hover pictures only: a missing or failing photo API must not break the home page build
+  try {
+    const urls = (await fetchPhotos('/')).map(p => p.url).sort(() => Math.random() - .5)
+    return { props: { photoPool: urls.slice(0, 12) }, revalidate: 3600 }
+  } catch {
+    return { props: { photoPool: [] }, revalidate: 3600 }
+  }
+}
+
+export default Home

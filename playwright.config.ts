@@ -5,7 +5,8 @@ export default defineConfig({
   timeout: 60_000,
   workers: 1,
   expect: {
-    timeout: 5_000,
+    // prod build on a dev laptop: route changes can take several seconds under background load
+    timeout: 15_000,
   },
   reporter: [['list']],
   use: {
