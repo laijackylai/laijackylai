@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 import path from 'node:path';
-import { watchRuntimeIssues } from './helpers';
+import { ready, watchRuntimeIssues } from './helpers';
 
 const routes = ['/', '/projects', '/photography', '/gis', '/music'];
 const axePath = require.resolve('axe-core/axe.min.js');
@@ -11,6 +11,7 @@ test.describe('accessibility smoke checks', () => {
       const runtime = watchRuntimeIssues(page);
 
       await page.goto(route);
+      await ready(page);
       await page.addScriptTag({ path: path.resolve(axePath) });
 
       const results = await page.evaluate(async () => {

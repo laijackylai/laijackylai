@@ -38,19 +38,20 @@ Photos live in the Amplify S3 bucket under `public/*` (bucket policy allows anon
 
 ### Pages
 
-- `/` — landing page with animated sections
-- `/photography` — photo gallery (ISR, AppSync + S3), shuffled client-side per load
-- `/projects` — project showcase; Takcarly screenshots + blur via `plaiceholder`
-- `/gis` — GIS work
-- `/music` — music section
+All pages share the v4 "hardware" design (styles/globals.css, plain CSS, no Tailwind). `/projects`, `/photography`, `/music` and `/gis` are full-page snap pages: `<html class="snap-page">` is set server-side in `_document.tsx` from `SNAP_PAGES` and toggled on client navigation.
+
+- `/` — hero, skills, journey (eBay logo flashes its 1999 logo on hover), page tiles with random greyscale hover pictures (photos pool comes from AppSync in `getStaticProps`, failure-tolerant)
+- `/projects` — data-driven `PROJECTS` list; Takcarly screenshots + blur via `plaiceholder`
+- `/photography` — photo sequence (ISR, AppSync + S3), shuffled per load, format filters, `<dialog>` viewer
+- `/gis` — map panels
+- `/music` — landing + deck linking to Instagram @sing.sang.sunk
 
 ### Key Components
 
-- `components/horizontalDrawer.tsx` — site nav; desktop and mobile layouts both render, CSS (`md:`) picks one
-- `components/navLinkBlob.tsx` — nav link with cursor-following blob animation
-- `components/interactiveNoise.tsx` — pointer-reactive dot canvas behind `.noise-bg` sections
-- `components/reviewOnScroll.tsx` — intersection-observer reveal animation wrapper
-- `components/animatedText.tsx` — animated text component
+- `components/layout.tsx` — nav, mobile sheet, footer, keys dialog, icon sprite; runs `initSite` after every route render
+- `lib/site.js` — imperative behaviours: theme switch (headlight view transition, beams pre-baked to PNG), nav indicator, dot-grid canvas behind `.noise-bg` (sleeps when idle), reveal, clocks, section pager, keyboard shortcuts, title glitch
+- `lib/storage.ts` — `publicStorageUrl`, `fetchPhotos`, `shouldFailStaticBuild`
+- Title glitch fonts: only Zerbydoo (commercial OK) ships in `public/fonts`; other faces in `FLICKS` are personal-use demos and are skipped until licensed and given an `@font-face`
 
 ### Testing
 

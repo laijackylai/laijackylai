@@ -1,30 +1,23 @@
-import { render, screen, within } from '@testing-library/react';
-import mockRouter from 'next-router-mock';
+import { render, screen } from '@testing-library/react';
 import GIS from '../pages/gis';
 import Music from '../pages/music';
 
-jest.mock('next/router', () => require('next-router-mock'));
-
 describe('secondary pages', () => {
-  beforeEach(() => {
-    mockRouter.setCurrentUrl('/');
-    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
-    Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 0 });
-  });
-
-  it('renders GIS images with blur placeholders in a snap container', () => {
+  it('renders each GIS map as a snap panel', () => {
     render(<GIS />);
 
-    expect(screen.getByAltText('torontoShootingRates2022')).toBeInTheDocument();
-    expect(screen.getByAltText('CycleRoutes')).toBeInTheDocument();
-    expect(document.querySelector('.snap-y.snap-mandatory')).toBeInTheDocument();
+    expect(screen.getByAltText(/shooting rates by Toronto neighbourhood/)).toBeInTheDocument();
+    expect(screen.getByAltText(/cycling routes/i)).toBeInTheDocument();
+    expect(document.querySelectorAll('section.snap')).toHaveLength(2);
   });
 
-  it('renders the music page shell', () => {
+  it('renders the music landing page linking to Instagram', () => {
     render(<Music />);
 
-    const nav = within(screen.getByTestId('desktop-nav'));
-    expect(nav.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
     expect(screen.getByRole('heading', { name: 'Music' })).toBeInTheDocument();
+    for (const link of screen.getAllByRole('link', { name: /instagram/i })) {
+      expect(link).toHaveAttribute('href', 'https://www.instagram.com/sing.sang.sunk/');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    }
   });
 });

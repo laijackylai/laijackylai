@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { IBM_Plex_Sans, Michroma } from "next/font/google";
+import { Doto, IBM_Plex_Sans, Michroma } from "next/font/google";
 
 const ocra = localFont({
   src: [
@@ -20,8 +20,14 @@ const ibmPlexSans = IBM_Plex_Sans({
 const michroma = Michroma({
   subsets: ['latin'],
   weight: '400',
-  variable: '--font-display',
+  variable: '--font-michroma',
+})
+
+const doto = Doto({
+  subsets: ['latin'],
+  weight: ['600', '800'],
+  variable: '--font-doto',
 })
 
 export default ocra
-export { ibmPlexSans, michroma as eurostile }
+export { ibmPlexSans, michroma, doto }

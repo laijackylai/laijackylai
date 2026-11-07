@@ -1,58 +1,26 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import Photography from '../pages/photography';
 
-jest.mock('next/router', () => ({
-  useRouter: () => ({
-    pathname: '/photography',
-  }),
-}));
-
 const photosData = [
-  {
-    id: 'photo-1',
-    s3key: 'photos/digital/photo-1.jpg',
-    type: 'digital',
-    aspectRatio: '1.500',
-    blurredBase64: 'data:image/png;base64,abc',
-    createdAt: '2026-04-29',
-    url: 'https://example.com/photo-1.jpg',
-  },
-  {
-    id: 'photo-2',
-    s3key: 'photos/film/photo-2.jpg',
-    type: 'film',
-    aspectRatio: '0.750',
-    blurredBase64: 'data:image/png;base64,def',
-    createdAt: '2026-04-28',
-    url: 'https://example.com/photo-2.jpg',
-  },
-  {
-    id: 'photo-3',
-    s3key: 'photos/film/photo-3.jpg',
-    type: 'film',
-    aspectRatio: '1.000',
-    blurredBase64: null,
-    createdAt: '2026-04-27',
-    url: 'https://example.com/photo-3.jpg',
-  },
+  { id: 'photo-1', s3key: 'photos/digital/photo-1.jpg', type: 'digital', aspectRatio: '1.500', blurredBase64: 'data:image/png;base64,abc', createdAt: '2026-04-29', url: 'https://example.com/photo-1.jpg' },
+  { id: 'photo-2', s3key: 'photos/film/photo-2.jpg', type: 'film', aspectRatio: '0.750', blurredBase64: 'data:image/png;base64,def', createdAt: '2026-04-28', url: 'https://example.com/photo-2.jpg' },
+  { id: 'photo-3', s3key: 'photos/film/photo-3.jpg', type: 'film', aspectRatio: '1.000', blurredBase64: null, createdAt: '2026-04-27', url: 'https://example.com/photo-3.jpg' },
 ];
 
 describe('Photography page', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
-    Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 0 });
-    window.scrollTo = jest.fn();
+    Element.prototype.scrollIntoView = jest.fn();
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('renders an empty photo list without crashing', () => {
+  it('renders an empty photo list with the empty notice hidden only when there are photos', () => {
     render(<Photography photosData={[]} />);
 
-    expect(screen.queryByRole('img', { name: /photos\//i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open .* photograph/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/0 photos shown/)).toBeInTheDocument();
   });
 
   it('renders one image per photo with metadata', () => {
@@ -61,34 +29,42 @@ describe('Photography page', () => {
     expect(screen.getByAltText('digital photograph photo-1.jpg')).toBeInTheDocument();
     expect(screen.getByAltText('film photograph photo-2.jpg')).toBeInTheDocument();
     expect(screen.getByText('photo-1')).toBeInTheDocument();
-    expect(screen.getByText('photo-2')).toBeInTheDocument();
+    expect(screen.getByText('photos/film/photo-2.jpg')).toBeInTheDocument();
   });
 
   it('randomizes the photo order on page load', () => {
-    jest.spyOn(Math, 'random')
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(0);
+    jest.spyOn(Math, 'random').mockReturnValueOnce(0).mockReturnValueOnce(0);
 
     render(<Photography photosData={photosData as any} />);
 
-    const photoButtons = screen.getAllByRole('button', { name: /open full resolution photo/i });
-    expect(photoButtons.map((button) => button.getAttribute('aria-label'))).toEqual([
-      'Open full resolution photo photos/film/photo-2.jpg',
-      'Open full resolution photo photos/film/photo-3.jpg',
-      'Open full resolution photo photos/digital/photo-1.jpg',
+    expect(screen.getAllByRole('button', { name: /^open /i }).map((b) => b.getAttribute('aria-label'))).toEqual([
+      'Open film photograph photo-2.jpg',
+      'Open film photograph photo-3.jpg',
+      'Open digital photograph photo-1.jpg',
     ]);
   });
 
-  it('opens a full resolution photo modal from a photo click', () => {
+  it('filters by format with counts', () => {
     render(<Photography photosData={photosData as any} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /open full resolution photo photos\/digital\/photo-1\.jpg/i }));
-
-    expect(screen.getByRole('dialog', { name: /full resolution photo photos\/digital\/photo-1\.jpg/i })).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: /close full resolution photo/i }));
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole('button', { name: /^film/i })[0]);
+    expect(screen.getAllByRole('button', { name: /^open /i })).toHaveLength(2);
+    expect(screen.getAllByRole('button', { name: /^film/i })[0]).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getAllByRole('button', { name: /^digital/i })[0]).toHaveTextContent('01');
   });
 
+  it('opens the viewer, steps through photos and closes', () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.99);
+    render(<Photography photosData={photosData as any} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open digital photograph photo-1.jpg' }));
+    expect(screen.getByText(/1 \/ 3 — digital · photo-1/)).toBeInTheDocument();
+
+    // jsdom has no showModal, so the viewer stays in a closed <dialog>: query hidden elements
+    fireEvent.click(screen.getByRole('button', { name: 'Next photo', hidden: true }));
+    expect(screen.getByText(/2 \/ 3 — film · photo-2/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /close full resolution photo/i, hidden: true }));
+    expect(screen.queryByText(/\/ 3 —/)).not.toBeInTheDocument();
+  });
 });

@@ -10,6 +10,7 @@ const nextConfig = {
         // loader: 'akamai',
         // path: '',
         formats: ['image/avif', 'image/webp'],
+        qualities: [40, 65, 75],
         remotePatterns: [
             {
                 protocol: 'https',

@@ -1,260 +1,160 @@
-import { GetStaticProps, NextPage } from 'next';
-import Title from '../../components/title';
-import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
-import HorizontalDrawer from '../../components/horizontalDrawer'
-import RevealOnScroll from '../../components/reviewOnScroll';
+import type { GetStaticProps, NextPage } from 'next'
+import Head from 'next/head'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
+import { Icon } from '../../components/layout'
+import { fetchPhotos, PhotoData, shouldFailStaticBuild } from '../../lib/storage'
 
-export type PhotoData = {
-  id: string,
-  s3key: string,
-  type: string,
-  aspectRatio: string,
-  blurredBase64: string | null,
-  createdAt?: string | null,
-  url: string,
-}
+export type { PhotoData }
 
 type Props = {
   photosData: PhotoData[],
 }
 
-const randomizePhotosForPageLoad = (photos: PhotoData[]) => {
-  const randomizedPhotos = [...photos];
-
-  for (let i = randomizedPhotos.length - 1; i > 0; i -= 1) {
+const shuffle = (photos: PhotoData[]) => {
+  const out = [...photos];
+  for (let i = out.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
-    [randomizedPhotos[i], randomizedPhotos[j]] = [randomizedPhotos[j], randomizedPhotos[i]];
+    [out[i], out[j]] = [out[j], out[i]];
   }
-
-  return randomizedPhotos;
+  return out;
 };
 
-const photoAlt = (photo: PhotoData) => `${photo.type} photograph ${photo.s3key.split('/').pop()}`;
+const FILTERS = ['all', 'film', 'digital'] as const
+type Filter = typeof FILTERS[number]
 
-const Photography: NextPage<Props> = ({
-  photosData,
-}) => {
-  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
-  const [selectedPhoto, setSelectedPhoto] = useState<PhotoData | null>(null);
-  const [visiblePhotosData, setVisiblePhotosData] = useState(photosData);
-  const imageHeightsById = useMemo(() => {
-    return photosData.reduce<Record<string, number>>((acc, photo) => {
-      const hash = Array.from(photo.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-      acc[photo.id] = 300 + (hash % 200);
-      return acc;
-    }, {});
-  }, [photosData]);
+const photoName = (photo: PhotoData) => photo.s3key.split('/').pop() ?? photo.id
+const photoAlt = (photo: PhotoData) => `${photo.type} photograph ${photoName(photo)}`
+const pad = (n: number) => String(n).padStart(2, '0')
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+
+const Photography: NextPage<Props> = ({ photosData }) => {
+  const [photos, setPhotos] = useState(photosData)
+  const [filter, setFilter] = useState<Filter>('all')
+  const [open, setOpen] = useState<number | null>(null)
+  const [docked, setDocked] = useState(false)
+  const headRef = useRef<HTMLElement>(null)
+  const listRef = useRef<HTMLOListElement>(null)
+  const emptyRef = useRef<HTMLParagraphElement>(null)
+  const lbRef = useRef<HTMLDialogElement>(null)
+  const opener = useRef<HTMLElement | null>(null)
+  const swipeX = useRef<number | null>(null)
+  const jump = useRef(false)
+
+  const shown = filter === 'all' ? photos : photos.filter(p => p.type === filter)
+  const count = (f: Filter) => (f === 'all' ? photos.length : photos.filter(p => p.type === f).length)
+
+  useEffect(() => { setPhotos(shuffle(photosData)) }, [photosData])
+
+  // re-index the section pager after every list change, and jump to the first frame after a filter click
+  useEffect(() => {
+    dispatchEvent(new Event('panelschange'))
+    if (!jump.current) return
+    jump.current = false;
+    (listRef.current?.querySelector('.photo') ?? emptyRef.current)?.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' })
+  }, [shown.length, filter, photos])
+
+  // docked copy of the filters, shown once the title screen leaves view
+  useEffect(() => {
+    const io = new IntersectionObserver(([en]) => setDocked(!en.isIntersecting), { threshold: .15 })
+    if (headRef.current) io.observe(headRef.current)
+    return () => io.disconnect()
+  }, [])
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolledToTop(window.scrollY === 0);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const lb = lbRef.current
+    if (!lb) return
+    if (open !== null && !lb.open) lb.showModal?.()
+    if (open === null && lb.open) lb.close()
+  }, [open])
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+  const pick = (f: Filter) => { jump.current = true; setFilter(f) }
+  const go = (i: number) => setOpen((i + shown.length) % shown.length)
+  const cur = open !== null ? shown[open] : null
 
-  }, []);
-
-  useEffect(() => {
-    setVisiblePhotosData(randomizePhotosForPageLoad(photosData));
-  }, [photosData]);
-
-  useEffect(() => {
-    if (!selectedPhoto) return undefined;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSelectedPhoto(null);
-      }
-    };
-    const previousOverflow = document.body.style.overflow;
-
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [selectedPhoto]);
-
-  const scrollUp = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
+  const chips = FILTERS.map(f => (
+    <button key={f} className="chip" type="button" aria-pressed={filter === f} onClick={() => pick(f)}>
+      {f[0].toUpperCase() + f.slice(1)} <span className="count">{pad(count(f))}</span>
+    </button>
+  ))
 
   return (
-    <div>
-      <Title />
-      <HorizontalDrawer />
-      <div className='noise-bg flex flex-col px-8 py-5 pt-12 sm:px-10 lg:px-24 lg:py-14 lg:pt-8 xl:px-32'>
-        <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-3 bg-black text-white z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
-          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-          </svg>
-        </button>
-        <div>
-          {
-            visiblePhotosData && visiblePhotosData.length > 0 && visiblePhotosData.map((p, i) => {
-              const isOdd = i % 2
-              const wh = imageHeightsById[p.id] ?? 400
-              const isInitialViewport = i < 2;
-              const photoPaddingClass = i === 0 ? 'pt-8 pb-24 lg:pt-10 lg:pb-32' : 'py-24 lg:py-32';
-              const photoContent = (
-                <div className={`gap-5 ${photoPaddingClass} flex flex-col items-end lg:justify-start ${isOdd ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-                  <button
-                    type="button"
-                    aria-label={`Open full resolution photo ${p.s3key}`}
-                    onClick={() => setSelectedPhoto(p)}
-                    className='cursor-zoom-in bg-transparent p-0 text-left'
-                  >
-                    <Image
-                      quality={65}
-                      src={p.url}
-                      alt={photoAlt(p)}
-                      width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
-                      height={wh}
-                      placeholder={p.blurredBase64 ? 'blur' : 'empty'}
-                      blurDataURL={p.blurredBase64 ? p.blurredBase64 : undefined}
-                      priority={isInitialViewport}
-                      sizes='(min-width: 1024px) 50vw, 100vw'
-                      className='object-cover hover:scale-105 transform ease-in duration-100 bg-gray-100'
-                    />
-                  </button>
-                  <div className={`flex flex-col text-right ${isOdd ? 'lg:text-right' : 'lg:text-left'} overflow-clip`}  >
-                    <div className='pb-2 font-display text-heading-3 uppercase tracking-display'>{p.type}</div>
-                    <div className='font-mono text-label text-gray-400'>{p.id}</div>
-                    <div className='font-mono text-label text-gray-400'>{p.s3key}</div>
-                    <div className='font-body text-label text-gray-400'>{p.createdAt}</div>
-                  </div>
-                </div>
-              );
-
-              return isInitialViewport ? (
-                <div key={p.id}>{photoContent}</div>
-              ) : (
-                <RevealOnScroll key={p.id}>{photoContent}</RevealOnScroll>
-              );
-            })
-          }
-        </div>
-      </div>
-      {selectedPhoto && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Full resolution photo ${selectedPhoto.s3key}`}
-          className='fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 lg:p-8'
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <div
-            className='relative'
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              aria-label="Close full resolution photo"
-              className='absolute bottom-0 left-full z-[101] bg-white px-3 py-2 font-mono text-label uppercase tracking-nav text-black'
-              onClick={() => setSelectedPhoto(null)}
-            >
-              X
-            </button>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={selectedPhoto.url}
-              alt={photoAlt(selectedPhoto)}
-              className='block max-h-[90vh] max-w-[90vw]'
-            />
+    <main id="main">
+      <Head><title>Photography — HKLai</title></Head>
+      <header className="page-head noise-bg" ref={headRef}>
+        <div className="inner">
+          <div>
+            <p className="label" style={{ marginBottom: 16 }}>Roll / shuffled each visit</p>
+            <h1>Photography</h1>
+            <div className="filters" role="group" aria-label="Filter photos by format" style={{ marginTop: 28 }}>{chips}</div>
           </div>
+          <span className="idx dot-num" aria-hidden="true">03</span>
         </div>
-      )}
-    </div>
-  );
+      </header>
+      <section className="wrap noise-bg" aria-label="Photos">
+        <div className="inner">
+          <p className="sr-only" role="status">{shown.length} photo{shown.length === 1 ? '' : 's'} shown.</p>
+          <ol className="photos" ref={listRef}>
+            {shown.map((p, i) => {
+              const ratio = parseFloat(p.aspectRatio) || 1
+              const h = ratio < 1 ? 560 : 420
+              return (
+                <li key={p.id} className="photo reveal in" data-pager={`Frame ${pad(i + 1)}`}>
+                  <button className="ph" type="button" aria-label={`Open ${photoAlt(p)}`} style={{ ['--h' as string]: `${h}px` }}
+                    onClick={e => { opener.current = e.currentTarget; setOpen(i) }}>
+                    <Image src={p.url} alt={photoAlt(p)} width={Math.round(h * ratio)} height={h} quality={65} priority={i < 2}
+                      sizes="(min-width: 1024px) 60vw, 100vw" placeholder={p.blurredBase64 ? 'blur' : 'empty'} blurDataURL={p.blurredBase64 ?? undefined} />
+                  </button>
+                  <div className="pmeta">
+                    <span className="frame dot-num">{pad(i + 1)}<span style={{ color: 'var(--num-dim)' }}>/{pad(shown.length)}</span></span>
+                    <h2>{p.type}</h2>
+                    <span className="label">{p.id}</span>
+                    <span className="part">{p.s3key}</span>
+                  </div>
+                </li>
+              )
+            })}
+          </ol>
+          <p className="empty" ref={emptyRef} hidden={shown.length > 0}>No photos match this filter. Choose <strong>All</strong> to see every format.</p>
+        </div>
+      </section>
+      <button className="to-top" type="button" aria-label="Scroll to top"><Icon name="up" /></button>
+
+      <div className={`filter-dock hw ${docked ? 'show' : ''}`} role="group" aria-label="Filter photos by format (docked)" {...(docked ? {} : { inert: '' })}>{chips}</div>
+
+      <dialog className="lightbox" ref={lbRef} aria-label={cur ? `Full resolution photo ${cur.s3key}` : 'Photo viewer'}
+        onClose={() => { setOpen(null); opener.current?.focus() }}
+        onClick={e => { if (e.target === e.currentTarget) setOpen(null) }}
+        onKeyDown={e => { if (open === null) return; if (e.key === 'ArrowLeft') go(open - 1); if (e.key === 'ArrowRight') go(open + 1) }}>
+        {cur && open !== null && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="lb-img" src={cur.url} alt={photoAlt(cur)}
+              onPointerDown={e => { swipeX.current = e.clientX }}
+              onPointerUp={e => { // swipe left/right on touch screens
+                if (swipeX.current === null) return
+                const dx = e.clientX - swipeX.current; swipeX.current = null
+                if (Math.abs(dx) > 50) go(open + (dx < 0 ? 1 : -1))
+              }} />
+            <div className="lb-bar">
+              <span className="label">{open + 1} / {shown.length} — {cur.type} · {cur.id}</span>
+              <div className="lb-btns">
+                <button type="button" aria-label="Previous photo" onClick={() => go(open - 1)}><Icon name="left" /></button>
+                <button type="button" aria-label="Next photo" onClick={() => go(open + 1)}><Icon name="right" /></button>
+                <button type="button" aria-label="Close full resolution photo" onClick={() => setOpen(null)}><Icon name="x" /></button>
+              </div>
+            </div>
+            <div className="lb-glyph" aria-hidden="true">{shown.map((_, j) => <i key={j} className={j < open ? 'on' : j === open ? 'red' : ''}></i>)}</div>
+          </>
+        )}
+      </dialog>
+    </main>
+  )
 }
 
-const defaultStorageBaseUrl = 'https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com';
-
-const shouldFailStaticBuild = () => (
-  process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
-);
-
-const getStorageBaseUrl = () => {
-  if (!process.env.STORAGE_BASE_URL && shouldFailStaticBuild()) {
-    throw new Error('STORAGE_BASE_URL is required to build /photography');
-  }
-  return process.env.STORAGE_BASE_URL || defaultStorageBaseUrl;
-};
-
-const publicStorageUrl = (key: string) => {
-  const storageBaseUrl = getStorageBaseUrl();
-  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
-  return `${storageBaseUrl.replace(/\/$/, '')}/${encodedKey}`;
-};
-
-const maxInlineBlurDataUrlLength = 2048;
-
-const normalizeBlurDataUrl = (blurredBase64: string | null) => {
-  if (!blurredBase64 || blurredBase64.length > maxInlineBlurDataUrlLength) {
-    return null;
-  }
-  return blurredBase64;
-};
-
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  if (!process.env.APPSYNC_URL || !process.env.APPSYNC_API_KEY) {
-    if (shouldFailStaticBuild()) {
-      throw new Error('APPSYNC_URL and APPSYNC_API_KEY are required to build /photography');
-    }
-    return { props: { photosData: [] }, revalidate: 60 };
-  }
-
   try {
-    const query = /* GraphQL */ `
-      query ListPhotos($nextToken: String) {
-        listPhotos(nextToken: $nextToken) {
-          items {
-            id
-            s3key
-            type
-            aspectRatio
-            blurredBase64
-            createdAt
-          }
-          nextToken
-        }
-      }
-    `;
-    const photos: Omit<PhotoData, 'url'>[] = [];
-    let nextToken: string | null = null;
-    do {
-      const res = await fetch(process.env.APPSYNC_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.APPSYNC_API_KEY,
-        },
-        body: JSON.stringify({ query, variables: { nextToken } }),
-      });
-      const json = await res.json();
-      if (res.ok === false || json.errors) {
-        throw new Error(JSON.stringify(json.errors ?? { status: res.status }));
-      }
-      photos.push(...(json.data?.listPhotos?.items ?? []));
-      nextToken = json.data?.listPhotos?.nextToken ?? null;
-    } while (nextToken);
-    const photosData = photos.map((photo) => ({
-      ...photo,
-      id: photo.id || photo.s3key,
-      blurredBase64: normalizeBlurDataUrl(photo.blurredBase64),
-      url: publicStorageUrl(photo.s3key),
-    }));
-
-    return { props: { photosData }, revalidate: 60 };
+    return { props: { photosData: await fetchPhotos('/photography') }, revalidate: 60 };
   } catch (error) {
     if (shouldFailStaticBuild()) {
       throw error;

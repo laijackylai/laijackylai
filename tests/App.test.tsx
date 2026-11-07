@@ -1,80 +1,53 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
-import App from '../pages'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import Home, { getStaticProps } from '../pages'
 
-jest.mock('next/router', () => require('next-router-mock'));
+describe('Home page', () => {
+  it('renders the hero, current role and every job', () => {
+    render(<Home photoPool={[]} />)
 
-describe('App', () => {
-  beforeEach(() => {
-    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
-    Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 });
-    Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 0 });
-    Object.defineProperty(window, 'pageYOffset', { writable: true, configurable: true, value: 0 });
-    window.requestAnimationFrame = (callback: FrameRequestCallback) => {
-      callback(0);
-      return 0;
-    };
-    window.cancelAnimationFrame = jest.fn();
-    window.scrollTo = jest.fn();
-  });
-
-  it('renders the current drawer links and journey items', () => {
-    render(<App />)
-    const nav = within(screen.getByTestId('desktop-nav'))
-
-    expect(nav.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
-    expect(nav.getByRole('link', { name: /photography/i })).toHaveAttribute('href', '/photography');
-    expect(nav.getByRole('link', { name: /music/i })).toHaveAttribute('href', '/music');
-    expect(nav.getByRole('link', { name: /gis/i })).toHaveAttribute('href', '/gis');
-    expect(screen.getByRole('link', { name: /linkedin_logo/i })).toHaveAttribute('href', 'https://linkedin.com/in/laijackylai');
-    expect(screen.getByRole('link', { name: /github_logo/i })).toHaveAttribute('href', 'https://github.com/laijackylai');
-    expect(screen.getByRole('link', { name: /instagram_logo/i })).toHaveAttribute('href', 'https://www.instagram.com/laijackylai/');
-    expect(screen.getByRole('link', { name: /contact/i })).toHaveAttribute('href', 'mailto:laijackylai@gmail.com');
-
-    expect(screen.getByText('DATA GEN ENGINEER @ GIESECKE+DEVRIENT')).toBeInTheDocument();
-    expect(screen.getByText('SOFTWARE ENGINEER @ VOTANIC LIMITED')).toBeInTheDocument();
-    expect(screen.getByText('CO-FOUNDER @ VIVABLEE LIMITED')).toBeInTheDocument();
-    expect(screen.getByText('CO-OP @ HONG KONG OBSERVATORY')).toBeInTheDocument();
-    expect(screen.getByText('PART-TIME RESEARCH ANALYST @ CENTALINE PROPERTY AGENCY')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Full Stack EngineerData & AI')
+    expect(screen.getByText(/currently at eBay/)).toBeInTheDocument()
+    for (const at of ['eBay', 'Giesecke+Devrient', 'Votanic Limited', 'Vivablee Limited', 'Hong Kong Observatory', 'Centaline Property']) {
+      expect(screen.getByText(`@ ${at}`)).toBeInTheDocument()
+    }
+    expect(screen.getByText('Current')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /linkedin/i })).toHaveAttribute('href', 'https://linkedin.com/in/laijackylai')
+    expect(screen.getByRole('link', { name: /github/i })).toHaveAttribute('href', 'https://github.com/laijackylai')
+    expect(screen.getByRole('link', { name: /instagram/i })).toHaveAttribute('href', 'https://www.instagram.com/laijackylai/')
   })
 
-  it('scroll arrows move down from the hero and back to top after scrolling', () => {
-    render(<App />)
+  it('flashes the old eBay logo on hover', () => {
+    jest.useFakeTimers()
+    jest.spyOn(window, 'matchMedia').mockReturnValue({ matches: false } as MediaQueryList)
+    render(<Home photoPool={[]} />)
+    const ebay = screen.getByAltText('eBay').closest('a') as HTMLElement
 
-    const downArrow = document.querySelector('button svg path[d="M19.5 8.25l-7.5 7.5-7.5-7.5"]')?.closest('button');
-    expect(downArrow).toBeInTheDocument();
-    fireEvent.click(downArrow as HTMLButtonElement);
-    expect(window.scrollTo).toHaveBeenCalledWith({ top: 300, behavior: 'smooth' });
-
-    Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 10 });
-    fireEvent.scroll(window);
-
-    const upArrow = document.querySelector('button svg path[d="M4.5 15.75l7.5-7.5 7.5 7.5"]')?.closest('button');
-    expect(upArrow).toBeInTheDocument();
-    fireEvent.click(upArrow as HTMLButtonElement);
-    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+    fireEvent.pointerEnter(ebay)
+    expect(screen.getByAltText('eBay')).toHaveStyle({ visibility: 'hidden' })
+    act(() => { jest.advanceTimersByTime(200) })
+    expect(screen.getByAltText('eBay')).not.toHaveStyle({ visibility: 'hidden' })
+    jest.useRealTimers()
+    jest.restoreAllMocks()
   })
 
-  it('deduplicates scroll updates while a frame is pending', () => {
-    const frameCallbacks: FrameRequestCallback[] = [];
-    window.requestAnimationFrame = jest.fn((callback: FrameRequestCallback) => {
-      frameCallbacks.push(callback);
-      return frameCallbacks.length;
-    });
+  it('gives each page tile its own hover picture pool', () => {
+    jest.useFakeTimers()
+    render(<Home photoPool={['https://example.com/a.jpg', 'https://example.com/b.jpg']} />)
+    const tile = (name: string) => screen.getByRole('link', { name: new RegExp(`^\\d+ JL-\\d+ ${name}`, 'i') })
+    const preview = (name: string) => tile(name).querySelector('img.preview')
 
-    render(<App />);
+    expect(preview('Music')).toBeNull()
+    expect(preview('GIS')?.getAttribute('src')).toContain('gis')
+    const before = preview('Photography')?.getAttribute('src')
+    expect(before).toContain('example.com')
+    fireEvent.pointerLeave(tile('Photography'))
+    act(() => { jest.advanceTimersByTime(400) })
+    expect(preview('Photography')?.getAttribute('src')).not.toBe(before)
+    jest.useRealTimers()
+  })
 
-    Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 10 });
-    fireEvent.scroll(window);
-    fireEvent.scroll(window);
-
-    expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
-
-    act(() => {
-      frameCallbacks[0](0);
-    });
-
-    Object.defineProperty(window, 'scrollY', { writable: true, configurable: true, value: 20 });
-    fireEvent.scroll(window);
-    expect(window.requestAnimationFrame).toHaveBeenCalledTimes(2);
+  it('builds without the photo API', async () => {
+    delete process.env.APPSYNC_URL
+    await expect(getStaticProps({} as any)).resolves.toEqual({ props: { photoPool: [] }, revalidate: 3600 })
   })
 })
