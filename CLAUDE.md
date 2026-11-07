@@ -51,7 +51,7 @@ All pages share the v4 "hardware" design (styles/globals.css, plain CSS, no Tail
 - `components/layout.tsx` — nav, mobile sheet, footer, keys dialog, icon sprite; runs `initSite` after every route render
 - `lib/site.js` — imperative behaviours: theme switch (headlight view transition, beams pre-baked to PNG), nav indicator, dot-grid canvas behind `.noise-bg` (sleeps when idle), reveal, clocks, section pager, keyboard shortcuts, title glitch
 - `lib/storage.ts` — `publicStorageUrl`, `fetchPhotos`, `shouldFailStaticBuild`
-- Title glitch fonts: only Zerbydoo (commercial OK) ships in `public/fonts`; other faces in `FLICKS` are personal-use demos and are skipped until licensed and given an `@font-face`
+- Title glitch fonts in `public/fonts`: Zerbydoo is commercial OK; Cyber Blast, RaXOR, Street Wolfker, Riot Funky are personal-use demos (licence txt alongside). Site must stay non-commercial or buy licences
 
 ### Testing
 

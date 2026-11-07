@@ -1,7 +1,11 @@
 /* HKLai v4 — Michroma / IBM Plex Sans / OCR-A / Doto (next/font, see pages/_app.tsx), dot grid, hairlines,
    mono micro-labels, industrial hardware cues (dot-matrix numerals, signal red, screw-corner modules). */
-/* Title glitch faces: only Zerbydoo (Typodermic, commercial OK, see public/fonts/zerbydoo-EULA.pdf) ships.
-   The other faces in lib/site.ts FLICKS are personal-use demos: add an @font-face here once licensed; missing faces are skipped. */
+/* Title glitch faces. Zerbydoo is commercial OK (public/fonts/zerbydoo-EULA.pdf); the others are personal-use
+   demos (public/fonts/*-LICENSE.txt), fine for this non-commercial site only. Missing faces are skipped. */
+@font-face { font-family: "Cyber Blast"; src: url("/fonts/cyber-blast.otf") format("opentype"); font-display: block; }
+@font-face { font-family: "RaXOR"; src: url("/fonts/raxor.otf") format("opentype"); font-display: block; }
+@font-face { font-family: "Street Wolfker"; src: url("/fonts/street-wolfker.ttf") format("truetype"); font-display: block; }
+@font-face { font-family: "Riot Funky"; src: url("/fonts/riot-funky.ttf") format("truetype"); font-display: block; }
 @font-face { font-family: "Zerbydoo Screen"; src: url("/fonts/zerbydoo-screen.otf") format("opentype"); font-display: block; }
 :root {
   --font-display: var(--nf-display, "Michroma"), "Arial Black", sans-serif;
