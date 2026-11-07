@@ -30,6 +30,8 @@ const randomizePhotosForPageLoad = (photos: PhotoData[]) => {
   return randomizedPhotos;
 };
 
+const photoAlt = (photo: PhotoData) => `${photo.type} photograph ${photo.s3key.split('/').pop()}`;
+
 const Photography: NextPage<Props> = ({
   photosData,
 }) => {
@@ -90,7 +92,7 @@ const Photography: NextPage<Props> = ({
     <div>
       <Title />
       <HorizontalDrawer />
-      <div className='flex flex-col px-8 py-5 pt-12 sm:px-10 lg:px-24 lg:py-14 lg:pt-8 xl:px-32'>
+      <div className='noise-bg flex flex-col px-8 py-5 pt-12 sm:px-10 lg:px-24 lg:py-14 lg:pt-8 xl:px-32'>
         <button type="button" aria-label="Scroll to top" onClick={scrollUp} className='fixed bottom-5 right-5 lg:bottom-10 lg:right-10 p-3 bg-black text-white z-100' style={{ display: isScrolledToTop ? 'none' : 'block' }}>
           <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
@@ -114,7 +116,7 @@ const Photography: NextPage<Props> = ({
                     <Image
                       quality={65}
                       src={p.url}
-                      alt={p.s3key}
+                      alt={photoAlt(p)}
                       width={wh * parseFloat(p.aspectRatio ? p.aspectRatio : '1')}
                       height={wh}
                       placeholder={p.blurredBase64 ? 'blur' : 'empty'}
@@ -165,7 +167,7 @@ const Photography: NextPage<Props> = ({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={selectedPhoto.url}
-              alt={selectedPhoto.s3key}
+              alt={photoAlt(selectedPhoto)}
               className='block max-h-[90vh] max-w-[90vw]'
             />
           </div>
@@ -175,7 +177,7 @@ const Photography: NextPage<Props> = ({
   );
 }
 
-const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
+const defaultStorageBaseUrl = 'https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com';
 
 const shouldFailStaticBuild = () => (
   process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
@@ -213,8 +215,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   try {
     const query = /* GraphQL */ `
-      query ListPhotos {
-        listPhotos {
+      query ListPhotos($nextToken: String) {
+        listPhotos(nextToken: $nextToken) {
           items {
             id
             s3key
@@ -223,22 +225,28 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
             blurredBase64
             createdAt
           }
+          nextToken
         }
       }
     `;
-    const res = await fetch(process.env.APPSYNC_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.APPSYNC_API_KEY,
-      },
-      body: JSON.stringify({ query }),
-    });
-    const json = await res.json();
-    if (res.ok === false || json.errors) {
-      throw new Error(JSON.stringify(json.errors ?? { status: res.status }));
-    }
-    const photos = (json.data?.listPhotos?.items ?? []) as Omit<PhotoData, 'url'>[];
+    const photos: Omit<PhotoData, 'url'>[] = [];
+    let nextToken: string | null = null;
+    do {
+      const res = await fetch(process.env.APPSYNC_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.APPSYNC_API_KEY,
+        },
+        body: JSON.stringify({ query, variables: { nextToken } }),
+      });
+      const json = await res.json();
+      if (res.ok === false || json.errors) {
+        throw new Error(JSON.stringify(json.errors ?? { status: res.status }));
+      }
+      photos.push(...(json.data?.listPhotos?.items ?? []));
+      nextToken = json.data?.listPhotos?.nextToken ?? null;
+    } while (nextToken);
     const photosData = photos.map((photo) => ({
       ...photo,
       id: photo.id || photo.s3key,

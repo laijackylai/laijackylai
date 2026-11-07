@@ -59,7 +59,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
   }
 
   const sectionClass = 'relative h-screen snap-start snap-always flex flex-col items-center justify-center px-6 lg:px-20';
-  const lightSectionClass = `${sectionClass} gap-y-5`;
+  const lightSectionClass = `${sectionClass} noise-bg gap-y-5`;
   const darkSectionClass = `${sectionClass} bg-gray-900 text-white gap-y-5`;
   const projectTitleClass = 'font-display text-heading-2 uppercase tracking-display mb-3 lg:mb-5';
   const projectImageClass = 'bg-gray-100 w-full max-h-[46vh] lg:max-h-[52vh] object-contain';
@@ -162,7 +162,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                       className='bg-gray-100 h-[50vh] w-auto max-w-none object-contain'
                       quality={75}
                       src={url}
-                      alt={url}
+                      alt={`Takcarly app screenshot ${i + 1}`}
                       width={500}
                       height={500}
                       placeholder={base64[i] ? 'blur' : 'empty'}
@@ -186,29 +186,23 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                 <div>Data Processing:</div>
                 <div className='flex flex-row items-center gap-3'>
                   <div className=' text-sm'>• 3D Terrain (hkdsm)</div>
-                  <a>
-                    <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
-                  </a>
+                  <Image src={pythonLogo} alt='Python' height={15} width={15} />
                   <a href={hkdsmURL} target="_blank" rel="noopener noreferrer">
-                    <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
+                    <Image src={githubLogo} alt='GitHub repository' height={15} width={15} />
                   </a>
                 </div>
                 <div className='flex flex-row items-center gap-3'>
                   <div className=' text-sm'>• Tidal Data (hktides)</div>
-                  <a>
-                    <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
-                  </a>
+                  <Image src={pythonLogo} alt='Python' height={15} width={15} />
                   <a href={hktidesURL} target="_blank" rel="noopener noreferrer">
-                    <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
+                    <Image src={githubLogo} alt='GitHub repository' height={15} width={15} />
                   </a>
                 </div>
                 <div className='flex flex-row items-center gap-3'>
                   <div className=' text-sm'>• Radar Data (hkradar)</div>
-                  <a>
-                    <Image src={pythonLogo} alt={'pythonLogo'} height={15} width={15} />
-                  </a>
+                  <Image src={pythonLogo} alt='Python' height={15} width={15} />
                   <a href={hkradarURL} target="_blank" rel="noopener noreferrer">
-                    <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
+                    <Image src={githubLogo} alt='GitHub repository' height={15} width={15} />
                   </a>
                 </div>
               </div>
@@ -216,11 +210,9 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
                 <div>Frontend:</div>
                 <div className='flex flex-row items-center gap-3'>
                   <div className=' text-sm'>• React.js (hkterrain)</div>
-                  <a>
-                    <Image src={reactLogo} alt={'reactLogo'} height={15} width={15} />
-                  </a>
+                  <Image src={reactLogo} alt='React' height={15} width={15} />
                   <a href={hkterrainURL} target="_blank" rel="noopener noreferrer">
-                    <Image src={githubLogo} alt={'githubLogo'} height={15} width={15} />
+                    <Image src={githubLogo} alt='GitHub repository' height={15} width={15} />
                   </a>
                 </div>
               </div>
@@ -241,7 +233,7 @@ const Projects: NextPage<Props> = ({ imageUrls, base64 }) => {
 
 export default Projects
 
-const defaultStorageBaseUrl = 'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com';
+const defaultStorageBaseUrl = 'https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com';
 
 const shouldFailStaticBuild = () => (
   process.env.NODE_ENV === 'production' && process.env.GITHUB_ACTIONS !== 'true'
@@ -273,9 +265,11 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     const photoBase64 = await Promise.all(
       urls.map(async (url: string) => {
         try {
-          const buffer = await fetch(url).then(async (res) =>
-            Buffer.from(await res.arrayBuffer())
-          );
+          const res = await fetch(url);
+          if (!res.ok) {
+            throw new Error(`Failed to fetch ${url}: ${res.status}`);
+          }
+          const buffer = Buffer.from(await res.arrayBuffer());
           const { base64 } = await getPlaiceholder(buffer);
           return base64
         } catch (error) {
@@ -292,6 +286,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         imageUrls: urls,
         base64: photoBase64
       },
+      revalidate: 3600,
     };
   } catch (error) {
     if (shouldFailStaticBuild()) {
@@ -302,6 +297,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         imageUrls: urls,
         base64: urls.map(() => null)
       },
+      revalidate: 3600,
     };
   }
 };

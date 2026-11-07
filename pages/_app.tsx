@@ -2,8 +2,9 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
 import ocra, { eurostile, ibmPlexSans } from '../components/font'
+import InteractiveNoise from '../components/interactiveNoise'
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps, router }: AppProps) {
     const fontVariables = `${ocra.variable} ${ibmPlexSans.variable} ${eurostile.variable} font-body`
 
     return (
@@ -15,6 +16,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "hkl116cujk");`}
             </Script>
+            <InteractiveNoise routeKey={router?.asPath} />
             <div className={fontVariables}>
                 <Component {...pageProps} />
             </div>

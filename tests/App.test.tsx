@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import App from '../pages'
 
 jest.mock('next/router', () => require('next-router-mock'));
@@ -19,11 +19,12 @@ describe('App', () => {
 
   it('renders the current drawer links and journey items', () => {
     render(<App />)
+    const nav = within(screen.getByTestId('desktop-nav'))
 
-    expect(screen.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
-    expect(screen.getByRole('link', { name: /photography/i })).toHaveAttribute('href', '/photography');
-    expect(screen.getByRole('link', { name: /music/i })).toHaveAttribute('href', '/music');
-    expect(screen.getByRole('link', { name: /gis/i })).toHaveAttribute('href', '/gis');
+    expect(nav.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
+    expect(nav.getByRole('link', { name: /photography/i })).toHaveAttribute('href', '/photography');
+    expect(nav.getByRole('link', { name: /music/i })).toHaveAttribute('href', '/music');
+    expect(nav.getByRole('link', { name: /gis/i })).toHaveAttribute('href', '/gis');
     expect(screen.getByRole('link', { name: /linkedin_logo/i })).toHaveAttribute('href', 'https://linkedin.com/in/laijackylai');
     expect(screen.getByRole('link', { name: /github_logo/i })).toHaveAttribute('href', 'https://github.com/laijackylai');
     expect(screen.getByRole('link', { name: /instagram_logo/i })).toHaveAttribute('href', 'https://www.instagram.com/laijackylai/');

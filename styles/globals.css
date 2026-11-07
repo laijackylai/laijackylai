@@ -31,3 +31,38 @@
 .cover-underline {
     @apply flex flex-col w-fit link-underline text-black gap-1
 }
+
+.noise-bg {
+    position: relative;
+    isolation: isolate;
+}
+
+.noise-bg > * {
+    z-index: 2;
+}
+
+.noise-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.14;
+    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.45) 0 0.55px, transparent 0.75px);
+    background-repeat: repeat;
+    background-size: 18px 18px;
+    mix-blend-mode: multiply;
+}
+
+.noise-bg--interactive::before {
+    opacity: 0;
+}
+
+.interactive-noise-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 1;
+    mix-blend-mode: multiply;
+}

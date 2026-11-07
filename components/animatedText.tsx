@@ -5,7 +5,7 @@ type Props = {
 const AnimatedText: React.FC<Props> = ({ text }) => {
   return (
     <div className="">
-      {text.match(/./gu)!.map((char, index) => (
+      {Array.from(text).map((char, index) => (
         <div
           className="animate-text-reveal inline-block [animation-fill-mode:backwards]"
           key={`${char}-${index}`}

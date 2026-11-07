@@ -63,4 +63,21 @@ describe('Photography getStaticProps', () => {
       revalidate: 60,
     });
   });
+
+  it('follows nextToken until every page of photos is loaded', async () => {
+    const page = (id: string, nextToken: string | null) => ({
+      json: jest.fn().mockResolvedValue({
+        data: { listPhotos: { items: [{ id, s3key: `public/${id}.jpg`, type: 'film', aspectRatio: '1.000', blurredBase64: null }], nextToken } },
+      }),
+    });
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(page('a', 'token-2'))
+      .mockResolvedValueOnce(page('b', null)) as any;
+
+    const result: any = await getStaticProps({} as any);
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(JSON.parse((global.fetch as jest.Mock).mock.calls[1][1].body).variables).toEqual({ nextToken: 'token-2' });
+    expect(result.props.photosData.map((p: any) => p.id)).toEqual(['a', 'b']);
+  });
 });

@@ -1,4 +1,4 @@
-import { GetServerSideProps, NextPage } from 'next';
+import { NextPage } from 'next';
 import Title from '../../components/title';
 import HorizontalDrawer from '../../components/horizontalDrawer';
 
@@ -11,21 +11,13 @@ const Music: NextPage<Props> = () => {
     <div>
       <Title />
       <HorizontalDrawer />
-      <div className='flex flex-col p-6 pt-32 lg:py-24 lg:px-16'>
+      <div className='noise-bg flex flex-col p-6 pt-32 lg:py-24 lg:px-16'>
         <div className='flex pt-32'>
-          <div className='font-display text-heading-1 uppercase tracking-display'>Music</div>
+          <h1 className='font-display text-heading-1 uppercase tracking-display'>Music</h1>
         </div>
       </div>
     </div>
   );
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    props: {
-
-    }
-  }
 }
 
 export default Music

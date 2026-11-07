@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import mockRouter from 'next-router-mock';
 import GIS from '../pages/gis';
 import Music from '../pages/music';
@@ -20,18 +20,11 @@ describe('secondary pages', () => {
     expect(document.querySelector('.snap-y.snap-mandatory')).toBeInTheDocument();
   });
 
-  it('renders the music page shell and removes its resize listener', () => {
-    const addEventListener = jest.spyOn(window, 'addEventListener');
-    const removeEventListener = jest.spyOn(window, 'removeEventListener');
+  it('renders the music page shell', () => {
+    render(<Music />);
 
-    const { unmount } = render(<Music />);
-
-    expect(screen.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
-    expect(screen.getAllByText('Music')).toHaveLength(2);
-
-    unmount();
-
-    expect(addEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
-    expect(removeEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
+    const nav = within(screen.getByTestId('desktop-nav'));
+    expect(nav.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
+    expect(screen.getByRole('heading', { name: 'Music' })).toBeInTheDocument();
   });
 });

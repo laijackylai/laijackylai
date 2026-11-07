@@ -68,3 +68,14 @@ amplify-gen1/mock-data
 amplify-gen1/mock-api-resources
 amplify-gen1/backend/amplify-meta.json
 amplify-gen1/backend/.temp
+
+# Claude Code local state
+.claude/scheduled_tasks.lock
+
+# Local Gen 1 leftovers / generated Amplify UI artifacts (not used by the app)
+/amplify-gen2/
+/amplify-backup-old/
+/src/models/
+/src/ui-components/
+/src/aws-exports.*
+/src/amplifyconfiguration.json

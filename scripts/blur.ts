@@ -21,6 +21,8 @@ type ExistingPhoto = {
 
 const folder = process.env.BLUR_IMAGE_DIR ?? './assets/images';
 const region = process.env.AWS_REGION ?? 'ap-southeast-1';
+// Keep the data URL under the photography page's 2048-char inline limit.
+const blurWidth = 16;
 
 type GraphqlClient = (query: string, variables: Record<string, unknown>) => Promise<any>;
 
@@ -95,8 +97,8 @@ export const createSignedGraphqlClient = (appSyncUrl = process.env.APPSYNC_URL) 
 };
 
 export const listByS3KeyQuery = /* GraphQL */ `
-  query ListPhotosByS3Key($s3key: String!) {
-    listPhotos(filter: { s3key: { eq: $s3key } }, limit: 1) {
+  query ListPhotosByS3Key($s3key: String!, $nextToken: String) {
+    listPhotos(filter: { s3key: { eq: $s3key } }, nextToken: $nextToken) {
       items {
         id
         s3key
@@ -104,9 +106,22 @@ export const listByS3KeyQuery = /* GraphQL */ `
         aspectRatio
         blurredBase64
       }
+      nextToken
     }
   }
 `;
+
+// DynamoDB applies `limit` before `filter`, so a match can sit on any page: follow nextToken.
+export const findPhotoByS3Key = async (readGql: GraphqlClient, s3key: string) => {
+  let nextToken: string | null | undefined = null;
+  do {
+    const data = await readGql(listByS3KeyQuery, { s3key, nextToken });
+    const existing = data.listPhotos?.items?.[0] as ExistingPhoto | undefined;
+    if (existing) return existing;
+    nextToken = data.listPhotos?.nextToken;
+  } while (nextToken);
+  return undefined;
+};
 
 const createPhotoMutation = /* GraphQL */ `
   mutation CreatePhoto($input: CreatePhotoInput!) {
@@ -124,13 +139,20 @@ const updatePhotoMutation = /* GraphQL */ `
   }
 `;
 
+export const makeBlurDataUrl = async (input: string | Buffer, aspectRatio: string) => {
+  const buffer = await sharp(input)
+    .resize({ width: blurWidth, height: Math.max(1, Math.round(blurWidth / parseFloat(aspectRatio))) })
+    .png()
+    .toBuffer();
+  return `data:image/png;base64,${buffer.toString('base64')}`;
+};
+
 const upsertPhoto = async (
   readGql: GraphqlClient,
   writeGql: GraphqlClient,
   input: Omit<ExistingPhoto, 'id'>
 ) => {
-  const data = await readGql(listByS3KeyQuery, { s3key: input.s3key });
-  const existing = data.listPhotos?.items?.[0] as ExistingPhoto | undefined;
+  const existing = await findPhotoByS3Key(readGql, input.s3key);
 
   if (existing) {
     if (
@@ -158,19 +180,13 @@ export const processImage = async (file: string, writeGql: GraphqlClient, readGq
     if (!stats.isFile()) return undefined;
 
     const fileType = file.startsWith('DSC') ? 'digital' : 'film';
-    const s3Key = `public/${fileType}/${file}`;
+    const s3Key = `public/photos/${fileType}/${file}`;
 
     const dimensions = sizeOf(filePath);
     if (!dimensions || !dimensions.width || !dimensions.height) return undefined;
 
     const aspectRatio = (dimensions.width / dimensions.height).toFixed(3);
-    const buffer = await sharp(filePath)
-      .resize({ width: 480, height: Math.round(480 / parseFloat(aspectRatio)) })
-      .blur(0.75)
-      .toBuffer();
-
-    const base64 = buffer.toString('base64');
-    const dataUrl = `data:image/png;base64,${base64}`;
+    const dataUrl = await makeBlurDataUrl(filePath, aspectRatio);
 
     return upsertPhoto(readGql, writeGql, {
       s3key: s3Key,

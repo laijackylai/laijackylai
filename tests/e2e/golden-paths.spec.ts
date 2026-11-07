@@ -87,7 +87,7 @@ test.describe('golden paths', () => {
     const runtime = watchRuntimeIssues(page);
     await page.goto('/');
 
-    const drawer = page.locator('.transform.transition-transform.fixed.top-0.left-0.bottom-0.z-20.w-screen');
+    const drawer = page.getByTestId('mobile-drawer');
 
     await expect(drawer).toHaveClass(/-translate-x-full/);
     await page.getByRole('button', { name: 'Open navigation menu' }).click({ force: true });
