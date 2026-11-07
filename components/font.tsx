@@ -1,5 +1,5 @@
-import localFont from "@next/font/local";
-import { IBM_Plex_Sans, Michroma } from "@next/font/google";
+import localFont from "next/font/local";
+import { IBM_Plex_Sans, Michroma } from "next/font/google";
 
 const ocra = localFont({
   src: [

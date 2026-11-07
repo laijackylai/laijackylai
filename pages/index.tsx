@@ -11,7 +11,6 @@ import GDLogo from "../public/logos/g+d_logo.png"
 import GithubLogo from '../public/logos/github.png'
 import InstagramLogo from '../public/logos/instagram.png'
 import HorizontalDrawer from '../components/horizontalDrawer';
-import AnimatedText from '../components/animatedText';
 import RevealOnScroll from '../components/reviewOnScroll';
 
 interface JourneyItem {
@@ -121,7 +120,7 @@ const App: NextPage = () => {
 
     return (
         <div className="w-full">
-            <div className={`relative h-screen p-5 lg:p-16 pt-0 lg:pt-0 flex flex-col justify-between bg-white z-20`}>
+            <div className={`noise-bg relative h-screen p-5 lg:p-16 pt-0 lg:pt-0 flex flex-col justify-between bg-white z-20`}>
                 <div className='absolute right-5 top-20 z-10 flex flex-row gap-7 items-center lg:right-8 lg:top-6'>
                     <a href="https://linkedin.com/in/laijackylai" target='_blank' rel="noopener noreferrer">
                         <Image className="grayscale" alt={"linkedin_logo"} src={LinkedinLogo} height={25} width={25} />
@@ -246,7 +245,7 @@ const App: NextPage = () => {
                     </div>
                 </div>
             </div>
-            <div className='flex flex-col items-center gap-24 lg:py-24 lg:px-16 p-6'>
+            <div className='noise-bg flex flex-col items-center gap-24 lg:py-24 lg:px-16 p-6'>
                 <div className="font-display text-heading-1 uppercase tracking-display">My Journey</div>
                 {journeyItems.map((item, index) => (
                     <RevealOnScroll key={item.href}>

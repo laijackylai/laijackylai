@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import mockRouter from 'next-router-mock';
 import HorizontalDrawer from '../components/horizontalDrawer';
 
@@ -14,12 +14,13 @@ describe('HorizontalDrawer', () => {
 
     render(<HorizontalDrawer logoSize={25} width={32} />);
 
-    const links = screen.getAllByRole('link');
+    const nav = within(screen.getByTestId('desktop-nav'));
+    const links = nav.getAllByRole('link');
     expect(links).toHaveLength(5);
-    expect(screen.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
-    expect(screen.getByRole('link', { name: /photography/i })).toHaveAttribute('href', '/photography');
-    expect(screen.getByRole('link', { name: /music/i })).toHaveAttribute('href', '/music');
-    expect(screen.getByRole('link', { name: /gis/i })).toHaveAttribute('href', '/gis');
+    expect(nav.getByRole('link', { name: /projects/i })).toHaveAttribute('href', '/projects');
+    expect(nav.getByRole('link', { name: /photography/i })).toHaveAttribute('href', '/photography');
+    expect(nav.getByRole('link', { name: /music/i })).toHaveAttribute('href', '/music');
+    expect(nav.getByRole('link', { name: /gis/i })).toHaveAttribute('href', '/gis');
     expect(links[0].parentElement).toHaveStyle({ width: '32rem' });
   });
 
@@ -29,9 +30,10 @@ describe('HorizontalDrawer', () => {
 
     render(<HorizontalDrawer logoSize={25} width={32} />);
 
-    expect(screen.getByRole('link', { name: /projects/i })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: /projects/i })).not.toHaveClass('bg-sapphire-500');
-    expect(screen.getByRole('link', { name: /projects/i }).lastElementChild).toHaveClass('text-black');
+    const projectsLink = within(screen.getByTestId('desktop-nav')).getByRole('link', { name: /projects/i });
+    expect(projectsLink).toHaveAttribute('aria-current', 'page');
+    expect(projectsLink).not.toHaveClass('bg-sapphire-500');
+    expect(projectsLink.lastElementChild).toHaveClass('text-black');
   });
 
   it('opens and closes the mobile drawer', () => {
@@ -41,12 +43,14 @@ describe('HorizontalDrawer', () => {
 
     const menuButton = screen.getByRole('button', { name: 'Open navigation menu' });
     const overlay = screen.getByRole('button', { name: 'Close navigation menu' });
-    const drawer = overlay.parentElement?.parentElement as HTMLElement;
+    const drawer = screen.getByTestId('mobile-drawer');
 
-    expect(drawer.className).toContain('-translate-x-full');
+    expect(drawer).toHaveClass('-translate-x-full', 'invisible');
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(menuButton);
-    expect(drawer.className).toContain('translate-x-0');
+    expect(drawer).toHaveClass('translate-x-0', 'visible');
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true');
     fireEvent.click(overlay);
-    expect(drawer.className).toContain('-translate-x-full');
+    expect(drawer).toHaveClass('-translate-x-full', 'invisible');
   });
 });

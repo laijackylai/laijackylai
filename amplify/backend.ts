@@ -6,6 +6,11 @@ import { data } from './data/resource.js';
 import { storage } from './storage/resource.js';
 
 const backend = defineBackend({ auth, data, storage });
+
+// Authenticated users can write/delete photos, so only admins may create accounts.
+backend.auth.resources.cfnResources.cfnUserPool.adminCreateUserConfig = {
+  allowAdminCreateUserOnly: true,
+};
 const bucket = backend.storage.resources.bucket;
 const cfnBucket = bucket.node.defaultChild as CfnBucket;
 

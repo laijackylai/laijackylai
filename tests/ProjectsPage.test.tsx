@@ -65,13 +65,21 @@ describe('Projects page', () => {
     await expect(getStaticProps({} as any)).resolves.toEqual({
       props: {
         imageUrls: [
-          'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_1.png',
-          'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_2.png',
-          'https://laijackylai-storage-4ba35e5623621-main.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_3.png',
+          'https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_1.png',
+          'https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_2.png',
+          'https://amplify-d2ukbi00figpw1-ma-laijackylaistoragebucket-fy9zegnfclvc.s3.ap-southeast-1.amazonaws.com/public/takcarly/takcarly_3.png',
         ],
         base64: [null, null, null],
       },
+      revalidate: 3600,
     });
+  });
+
+  it('treats non-OK image responses as missing blur placeholders', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 403 });
+
+    const result: any = await getStaticProps({} as any);
+    expect(result.props.base64).toEqual([null, null, null]);
   });
 
   it('preserves public/ prefixes in public storage URLs', () => {

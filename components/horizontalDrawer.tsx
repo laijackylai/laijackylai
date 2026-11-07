@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import logo from '../assets/logo/logo_black.svg';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NavLinkBlob from './navLinkBlob';
 
 type Props = {
@@ -14,20 +14,7 @@ type Props = {
 const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMobile = true }) => {
 
   const router = useRouter();
-  const [isDesktop, setIsDesktop] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    return () => {
-      window.removeEventListener('resize', checkScreenSize);
-    };
-  }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -40,10 +27,12 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMob
   const navTextClass = 'font-mono text-body-sm uppercase tracking-nav';
   const mobileHeaderPosition = fixedMobile ? 'fixed top-0 left-0' : 'relative';
 
-  return isDesktop ?
-    (
+  // Both layouts render and CSS picks one at the md breakpoint, so SSR markup matches the client.
+  return (
+    <>
       <div
-        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] flex w-screen px-5 py-10 lg:px-16"
+        data-testid="desktop-nav"
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] hidden md:flex w-screen px-5 py-10 lg:px-16"
       >
         <div
           className="flex flex-row justify-between items-center gap-5 overflow-auto"
@@ -58,13 +47,16 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMob
           <NavLinkBlob href="/gis" label="GIS" />
         </div>
       </div>
-    )
-    :
-    (
-      <div className='flex items-center z-0'>
+      <div data-testid="mobile-nav" className='flex md:hidden items-center z-0'>
         <div className={`${mobileHeaderPosition} w-screen z-0`}>
           <div className='flex flex-row justify-between items-center bg-white p-5'>
-            <button type="button" aria-label="Open navigation menu" onClick={toggleDrawer} >
+            <button
+              type="button"
+              aria-label="Open navigation menu"
+              aria-expanded={drawerOpen}
+              aria-controls="mobile-drawer"
+              onClick={toggleDrawer}
+            >
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 6H20M4 12H14M4 18H9" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -76,9 +68,12 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMob
           <div className='h-5 bg-gradient-to-b from-white to-transparent'></div>
         </div>
 
+        {/* `invisible` keeps the closed drawer's links out of the tab order and the a11y tree. */}
         <div
-          className={`${drawerOpen ? 'translate-x-0' : '-translate-x-full'
-            } md:translate-x-0 transform transition-transform fixed top-0 left-0 bottom-0 z-20 w-screen`}
+          id="mobile-drawer"
+          data-testid="mobile-drawer"
+          className={`${drawerOpen ? 'translate-x-0 visible' : '-translate-x-full invisible'
+            } transform transition-[transform,visibility] fixed top-0 left-0 bottom-0 z-20 w-screen`}
         >
           <div className='flex flex-row fixed top-0 left-0 bottom-0 w-screen'>
             <div className='p-5 w-full bg-white flex flex-col gap-10'>
@@ -115,7 +110,8 @@ const HorizontalDrawer: React.FC<Props> = ({ logoSize = 25, width = 40, fixedMob
           </div>
         </div>
       </div>
-    )
+    </>
+  )
 }
 
 export default HorizontalDrawer;

@@ -17,7 +17,7 @@ describe('blur script image processing', () => {
     (sizeOf as jest.Mock).mockReturnValue({ width: 1200, height: 800 });
     (sharp as unknown as jest.Mock).mockReturnValue({
       resize: jest.fn().mockReturnThis(),
-      blur: jest.fn().mockReturnThis(),
+      png: jest.fn().mockReturnThis(),
       toBuffer: jest.fn().mockResolvedValue(Buffer.from('blur')),
     });
   });
@@ -38,7 +38,7 @@ describe('blur script image processing', () => {
     await expect(processImage('DSC001.jpg', gql as any)).resolves.toBe('created');
     expect(gql.mock.calls[1][1]).toEqual({
       input: {
-        s3key: 'public/digital/DSC001.jpg',
+        s3key: 'public/photos/digital/DSC001.jpg',
         type: 'digital',
         aspectRatio: '1.500',
         blurredBase64: 'data:image/png;base64,Ymx1cg==',
@@ -57,6 +57,28 @@ describe('blur script image processing', () => {
     expect(writeGql.mock.calls[0][0]).toContain('mutation CreatePhoto');
   });
 
+  it('follows nextToken when the matching row is not on the first page', async () => {
+    const gql = jest
+      .fn()
+      .mockResolvedValueOnce({ listPhotos: { items: [], nextToken: 'page-2' } })
+      .mockResolvedValueOnce({
+        listPhotos: {
+          items: [{
+            id: 'photo-1',
+            s3key: 'public/photos/digital/DSC001.jpg',
+            type: 'digital',
+            aspectRatio: '1.500',
+            blurredBase64: 'data:image/png;base64,Ymx1cg==',
+          }],
+          nextToken: null,
+        },
+      });
+
+    await expect(processImage('DSC001.jpg', gql as any)).resolves.toBe('unchanged');
+    expect(gql).toHaveBeenCalledTimes(2);
+    expect(gql.mock.calls[1][1]).toEqual({ s3key: 'public/photos/digital/DSC001.jpg', nextToken: 'page-2' });
+  });
+
   it('updates a changed existing photo', async () => {
     const gql = jest
       .fn()
@@ -64,7 +86,7 @@ describe('blur script image processing', () => {
         listPhotos: {
           items: [{
             id: 'photo-1',
-            s3key: 'public/film/film.jpg',
+            s3key: 'public/photos/film/film.jpg',
             type: 'film',
             aspectRatio: '1.000',
             blurredBase64: 'old',
@@ -77,7 +99,7 @@ describe('blur script image processing', () => {
     expect(gql.mock.calls[1][1]).toEqual({
       input: {
         id: 'photo-1',
-        s3key: 'public/film/film.jpg',
+        s3key: 'public/photos/film/film.jpg',
         type: 'film',
         aspectRatio: '1.500',
         blurredBase64: 'data:image/png;base64,Ymx1cg==',

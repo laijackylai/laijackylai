@@ -3,7 +3,7 @@ import { loadEnvConfig } from '@next/env';
 import {
   createApiKeyGraphqlClient,
   createSignedGraphqlClient,
-  listByS3KeyQuery,
+  findPhotoByS3Key,
   validateAwsCredentials,
 } from './blur';
 
@@ -40,8 +40,7 @@ const main = async () => {
     const s3key = rawKey.startsWith('public/') ? rawKey : `public/${rawKey}`;
 
     try {
-      const existing = await readGql(listByS3KeyQuery, { s3key });
-      if (existing.listPhotos?.items?.length) {
+      if (await findPhotoByS3Key(readGql, s3key)) {
         skipped += 1;
         continue;
       }

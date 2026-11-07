@@ -58,8 +58,8 @@ describe('Photography page', () => {
   it('renders one image per photo with metadata', () => {
     render(<Photography photosData={photosData as any} />);
 
-    expect(screen.getByAltText('photos/digital/photo-1.jpg')).toBeInTheDocument();
-    expect(screen.getByAltText('photos/film/photo-2.jpg')).toBeInTheDocument();
+    expect(screen.getByAltText('digital photograph photo-1.jpg')).toBeInTheDocument();
+    expect(screen.getByAltText('film photograph photo-2.jpg')).toBeInTheDocument();
     expect(screen.getByText('photo-1')).toBeInTheDocument();
     expect(screen.getByText('photo-2')).toBeInTheDocument();
   });
