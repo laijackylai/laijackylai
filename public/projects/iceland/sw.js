@@ -21,7 +21,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
 
   if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).then(r => { caches.open(SHELL).then(c => c.put('./index.html', r.clone())); return r; })
+    e.respondWith(fetch(req).then(r => { if (r.ok) { const cp = r.clone(); caches.open(SHELL).then(c => c.put('./index.html', cp)); } return r; })
       .catch(() => caches.match('./index.html')));
     return;
   }
