@@ -20,6 +20,15 @@ const shuffle = (photos: PhotoData[]) => {
   return out;
 };
 
+// Shuffled once per page load, then kept: back/forward must find the same photo where the scroll position left it
+let visitOrder: string[] = []
+export const resetVisitOrder = () => { visitOrder = [] } // tests: a fresh page load
+const visitShuffle = (photos: PhotoData[]) => {
+  const byId = new Map(photos.map(p => [p.id, p]))
+  if (visitOrder.length !== photos.length || !visitOrder.every(id => byId.has(id))) visitOrder = shuffle(photos).map(p => p.id)
+  return visitOrder.map(id => byId.get(id)!)
+}
+
 const FILTERS = ['all', 'film', 'digital'] as const
 type Filter = typeof FILTERS[number]
 
@@ -29,7 +38,7 @@ const pad = (n: number) => String(n).padStart(2, '0')
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const Photography: NextPage<Props> = ({ photosData }) => {
-  const [photos, setPhotos] = useState(photosData)
+  const [photos, setPhotos] = useState(() => (visitOrder.length ? visitShuffle(photosData) : photosData)) // first load: server order, so hydration matches
   const [filter, setFilter] = useState<Filter>('all')
   const [open, setOpen] = useState<number | null>(null)
   const [docked, setDocked] = useState(false)
@@ -44,7 +53,7 @@ const Photography: NextPage<Props> = ({ photosData }) => {
   const shown = filter === 'all' ? photos : photos.filter(p => p.type === filter)
   const count = (f: Filter) => (f === 'all' ? photos.length : photos.filter(p => p.type === f).length)
 
-  useEffect(() => { setPhotos(shuffle(photosData)) }, [photosData])
+  useEffect(() => { setPhotos(visitShuffle(photosData)) }, [photosData])
 
   // re-index the section pager after every list change, and jump to the first frame after a filter click
   useEffect(() => {

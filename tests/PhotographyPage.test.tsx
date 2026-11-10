@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import Photography from '../pages/photography';
+import Photography, { resetVisitOrder } from '../pages/photography';
 
 const photosData = [
   { id: 'photo-1', s3key: 'photos/digital/photo-1.jpg', type: 'digital', aspectRatio: '1.500', blurredBase64: 'data:image/png;base64,abc', createdAt: '2026-04-29', url: 'https://example.com/photo-1.jpg' },
@@ -9,6 +9,7 @@ const photosData = [
 
 describe('Photography page', () => {
   beforeEach(() => {
+    resetVisitOrder();
     Element.prototype.scrollIntoView = jest.fn();
   });
 
@@ -42,6 +43,17 @@ describe('Photography page', () => {
       'Open film photograph photo-3.jpg',
       'Open digital photograph photo-1.jpg',
     ]);
+  });
+
+  it('keeps the shuffled order when revisited in the same page load (back/forward)', () => {
+    const labels = () => screen.getAllByRole('button', { name: /^open /i }).map((b) => b.getAttribute('aria-label'));
+    const first = render(<Photography photosData={photosData as any} />);
+    const order = labels();
+    first.unmount();
+
+    render(<Photography photosData={photosData.map((p) => ({ ...p })) as any} />);
+
+    expect(labels()).toEqual(order);
   });
 
   it('filters by format with counts', () => {
