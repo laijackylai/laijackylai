@@ -1,0 +1,104 @@
+[
+ {
+  "id": "tv-launch",
+  "file": "tv-launch.mp4",
+  "kind": "tv",
+  "t": -15.0,
+  "dur": 60.0,
+  "title": "Lift-off",
+  "caption": "NASA launch-control television: the pad cameras with the count clock, then the long-range trackers",
+  "credit": "NASA/KSC, \"Apollo 11 Pre-Launch and Launch\" (B_1372)",
+  "timing": "soundtrack matched to the mission recordings (rms 9 ms)"
+ },
+ {
+  "id": "film-dock",
+  "file": "film-dock.mp4",
+  "kind": "film",
+  "t": 12222.2,
+  "dur": 45.5,
+  "title": "Docking with Eagle",
+  "caption": "16-mm film through Columbia's window (shot into a mirror; flipped back): Eagle's top closes in, capture, the probe retracts",
+  "credit": "NASA 16-mm magazine 1116-A (Apollo Flight Journal scan)",
+  "fps": 12,
+  "timing": "capture (LVFEA 12,243.7 s; the scan jolts at 100.92 s); 12 frames/s: the probe draws the two craft together over 9 s of the film at that speed (Mission Report: 6–8 s; at 6 frames/s it would be 18 s), and magazine A's 3,386 frames last the 4 min 41 s of the journal's real-time edition"
+ },
+ {
+  "id": "film-undock",
+  "file": "film-undock.mp4",
+  "kind": "film",
+  "t": 360719.0,
+  "dur": 77.0,
+  "title": "Eagle undocks",
+  "caption": "16-mm film from Columbia: Eagle backs away and turns so Collins can check its legs",
+  "credit": "NASA 16-mm magazine 1121-C (Apollo Flight Journal scan)",
+  "fps": 12,
+  "timing": "undocking (Mission Report 100:12:00; first movement in the scan at frame 1,442); 12 frames/s: magazine C's 5,612 frames last the 7 min 46 s of the journal's real-time edition"
+ },
+ {
+  "id": "film-landing",
+  "file": "film-landing.mp4",
+  "kind": "film",
+  "t": 369700.0,
+  "dur": 258.0,
+  "title": "Landing",
+  "caption": "16-mm film out of Aldrin's window: the boulder field, West crater, the dust and the shadow at touchdown",
+  "credit": "NASA 16-mm magazine 1080-I (Apollo Flight Journal scan)",
+  "fps": 6,
+  "timing": "contact (contact light 102:45:39.9; Eagle's shadow fills the frame at frame 6,024.5); 6 frames/s, as the flight plan set it for the descent; the film then starts at 102:31:07, against the camera's recorded start at 102:31:04"
+ },
+ {
+  "id": "tv-step",
+  "file": "tv-step.mp4",
+  "kind": "tv",
+  "t": 393750.0,
+  "dur": 180.0,
+  "title": "One small step",
+  "caption": "Live television from the camera on the equipment bay, as received at Goldstone, Honeysuckle Creek and Parkes",
+  "credit": "NASA, \"Apollo 11 Restored Moonwalk\" (2009 restoration)",
+  "timing": "soundtrack matched to the mission recordings (rms 45 ms)"
+ },
+ {
+  "id": "tv-aldrin",
+  "file": "tv-aldrin.mp4",
+  "kind": "tv",
+  "t": 394880.0,
+  "dur": 170.0,
+  "title": "Aldrin steps out",
+  "caption": "Live television: Aldrin backs down the ladder, \"Magnificent desolation\"",
+  "credit": "NASA, \"Apollo 11 Restored Moonwalk\" (2009 restoration)",
+  "timing": "soundtrack matched to the mission recordings (rms 4 ms)"
+ },
+ {
+  "id": "tv-plaque",
+  "file": "tv-plaque.mp4",
+  "kind": "tv",
+  "t": 395530.0,
+  "dur": 90.0,
+  "title": "The plaque",
+  "caption": "Live television: Armstrong reads the plaque on the front leg",
+  "credit": "NASA, \"Apollo 11 Restored Moonwalk\" (2009 restoration)",
+  "timing": "soundtrack matched to the mission recordings (rms 4 ms)"
+ },
+ {
+  "id": "tv-flag",
+  "file": "tv-flag.mp4",
+  "kind": "tv",
+  "t": 396480.0,
+  "dur": 150.0,
+  "title": "The flag",
+  "caption": "Live television from the camera on its tripod, 18 m north-west of Eagle",
+  "credit": "NASA, \"Apollo 11 Restored Moonwalk\" (2009 restoration)",
+  "timing": "soundtrack matched to the mission recordings (rms 9 ms)"
+ },
+ {
+  "id": "tv-nixon",
+  "file": "tv-nixon.mp4",
+  "kind": "tv",
+  "t": 396960.0,
+  "dur": 145.0,
+  "title": "The President's call",
+  "caption": "Live television: Armstrong and Aldrin by the flag take the call from the White House",
+  "credit": "NASA, \"Apollo 11 Restored Moonwalk\" (2009 restoration)",
+  "timing": "soundtrack matched to the mission recordings (rms 5 ms)"
+ }
+]

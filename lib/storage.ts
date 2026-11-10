@@ -65,10 +65,9 @@ export const fetchPhotos = async (route: string): Promise<PhotoData[]> => {
       },
       body: JSON.stringify({ query: listPhotosQuery, variables: { nextToken } }),
     });
+    if (res.ok === false) throw new Error(JSON.stringify({ status: res.status }));
     const json = await res.json();
-    if (res.ok === false || json.errors) {
-      throw new Error(JSON.stringify(json.errors ?? { status: res.status }));
-    }
+    if (json.errors) throw new Error(JSON.stringify(json.errors));
     photos.push(...(json.data?.listPhotos?.items ?? []));
     nextToken = json.data?.listPhotos?.nextToken ?? null;
   } while (nextToken);

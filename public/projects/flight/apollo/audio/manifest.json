@@ -1,0 +1,232 @@
+[
+ {
+  "id": "launch-count",
+  "file": "launch-count.mp3",
+  "t": -98.33,
+  "dur": 81.92,
+  "label": "Final count (launch control commentary)",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_t-0000135.mp3",
+  "fileStart": -98.33,
+  "rate": 1.0
+ },
+ {
+  "id": "launch-1",
+  "file": "launch-1.mp3",
+  "t": -16.41,
+  "dur": 185.35,
+  "label": "Ignition, lift-off and first stage (launch control, air-to-ground)",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0000000.mp3",
+  "fileStart": -16.41,
+  "rate": 1.0
+ },
+ {
+  "id": "launch-2",
+  "file": "launch-2.mp3",
+  "t": 172.14,
+  "dur": 399.48,
+  "label": "Ascent, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0000255.mp3",
+  "fileStart": 172.14,
+  "rate": 1.00325
+ },
+ {
+  "id": "launch-3",
+  "file": "launch-3.mp3",
+  "t": 578.62,
+  "dur": 345.35,
+  "label": "Orbit insertion, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0001001.mp3",
+  "fileStart": 578.62,
+  "rate": 1.0
+ },
+ {
+  "id": "tli",
+  "file": "tli.mp3",
+  "t": 9790.58,
+  "dur": 475.15,
+  "label": "Translunar injection, onboard recorder",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0024318ob.mp3",
+  "fileStart": 9790.58,
+  "rate": 1.0
+ },
+ {
+  "id": "landing",
+  "file": "landing.mp3",
+  "t": 369074.39,
+  "dur": 991.59,
+  "label": "Powered descent and landing, air-to-ground",
+  "source": "https://apollojournals.org/alsj/a11/a11a1023114-4746.mp3",
+  "fileStart": 369074.39,
+  "rate": 1.00259
+ },
+ {
+  "id": "step",
+  "file": "step.mp3",
+  "t": 393345.18,
+  "dur": 3399.5,
+  "label": "Egress, first steps and the flag, air-to-ground",
+  "source": "https://apollojournals.org/alsj/a11/a11a1091545-1101226.mp3",
+  "fileStart": 393345.18,
+  "rate": 1.00028
+ },
+ {
+  "id": "liftoff",
+  "file": "liftoff.mp3",
+  "t": 447300.0,
+  "dur": 972.0,
+  "label": "Lift-off from the Moon, air-to-ground",
+  "source": "https://apollojournals.org/alsj/a11/a11a1234747-1243113.mp3",
+  "fileStart": 445671.88,
+  "rate": 1.00158
+ },
+ {
+  "id": "tei",
+  "file": "tei.mp3",
+  "t": 487987.82,
+  "dur": 407.73,
+  "label": "After transearth injection, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_1353310.mp3",
+  "fileStart": 487987.82,
+  "rate": 1.0
+ },
+ {
+  "id": "splash",
+  "file": "splash.mp3",
+  "t": 702899.88,
+  "dur": 1000.0,
+  "label": "Splashdown and recovery, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_1951503.mp3",
+  "fileStart": 702899.88,
+  "rate": 1.0
+ },
+ {
+  "id": "tli-go",
+  "file": "tli-go.mp3",
+  "t": 8700.69,
+  "dur": 108.71,
+  "label": "Go for TLI, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0022500.mp3",
+  "fileStart": 8700.69,
+  "rate": 1.0
+ },
+ {
+  "id": "docking",
+  "file": "docking.mp3",
+  "t": 12113.28,
+  "dur": 383.52,
+  "label": "Transposition and docking, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0032207.mp3",
+  "fileStart": 12113.28,
+  "rate": 1.0
+ },
+ {
+  "id": "ptc",
+  "file": "ptc.mp3",
+  "t": 39448.14,
+  "dur": 151.86,
+  "label": "Passive thermal control started, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0105732.mp3",
+  "fileStart": 39448.14,
+  "rate": 1.0
+ },
+ {
+  "id": "loi-go",
+  "file": "loi-go.mp3",
+  "t": 271581.3,
+  "dur": 339.8,
+  "label": "Go for lunar orbit insertion, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0752600.mp3",
+  "fileStart": 271581.3,
+  "rate": 1.0
+ },
+ {
+  "id": "loi-pass",
+  "file": "loi-pass.mp3",
+  "t": 274820.0,
+  "dur": 169.3,
+  "label": "After lunar orbit insertion, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0761400.mp3",
+  "fileStart": 274431.74,
+  "rate": 1.0
+ },
+ {
+  "id": "undock-go",
+  "file": "undock-go.mp3",
+  "t": 357780.0,
+  "dur": 220.0,
+  "label": "Go for undocking, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_0991527.mp3",
+  "fileStart": 357324.59,
+  "rate": 1.00347
+ },
+ {
+  "id": "undock",
+  "file": "undock.mp3",
+  "t": 360857.1,
+  "dur": 790.8,
+  "label": "Undocking and the gear inspection, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_1001400.mp3",
+  "fileStart": 360857.1,
+  "rate": 1.0
+ },
+ {
+  "id": "separation",
+  "file": "separation.mp3",
+  "t": 361990.0,
+  "dur": 530.0,
+  "label": "Separation, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_1002902.mp3",
+  "fileStart": 361738.02,
+  "rate": 1.005
+ },
+ {
+  "id": "pdi-go",
+  "file": "pdi-go.mp3",
+  "t": 368700.0,
+  "dur": 374.39,
+  "label": "Go for powered descent, air-to-ground",
+  "source": "https://apollojournals.org/alsj/a11/a11a1021133-3114.mp3",
+  "fileStart": 367890.24,
+  "rate": 1.00302
+ },
+ {
+  "id": "yawed",
+  "file": "yawed.mp3",
+  "t": 412425.0,
+  "dur": 175.0,
+  "label": "Eagle's attitude on the surface, air-to-ground",
+  "source": "https://apollojournals.org/alsj/a11/a11a1134623-1145426.mp3",
+  "fileStart": 410473.87,
+  "rate": 1.0029
+ },
+ {
+  "id": "rendezvous",
+  "file": "rendezvous.mp3",
+  "t": 460216.56,
+  "dur": 446.84,
+  "label": "Station keeping, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_1275000.mp3",
+  "fileStart": 460216.56,
+  "rate": 1.0
+ },
+ {
+  "id": "dock2",
+  "file": "dock2.mp3",
+  "t": 460846.52,
+  "dur": 278.88,
+  "label": "Docking in lunar orbit, air-to-ground",
+  "source": "https://apollojournals.org/afj/ap11fj/audio/a11_1280050.mp3",
+  "fileStart": 460846.52,
+  "rate": 1.0
+ },
+ {
+  "id": "eva2",
+  "file": "eva2.mp3",
+  "t": 396744.68,
+  "dur": 695.32,
+  "label": "The President's call and the samples, air-to-ground",
+  "source": "https://apollojournals.org/alsj/a11/a11a1101216-1105300.mp3",
+  "fileStart": 396736.92,
+  "rate": 1.0
+ }
+]

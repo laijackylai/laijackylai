@@ -31,7 +31,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0')
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter()
   const path = router?.pathname ?? '/'
-  const cur = Math.max(0, PAGES.findIndex(([, , href]) => href === path))
+  const cur = Math.max(0, PAGES.findIndex(([, , href]) => href === path || path.startsWith(`${href}/`)))
   const [page, label] = PAGES[cur]
   const current = (i: number) => (i === cur ? 'page' as const : undefined)
 
