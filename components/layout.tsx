@@ -35,10 +35,12 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [page, label] = PAGES[cur]
   const current = (i: number) => (i === cur ? 'page' as const : undefined)
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('snap-page', SNAP_PAGES.includes(path))
-    return initSite({ page, push: (href: string) => router.push(href) })
-  }, [page, path, router])
+  // Set during render, not in an effect: Next restores scroll / jumps to #hash in a layout effect that runs
+  // before ours, and must see the new page's snap layout (else back lands mid-panel or at the bottom).
+  if (typeof document !== 'undefined') document.documentElement.classList.toggle('snap-page', SNAP_PAGES.includes(path))
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- path: rebuild the pager when the page changes within a section
+  useEffect(() => initSite({ page, push: (href: string) => router.push(href) }), [page, path, router])
 
   return (
     <>
