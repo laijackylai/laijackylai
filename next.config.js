@@ -2,6 +2,7 @@
 const nextConfig = {
     reactStrictMode: true,
     output: 'standalone',
+    experimental: { scrollRestoration: true }, // back/forward return to the previous scroll position
     // Static Vite builds in public/projects/<id>. Point at index.html: Next serves no directory
     // index, and the Iceland page must sit inside its service worker's /projects/iceland/ scope.
     async redirects() {
