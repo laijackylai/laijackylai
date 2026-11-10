@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Projects, { getStaticProps } from '../pages/projects';
+import CaseStudy, { getStaticPaths } from '../pages/projects/[id]';
 import { publicStorageUrl } from '../lib/storage';
 
 jest.mock('plaiceholder', () => ({
@@ -88,6 +89,21 @@ describe('Projects page', () => {
     expect(publicStorageUrl('public/takcarly/takcarly_1.png')).toBe(
       'https://example.s3.amazonaws.com/public/takcarly/takcarly_1.png'
     );
+  });
+
+  it('links projects with a case study to their page', async () => {
+    render(<Projects imageUrls={[]} base64={[]} />);
+    expect(screen.getAllByRole('link', { name: /read case study/i }).map(a => a.getAttribute('href'))).toEqual(['/projects/rbrmesh', '/projects/pitchpose']);
+    await expect(getStaticPaths({} as any)).resolves.toEqual({ paths: [{ params: { id: 'rbrmesh' } }, { params: { id: 'pitchpose' } }], fallback: false });
+  });
+
+  it('renders the rbrmesh case study with pipeline and compare slider', () => {
+    render(<CaseStudy id="rbrmesh" />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('rbrmesh');
+    expect(screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent)).toContain('Camera poses');
+    expect(screen.getByRole('slider', { name: /geometry mask/i })).toHaveValue('50');
+    expect(document.querySelectorAll('svg.diagram[role="img"][aria-label]')).toHaveLength(4);
+    expect(screen.getByRole('table')).toHaveTextContent('road_mesh.ply');
   });
 
 });

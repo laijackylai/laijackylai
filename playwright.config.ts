@@ -10,12 +10,13 @@ export default defineConfig({
   },
   reporter: [['list']],
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    // own port: reuseExistingServer must never pick up `npm run dev` on :3000 (shares .next, flaky)
+    baseURL: 'http://127.0.0.1:3100',
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run build && npm run start -- --hostname 127.0.0.1 --port 3000',
-    url: 'http://127.0.0.1:3000',
+    command: 'npm run build && npm run start -- --hostname 127.0.0.1 --port 3100',
+    url: 'http://127.0.0.1:3100',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

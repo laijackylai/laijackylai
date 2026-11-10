@@ -2,6 +2,11 @@
 const nextConfig = {
     reactStrictMode: true,
     output: 'standalone',
+    // Static Vite builds in public/projects/<id>. Point at index.html: Next serves no directory
+    // index, and the Iceland page must sit inside its service worker's /projects/iceland/ scope.
+    async redirects() {
+        return ['iceland', 'flight'].map(id => ({ source: `/projects/${id}`, destination: `/projects/${id}/index.html`, permanent: false }))
+    },
     eslint: {
         ignoreDuringBuilds: false,
     },

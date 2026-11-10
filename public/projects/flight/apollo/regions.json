@@ -1,0 +1,64 @@
+{
+ "tranq": {
+  "bbox": [
+   13.0,
+   -7.0,
+   45.0,
+   9.0
+  ],
+  "size": [
+   3240,
+   1620
+  ],
+  "heightSize": [
+   1080,
+   540
+  ],
+  "heightOffset": 10000.0,
+  "heightScale": 1.0,
+  "gain": 0.7683595967933442
+ },
+ "site": {
+  "bbox": [
+   23.37230873825436,
+   0.6045176322402982,
+   23.511562582896744,
+   0.7437502678476594
+  ],
+  "heightSize": [
+   2111,
+   2111
+  ],
+  "heightScale": 10.0,
+  "heightOffset": 32768.0,
+  "orthoSize": [
+   4220,
+   4222
+  ],
+  "surfaceElevation": -1927.6000000000931,
+  "metresPerPixel": 2.0,
+  "source": "LROC NAC_DTM_APOLLO11 v1.9 (2 m), orthophoto M150361817 (0.5 m \u2192 1 m)",
+  "gain": 0.148403793287337
+ },
+ "moonRadius": 1737400.0,
+ "ksc": [
+  {
+   "name": "ksc_outer",
+   "bbox": [
+    -81.25,
+    27.95,
+    -80.15,
+    29.05
+   ]
+  },
+  {
+   "name": "ksc_inner",
+   "bbox": [
+    -80.6841,
+    28.5485,
+    -80.5241,
+    28.6685
+   ]
+  }
+ ]
+}
